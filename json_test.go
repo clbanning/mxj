@@ -75,67 +75,26 @@ func TestJson(t *testing.T) {
 
 	fmt.Println("Json, jdata:", string(jdata))
 	fmt.Println("Json, j    :", string(j))
+
+	j, _ = m.Json(true)
+	fmt.Println("Json, j safe:", string(j))
 }
 
 func TestJsonWriter(t *testing.T) {
-	mv := Map( map[string]interface{}{ "this":"is a", "float":3.14159, "and":"a", "bool":true } )
+	mv := Map(map[string]interface{}{"this": "is a", "float": 3.14159, "and": "a", "bool": true})
 
 	w := new(bytes.Buffer)
 	raw, err := mv.JsonWriterRaw(w)
 	if err != nil {
-		t.Fatal("err:",err.Error())
+		t.Fatal("err:", err.Error())
 	}
 
-	b := make([]byte,w.Len())
+	b := make([]byte, w.Len())
 	_, err = w.Read(b)
 	if err != nil {
-		t.Fatal("err:",err.Error())
+		t.Fatal("err:", err.Error())
 	}
 
 	fmt.Println("JsonWriter, raw:", string(*raw))
 	fmt.Println("JsonWriter, b  :", string(b))
 }
-
-// --------------------------  JSON Handler test cases -------------------------
-
-/* tested in bulk_test.go ...
-var jhdata = []byte(`{ "string":"this is it", "number":4, "boolean":true },
-	{ "some":"thing", "that":[ "is", "more", "complex", { "like":"this", "value":"here" } ] },
-	{ "this":"has", "an":error }`)
-
-func TestHandleJsonReader(t *testing.T) {
-	fmt.Println("HandleJsonReader:", string(jhdata))
-
-	rdr := bytes.NewReader(jhdata)
-	err := HandleJsonReader(rdr, jmhandler, jehandler)
-	if err != nil {
-		t.Fatal("err:", err.Error())
-	}
-}
-
-var jt *testing.T
-
-func jmhandler(m Map, raw *[]byte) bool {
-	j, jerr := m.Json()
-	if jerr != nil {
-		jt.Fatal("... jmhandler:", jerr.Error())
-		return false
-	}
-
-	fmt.Println("... jmhandler, raw:", string(*raw))
-	fmt.Println("... jmhandler, j  :", string(j))
-	return true
-}
-
-func jehandler(err error, raw *[]byte) bool {
-	if err == nil {
-		// shouldn't be here
-		jt.Fatal("... jehandler: <nil>")
-		return false
-	}
-
-	fmt.Println("... jehandler, err:", err.Error())
-	fmt.Println("... jehandler: raw", string(*raw))
-	return true
-}
-*/

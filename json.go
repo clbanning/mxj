@@ -12,31 +12,33 @@ import (
 // ------------------------------ write JSON -----------------------
 
 // Just a wrapper on json.Marshal.
-// If option unsafeEncoding is'true' then safe encoding of '<' and '>'
-// is rolled back (see encoding/json#Marshal).
-func (mv Map) Json(unsafeEncoding ...bool) ([]byte, error) {
+// If option safeEncoding is'true' then safe encoding of '<' and '>'
+// is preserved. (see encoding/json#Marshal)
+func (mv Map) Json(safeEncoding ...bool) ([]byte, error) {
+	var s bool
+	if len(safeEncoding) == 1 {
+		s = safeEncoding[0]
+	}
+
 	b, err := json.Marshal(mv)
-	if len(unsafeEncoding) == 1 && unsafeEncoding[0] {
+	if !s {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
 		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
 	}
 	return b, err
 }
 
-func (mv Map) JsonErr(callErr ...error) ([]byte, error) {
-	if  len(callErr) == 1 {
-		return nil, callErr[0]
-	}
-	b, err := json.Marshal(mv)
-	return b, err
-}
-
 // Just a wrapper on json.MarshalIndent.
-// If option unsafeEncoding is'true' then safe encoding of '<' and '>'
-// is rolled back (see encoding/json#Marshal).
-func (mv Map) JsonIndent(prefix, indent string, unsafeEncoding ...bool) ([]byte, error) {
+// If option safeEncoding is'true' then safe encoding of '<' and '>'
+// is preserved. (see encoding/json#Marshal)
+func (mv Map) JsonIndent(prefix, indent string, safeEncoding ...bool) ([]byte, error) {
+	var s bool
+	if len(safeEncoding) == 1 {
+		s = safeEncoding[0]
+	}
+
 	b, err := json.MarshalIndent(mv, prefix, indent)
-	if len(unsafeEncoding) == 1 && unsafeEncoding[0] {
+	if !s {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
 		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
 	}
@@ -47,9 +49,9 @@ func (mv Map) JsonIndent(prefix, indent string, unsafeEncoding ...bool) ([]byte,
 // The names will also provide a key for the number of return arguments.
 
 // Writes the Map as JSON on the Writer. 
-// Rolls back "safe" encoding of '<' and '>' - use with caution.
-func (mv Map) JsonWriter(jsonWriter io.Writer) error {
-	b, err := mv.Json()
+// If 'safeEncoding' is 'true', then "safe" encoding of '<' and '>' is preserved.
+func (mv Map) JsonWriter(jsonWriter io.Writer, safeEncoding ...bool) error {
+	b, err := mv.Json(safeEncoding...)
 	if err != nil {
 		return err
 	}
@@ -59,9 +61,9 @@ func (mv Map) JsonWriter(jsonWriter io.Writer) error {
 }
 
 // Writes the Map as JSON on the Writer. *[]byte is the raw JSON that was written.
-// Rolls back "safe" encoding of '<' and '>' - use with caution.
-func (mv Map) JsonWriterRaw(jsonWriter io.Writer) (*[]byte, error) {
-	b, err := mv.Json()
+// If 'safeEncoding' is 'true', then "safe" encoding of '<' and '>' is preserved.
+func (mv Map) JsonWriterRaw(jsonWriter io.Writer, safeEncoding ...bool) (*[]byte, error) {
+	b, err := mv.Json(safeEncoding...)
 	if err != nil {
 		return &b, err
 	}
