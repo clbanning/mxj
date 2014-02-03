@@ -1,0 +1,45 @@
+// mxj - A collection of map[string]interface{} and associated XML and JSON utilities.
+// Copyright 2012-2014 Charles Banning. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file
+
+/*
+Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract values from maps by key or key-path, including wildcards.
+
+	type Map map[string]interface{}
+
+	Create a Map value, 'm', from any map[string]interface{} value, 'v':
+		m := Map(v)
+
+	Unmarshal / marshal XML as a Map value, 'm':
+		m, err := NewMapXml(xmlValue) // unmarshal
+		xmlValue, err := m.Xml()      // marshal
+
+	Unmarshal XML from an io.Reader as a Map value, 'm':
+		m, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
+		m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' points to the raw XML that was decoded
+
+	Marshal Map value, 'm', to an XML Writer (io.Writer):
+		err := m.XmlWriter(xmlWriter)
+		err, raw := m.XmlWriterRaw(xmlWriter) // 'raw' points to the raw XML that was written on xmlWriter
+
+	Bulk process XML with error handling (note: handlers must return a boolean value):
+		err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))
+		err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, *[]byte), errHandler(error, *[]byte))
+
+	Converting XML to JSON: see Examples for NewMapXml and HandleXmlReader.
+
+	There are comparable functions and methods for JSON processing.
+
+	Arbitrary structure values can be decoded to / encoded from Map values:
+		m, err := NewMapStruct(structVal)
+		err := m.Struct(structPointer)
+
+	To work with XML tag values, JSON or Map key values or structure field values, decode the XML, JSON
+	or structure to a Map value, 'm', or cast a map[string]interface{} value to a Map value, 'm', then:
+		paths := m.PathsForKey(key)
+		path := m.PathForKeyShortest(key)
+		values, err := m.ValuesForKey(key)
+		values, err := m.ValuesForPath(path)
+*/
+package mxj
