@@ -6,6 +6,11 @@
 /*
 Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract values from maps by key or key-path, including wildcards.
 
+mxj supplants the legacy x2j and j2x packages. If you want the old syntax, just uncomment the content of x2j.go
+or j2x.go, which are included as part of this package.
+
+SUMMARY
+
 	type Map map[string]interface{}
 
 	Create a Map value, 'm', from any map[string]interface{} value, 'v':
@@ -41,5 +46,14 @@ Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extrac
 		path := m.PathForKeyShortest(key)
 		values, err := m.ValuesForKey(key)
 		values, err := m.ValuesForPath(path)
+
+XML PARSING CONVENTIONS
+
+   - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
+     to the attribute label.
+   - If the element is a simple element and has attributes, the element value
+     is given the key '#text' for its map[string]interface{} representation.  (See
+     the 'atomFeedString.xml' test data, below.)
+
 */
 package mxj
