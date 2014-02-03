@@ -8,40 +8,40 @@ package mxj
 import "io"
 
 // FromXml() --> ToJson().
-func XmlToJson(xmlVal []byte) ([]byte, error) {
+func XmlToJson(xmlVal []byte, safeEncoding ...bool) ([]byte, error) {
 	m, merr := NewMapXml(xmlVal)
 	if merr != nil {
 		return nil, merr
 	}
-	return m.Json()
+	return m.Json(safeEncoding...)
 }
 
 // FromXml() --> ToJsonWriter().
-func XmlToJsonWriter(xmlVal []byte, jsonWriter io.Writer) (*[]byte, error) {
+func XmlToJsonWriter(xmlVal []byte, jsonWriter io.Writer, safeEncoding ...bool) (*[]byte, error) {
 	m, merr := NewMapXml(xmlVal)
 	if merr != nil {
 		return nil, merr
 	}
-	return m.JsonWriter(jsonWriter)
+	return m.JsonWriter(jsonWriter, safeEncoding...)
 }
 
 // FromXmlReader() --> ToJson().
-func XmlReaderToJson(xmlReader io.Reader) ([]byte, *[]byte, error) {
+func XmlReaderToJson(xmlReader io.Reader, safeEncoding ...bool) ([]byte, *[]byte, error) {
 	m, raw, merr := NewMapXmlReader(xmlReader)
 	if merr != nil {
 		return nil, raw, merr
 	}
-	j, jerr := m.Json()
+	j, jerr := m.Json(safeEncoding...)
 	return j, raw, jerr
 }
 
 // FromXmlReader() --> ToJsonWriter().  Handy for bulk transformation of documents.
-func XmlReaderToJsonWriter(xmlReader io.Reader, jsonWriter io.Writer) (*[]byte, *[]byte, error) {
+func XmlReaderToJsonWriter(xmlReader io.Reader, jsonWriter io.Writer, safeEncoding ...bool) (*[]byte, *[]byte, error) {
 	m, xraw, merr := NewMapXmlReader(xmlReader)
 	if merr != nil {
 		return xraw, nil, merr
 	}
-	jraw, jerr := m.JsonWriter(jsonWriter)
+	jraw, jerr := m.JsonWriter(jsonWriter, safeEncoding...)
 	return xraw, jraw, jerr
 }
 */
