@@ -28,7 +28,7 @@ SUMMARY
 		err := m.XmlWriter(xmlWriter)
 		err, raw := m.XmlWriterRaw(xmlWriter) // 'raw' points to the raw XML that was written on xmlWriter
 
-	Bulk process XML with error handling (note: handlers must return a boolean value):
+	Bulk process XML with error handling:
 		err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))
 		err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, *[]byte), errHandler(error, *[]byte))
 
