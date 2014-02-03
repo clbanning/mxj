@@ -14,14 +14,13 @@ import (
 
 // ----------------------------- get everything FOR a single key -------------------------
 
-// ValuesForKey - return all values in Map, 'mv', associated with 'key'
+// Return all values in Map, 'mv', associated with a 'key'. If len(returned_values) == 0, then no match.
+// On error, the returned array is 'nil'.
 //   'subkeys' (optional) are "key:val" strings representing attributes or elements in a list.
 //		         By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //		         For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
 //		         If the 'key' refers to a list, then "key:value" could select a list member of the list.
 //             The subkey can be wildcarded - "key:*" - to require that it's there with some value.
-//          If a node is '*', then everything beyond is walked.
-//		Returns nil if the 'key' does not occur in the map. Error can occur when parsing subkeys values.
 func (mv Map) ValuesForKey(key string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
@@ -34,12 +33,8 @@ func (mv Map) ValuesForKey(key string, subkeys ...string) ([]interface{}, error)
 	}
 
 	ret := make([]interface{}, 0)
-
 	hasKey(m, key, &ret, subKeyMap)
-	if len(ret) > 0 {
-		return ret, nil
-	}
-	return nil, nil
+	return ret, nil
 }
 
 // hasKey - if the map 'key' exists append it to array
@@ -80,15 +75,14 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 
 // -----------------------  get everything for a node in the Map ---------------------------
 
-// ValuesForPath - deliver all values for a path node from the Map.
-// If there are no values for the path 'nil' is returned.
-//   'path' is a dot-separated path of key values
+// Retrieve all values for a path from the Map.  If len(returned_values) == 0, then no match.
+// On error, the returned array is 'nil'.
+//   'path' is a dot-separated path of key values. If a node in the path is '*', then everything beyond is walked.
 //   'subkeys' (optional) are "key:val" strings representing attributes or elements in a list.
 //		         By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //		         For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
 //		         If the 'path' refers to a list, then "tag:value" would select a list member of the list.
 //             The subkey can be wildcarded - "key:*" - to require that it's there with some value.
-//          If a node is '*', then everything beyond is walked.
 func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
@@ -103,9 +97,6 @@ func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, erro
 	keys := strings.Split(path, ".")
 	ret := make([]interface{}, 0)
 	valuesForKeyPath(&ret, m, keys, subKeyMap)
-	if len(ret) == 0 {
-		return nil, nil
-	}
 	return ret, nil
 }
 
