@@ -82,9 +82,10 @@ func NewMapXmlReader(xmlReader io.Reader, recast ...bool) (Map, error) {
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and pointer to raw XML.
 //	NOTE: Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to *[]byte
-//	      using a ByteReader; this can result in significantly slower decoding XML to a Map.
-//	      Use with caution; for http.Handler request processing, NewMapXml or NewMapXmlReader are probably
-//	      more appropriate.
+//	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
+//	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
+//	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
+//	      you CAN use it to efficiently unmarhal an XML and retrieve the raw XML in a single call.
 func NewMapXmlReaderRaw(xmlReader io.Reader, recast ...bool) (Map, *[]byte, error) {
 	var r bool
 	if len(recast) == 1 {
