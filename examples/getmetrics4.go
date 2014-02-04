@@ -1,8 +1,8 @@
-// getmetrics3.go - transform Eclipse Metrics (v3) XML report into CSV files for each metric
-// Uses NewMapXmlReaderRaw that requires loading raw XML into a []byte buffer using a ByteReader.
-// Show's performance impact of copying the raw XML while simultaneously decoding it from on os.File
-//	Reader. (vs. getmetrics1.go) If you're processing a file and need a copy of the raw XML and SPEED,
-//	should buffer the file in memory and decode using mxj.NewMapXmlReaderRaw as in getmetrics4.go.
+// getmetrics2.go - transform Eclipse Metrics (v3) XML report into CSV files for each metric
+// Uses an in-memory buffer for the XML data and direct XML decoding of the buffer into a Map.
+// Then XML buffer is decoded into a Map while the raw XML is copied using NewMapXmlReaderRaw()
+// to illustrate processing overhead relative to getmetrics2.go.  Not a practical example, 
+// but confirms the getmetrics1.go vs. getmetrics3.go use case.
 
 /*
 I needed to convert a large (14.9 MB) XML data set from an Eclipse metrics report on an
@@ -30,7 +30,7 @@ In addition, the metrics were reported with two different "Metric" compound elem
 	</Metrics>
 
 To run this example, extract the metrics_data.xml file from metrics_data.zip, then:
-	> go run getmetrics3 -file=metrics_data.xml
+	> go run getmetrics -file=metrics_data.xml
 
 The output will be a set of "csv" files.
 */
@@ -38,6 +38,7 @@ The output will be a set of "csv" files.
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -59,28 +60,26 @@ func main() {
 	defer fh.Close()
 	fmt.Println(time.Now().String(), "... File Opened:", file)
 
-	/*
-		// Get the XML data set from the file.
-		fs, _ := fh.Stat()
-		xmldata := make([]byte, fs.Size())
-		n, frerr := fh.Read(xmldata)
-		if frerr != nil {
-			fmt.Println("frerr:", frerr.Error())
-			return
-		}
-		if int64(n) != fs.Size() {
-			fmt.Println("n:", n, "fs.Size():", fs.Size())
-			return
-		}
-		fmt.Println(time.Now().String(), "... File Read - size:", fs.Size())
+	// Get the XML data set from the file.
+	fs, _ := fh.Stat()
+	xmldata := make([]byte, fs.Size())
+	n, frerr := fh.Read(xmldata)
+	if frerr != nil {
+		fmt.Println("frerr:", frerr.Error())
+		return
+	}
+	if int64(n) != fs.Size() {
+		fmt.Println("n:", n, "fs.Size():", fs.Size())
+		return
+	}
+	fmt.Println(time.Now().String(), "... File Read - size:", fs.Size())
 
-		// load XML into a Map value
-		m, merr := mxj.NewMapXml(xmldata)
-	*/
-	// Consume the file using os.File Reader.
+	// wrap the buffer in an io.Reader
+	xmlReader := bytes.NewBuffer(xmldata)
+
+	// load XML into a Map value
 	// Note: there is a single record with root tag of "Metrics".
-	// Also: this is MUCH slower than using buffer or not loading raw XML.
-	m, raw, merr := mxj.NewMapXmlReaderRaw(fh)
+	m, raw, merr := mxj.NewMapXmlReaderRaw(xmlReader)	// don't catch the pointer to raw XML
 	if merr != nil {
 		log.Fatal("merr:", merr.Error())
 	}
@@ -88,7 +87,7 @@ func main() {
 	fmt.Println("raw XML buffer size (should be same as File size):", len(*raw))
 
 	// Get just the key values of interest.
-	// Could also use m.ValuesForKey("Metric"),
+	// Could also use m.ValuesForKey("Metric"), 
 	// since there's just the one path.
 	metricVals, err := m.ValuesForPath("Metrics.Metric")
 	if err != nil {

@@ -1,5 +1,6 @@
-// getmetrics2.go - transform Eclipse Metrics (v3) XML report into CSV files for each metric
-// Uses NewMapXmlReader instead of first buffering the XML file in-memory. 
+// getmetrics1.go - transform Eclipse Metrics (v3) XML report into CSV files for each metric
+// Uses NewMapXmlReader on os.File without copying the raw XML into a buffer while decoding.. 
+// Shows no significant overhead for not first buffering large XML file as in getmetrics2.go.
 
 /*
 I needed to convert a large (14.9 MB) XML data set from an Eclipse metrics report on an
@@ -27,7 +28,7 @@ In addition, the metrics were reported with two different "Metric" compound elem
 	</Metrics>
 
 To run this example, extract the metrics_data.xml file from metrics_data.zip, then:
-	> go run getmetrics2 -file=metrics_data.xml
+	> go run getmetrics1 -file=metrics_data.xml
 
 The output will be a set of "csv" files.
 */

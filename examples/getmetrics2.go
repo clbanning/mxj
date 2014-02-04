@@ -1,5 +1,7 @@
-// getmetrics.go - transform Eclipse Metrics (v3) XML report into CSV files for each metric
-// Uses an in-memory buffer for the XML data.
+// getmetrics2.go - transform Eclipse Metrics (v3) XML report into CSV files for each metric
+// Uses an in-memory buffer for the XML data and direct XML decoding of the buffer into a Map.
+// Not significantly faster than getmetrics1.go that uses an io.Reader (os.File) to directly
+// decode the XML from the file.
 
 /*
 I needed to convert a large (14.9 MB) XML data set from an Eclipse metrics report on an
