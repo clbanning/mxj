@@ -12,8 +12,8 @@ import (
 // ------------------------------ write JSON -----------------------
 
 // Just a wrapper on json.Marshal.
-// If option safeEncoding is'true' then safe encoding of '<' and '>'
-// is preserved. (see encoding/json#Marshal)
+// If option safeEncoding is'true' then safe encoding of '<', '>' and '&'
+// is preserved. (see encoding/json#Marshal, encoding/json#Encode)
 func (mv Map) Json(safeEncoding ...bool) ([]byte, error) {
 	var s bool
 	if len(safeEncoding) == 1 {
@@ -24,13 +24,14 @@ func (mv Map) Json(safeEncoding ...bool) ([]byte, error) {
 	if !s {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
 		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
+		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
 	}
 	return b, err
 }
 
 // Just a wrapper on json.MarshalIndent.
-// If option safeEncoding is'true' then safe encoding of '<' and '>'
-// is preserved. (see encoding/json#Marshal)
+// If option safeEncoding is'true' then safe encoding of '<' , '>' and '&'
+// is preserved. (see encoding/json#Marshal, encoding/json#Encode)
 func (mv Map) JsonIndent(prefix, indent string, safeEncoding ...bool) ([]byte, error) {
 	var s bool
 	if len(safeEncoding) == 1 {
@@ -41,6 +42,7 @@ func (mv Map) JsonIndent(prefix, indent string, safeEncoding ...bool) ([]byte, e
 	if !s {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
 		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
+		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
 	}
 	return b, err
 }

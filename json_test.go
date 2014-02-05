@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-var jdata = []byte(`{ "key1":"string", "key2":34, "key3":true, "key4":"unsafe: <>" }`)
-var jdata2 = []byte(`{ "key1":"string", "key2":34, "key3":true, "key4":"unsafe: <>" },
+var jdata = []byte(`{ "key1":"string", "key2":34, "key3":true, "key4":"unsafe: <>&" }`)
+var jdata2 = []byte(`{ "key1":"string", "key2":34, "key3":true, "key4":"unsafe: <>&" },
 	{ "key":"value in new JSON string" }`)
 
 func TestJsonHeader(t *testing.T) {
