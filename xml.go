@@ -311,7 +311,7 @@ func XmlDefaultEmptyElemSyntax() {
 	useGoXmlEmptyElemSyntax = false
 }
 
-// Encode a Map variable as XML.  The companion of NewMapXmml().
+// Encode a Map variable as XML.  The companion of NewMapXml().
 // The following rules apply.
 //    - The key label "#text" is treated as the value for a simple element with attributes.
 //    - Map keys that begin with a hyphen, '-', are interpreted as attributes.
@@ -323,8 +323,8 @@ func XmlDefaultEmptyElemSyntax() {
 //            value is "UNKNOWN"
 //    - Elements with only attribute values or are null are terminated using "/>".
 //    - If len(m) == 1 and no rootTag is provided, then the map key is used as the root tag.
-//      Thus, `{ "key":"value" }` encodes as `<key>value</key>`.
-//	If you want encoding of empty elements consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
+//      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
+//    - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 	var err error
