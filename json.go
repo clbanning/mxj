@@ -52,7 +52,7 @@ func (mv Map) JsonIndent(prefix, indent string, safeEncoding ...bool) ([]byte, e
 // The names will also provide a key for the number of return arguments.
 
 // Writes the Map as JSON on the Writer. 
-// If 'safeEncoding' is 'true', then "safe" encoding of '<' and '>' is preserved.
+// If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
 func (mv Map) JsonWriter(jsonWriter io.Writer, safeEncoding ...bool) error {
 	b, err := mv.Json(safeEncoding...)
 	if err != nil {
@@ -64,7 +64,7 @@ func (mv Map) JsonWriter(jsonWriter io.Writer, safeEncoding ...bool) error {
 }
 
 // Writes the Map as JSON on the Writer. *[]byte is the raw JSON that was written.
-// If 'safeEncoding' is 'true', then "safe" encoding of '<' and '>' is preserved.
+// If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
 func (mv Map) JsonWriterRaw(jsonWriter io.Writer, safeEncoding ...bool) (*[]byte, error) {
 	b, err := mv.Json(safeEncoding...)
 	if err != nil {

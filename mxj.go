@@ -18,6 +18,11 @@ func New() Map {
 	return m
 }
 
+// Cast a Map to map[string]interface{}
+func (mv Map)Old() map[string]interface{} {
+	return mv
+}
+
 // --------------- StringIndent ... from x2j.WriteMap -------------
 
 // Pretty print a Map.
