@@ -165,5 +165,23 @@ func TestValuesForPath(t *testing.T) {
 	for _, v := range ss {
 		fmt.Println("... ss.v:", v)
 	}
+
+	fmt.Println("ValuesForPath, doc.books.* -seq=3")
+	ss, sserr = m.ValuesForPath("doc.books.*", "-seq:3")
+	if sserr != nil {
+		t.Fatal("sserr:", sserr.Error())
+	}
+	for _, v := range ss {
+		fmt.Println("... ss.v:", v)
+	}
+
+	fmt.Println("ValuesForPath, doc.*.* -seq=3")
+	ss, sserr = m.ValuesForPath("doc.*.*", "-seq:3")
+	if sserr != nil {
+		t.Fatal("sserr:", sserr.Error())
+	}
+	for _, v := range ss {
+		fmt.Println("... ss.v:", v)
+	}
 }
 

@@ -95,12 +95,16 @@ func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, erro
 	}
 
 	keys := strings.Split(path, ".")
-	ret := make([]interface{}, 0)
+	ret := make([]*interface{}, 0)
 	valuesForKeyPath(&ret, m, keys, subKeyMap)
-	return ret, nil
+	ivals := make([]interface{},len(ret))
+	for i := 0 ; i < len(ret); i++ {
+		ivals[i] = *(ret[i])
+	}
+	return ivals, nil
 }
 
-func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys map[string]interface{}) {
+func valuesForKeyPath(ret *[]*interface{}, m interface{}, keys []string, subkeys map[string]interface{}) {
 	lenKeys := len(keys)
 
 	// load 'm' values into 'ret'
@@ -113,21 +117,21 @@ func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys 
 					return
 				}
 			}
-			*ret = append(*ret, m)
+			*ret = append(*ret, &m)
 		case []interface{}:
-			for _, v := range m.([]interface{}) {
+			for i, v := range m.([]interface{}) {
 				if subkeys != nil {
 					if ok := hasSubKeys(v, subkeys); !ok {
 						continue // only load list members with subkeys
 					}
 				}
-				*ret = append(*ret, v)
+				*ret = append(*ret, &((m.([]interface{}))[i]))
 			}
 		default:
 			if subkeys != nil {
 				return // must be map[string]interface{} if there are subkeys
 			}
-			*ret = append(*ret, m)
+			*ret = append(*ret, &m)
 		}
 		return
 	}
