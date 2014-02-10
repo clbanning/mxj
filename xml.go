@@ -1,3 +1,7 @@
+// Copyright 2012-2014 Charles Banning. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file
+
 // xml.go - basically the core of X2j for map[string]interface{} values.
 //          NewMapXml, NewMapXmlReader, mv.Xml, mv.XmlWriter
 // see x2j and j2x for wrappers to provide end-to-end transformation of XML and JSON messages.

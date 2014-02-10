@@ -1,3 +1,7 @@
+// Copyright 2012-2014 Charles Banning. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file
+
 // j2x.go - wrappers for end-to-end transformatioin of JSON to XML
 // For (mostly) backwards compatibility with j2x package.
 

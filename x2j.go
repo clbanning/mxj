@@ -1,3 +1,7 @@
+// Copyright 2012-2014 Charles Banning. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file
+
 // x2j - for (mostly) backwards compatibility with x2j package
 
 package mxj
