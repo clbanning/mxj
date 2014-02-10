@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
-//	valuesFor.go: Extract values from an arbitrary XML doc. Tag path can include wildcard characters.
+//	keyvalues.go: Extract values from an arbitrary XML doc. Tag path can include wildcard characters.
 
 package mxj
 
@@ -266,7 +266,7 @@ func getSubKeyMap(kv ...string) (map[string]interface{}, error) {
 //----------------------------- find all paths to a key --------------------------------
 
 // Get all paths through Map, 'mv', (in dot-notation) that terminate with the specified key.
-// Results can be used with ValuesAtKeyPath() and ValuesFromKeyPath().
+// Results can be used with ValuesForPath.
 func (mv Map) PathsForKey(key string) []string {
 	m := map[string]interface{}(mv)
 	breadbasket := make(map[string]bool, 0)
