@@ -36,7 +36,6 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 // NewMapXml - convert an XML doc into a Map
 // (This is analogous to unmarshalling a JSON string to map[string]interface{} using json.Unmarshal().)
 //	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
-//	Note: recasting is only applied to element values, not attribute values.
 //
 //	Converting XML to JSON is a simple as:
 //		...
