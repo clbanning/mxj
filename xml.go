@@ -314,7 +314,7 @@ func XmlDefaultEmptyElemSyntax() {
 	useGoXmlEmptyElemSyntax = false
 }
 
-// Encode a Map variable as XML.  The companion of NewMapXml().
+// Encode a Map as XML.  The companion of NewMapXml().
 // The following rules apply.
 //    - The key label "#text" is treated as the value for a simple element with attributes.
 //    - Map keys that begin with a hyphen, '-', are interpreted as attributes.
@@ -594,7 +594,7 @@ func (t *teeReader) ReadByte() (c byte, err error) {
 
 // ---------------------- XmlIndent - from j2x package ----------------------------
 
-// Encode a map[string]interface{} variable as a pretty XML string.
+// Encode a map[string]interface{} as a pretty XML string.
 // See Xml for encoding rules.
 func (mv Map)XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
