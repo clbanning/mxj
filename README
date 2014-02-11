@@ -42,7 +42,9 @@ SUMMARY
 
 USAGE
 
-The package is fairly well self-documented with examples. (http://godoc.org/github.com/clbanning/mxj)  
+The package is fairly well self-documented with examples. (http://godoc.org/github.com/clbanning/mxj)
+
+Also, the subdirectory "examples" contains a wide range of examples, several taken from golang-nuts discussions.
 
 XML PARSING CONVENTIONS
 
