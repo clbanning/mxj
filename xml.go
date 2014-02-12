@@ -325,7 +325,7 @@ func XmlDefaultEmptyElemSyntax() {
 //          > structures, etc.: handed to xml.Marshal() - if there is an error, the element
 //            value is "UNKNOWN"
 //    - Elements with only attribute values or are null are terminated using "/>".
-//    - If len(m) == 1 and no rootTag is provided, then the map key is used as the root tag.
+//    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag.
 //      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
 //    - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
