@@ -58,11 +58,12 @@ var doc2 = []byte(`
 
 // the basic demo/test case - a small bibliography with mixed element types
 func TestPathsForKey(t *testing.T) {
-	fmt.Println("PathsForKey, doc1#author")
+	fmt.Println("PathsForKey, doc1 ...")
 	m, merr := NewMapXml(doc1)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}
+	fmt.Println("PathsForKey, doc1#author")
 	ss := m.PathsForKey("author")
 	fmt.Println("... ss:", ss)
 
@@ -70,11 +71,12 @@ func TestPathsForKey(t *testing.T) {
 	ss = m.PathsForKey("books")
 	fmt.Println("... ss:", ss)
 
-	fmt.Println("PathsForKey, doc2#book")
+	fmt.Println("PathsForKey, doc2 ...")
 	m, merr = NewMapXml(doc2)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}
+	fmt.Println("PathForKey, doc2#book")
 	ss = m.PathsForKey("book")
 	fmt.Println("... ss:", ss)
 
@@ -84,11 +86,12 @@ func TestPathsForKey(t *testing.T) {
 }
 
 func TestValuesForKey(t *testing.T) {
-	fmt.Println("ValuesForKey, doc1#author")
+	fmt.Println("ValuesForKey ...")
 	m, merr := NewMapXml(doc1)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}
+	fmt.Println("ValuesForKey, doc1#author")
 	ss, sserr := m.ValuesForKey("author")
 	if sserr != nil {
 		t.Fatal("sserr:", sserr.Error())
@@ -135,11 +138,12 @@ func TestValuesForKey(t *testing.T) {
 }
 
 func TestValuesForPath(t *testing.T) {
-	fmt.Println("ValuesForPath, doc.books.book.author")
+	fmt.Println("ValuesForPath ...")
 	m, merr := NewMapXml(doc1)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}
+	fmt.Println("ValuesForPath, doc.books.book.author")
 	ss, sserr := m.ValuesForPath("doc.books.book.author")
 	if sserr != nil {
 		t.Fatal("sserr:", sserr.Error())
