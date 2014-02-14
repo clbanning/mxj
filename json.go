@@ -7,7 +7,6 @@ package mxj
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -55,7 +54,7 @@ func (mv Map) JsonIndent(prefix, indent string, safeEncoding ...bool) ([]byte, e
 // The following implementation is provided for symmetry with NewMapJsonReader[Raw]
 // The names will also provide a key for the number of return arguments.
 
-// Writes the Map as JSON on the Writer. 
+// Writes the Map as JSON on the Writer.
 // If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
 func (mv Map) JsonWriter(jsonWriter io.Writer, safeEncoding ...bool) error {
 	b, err := mv.Json(safeEncoding...)
@@ -134,7 +133,7 @@ func getJson(rdr io.Reader) (*[]byte, error) {
 		_, err := rdr.Read(bval)
 		if err != nil {
 			if err == io.EOF && inJson && parenCnt > 0 {
-				return nil, errors.New("no closing } for JSON string: " + string(jb))
+				return nil, fmt.Errorf("no closing } for JSON string: %s", string(jb))
 			}
 			return nil, err
 		}
@@ -149,7 +148,7 @@ func getJson(rdr io.Reader) (*[]byte, error) {
 				parenCnt--
 			}
 			if parenCnt < 0 {
-				return nil, errors.New("closing } without opening {: " + string(jb))
+				return nil, fmt.Errorf("closing } without opening {: %s", string(jb))
 			}
 		case '"':
 			if inQuote {
@@ -197,7 +196,7 @@ func HandleJsonReader(jsonReader io.Reader, mapHandler func(Map) bool, errHandle
 
 		// handle error condition with errhandler
 		if merr != nil && merr != io.EOF {
-			merr = errors.New(fmt.Sprintf("[jsonReader: %d] %s", n, merr.Error()))
+			merr = fmt.Errorf("[jsonReader: %d] %s", n, merr.Error())
 			if ok := errHandler(merr); !ok {
 				// caused reader termination
 				return merr
@@ -236,7 +235,7 @@ func HandleJsonReaderRaw(jsonReader io.Reader, mapHandler func(Map, *[]byte) boo
 
 		// handle error condition with errhandler
 		if merr != nil && merr != io.EOF {
-			merr = errors.New(fmt.Sprintf("[jsonReader: %d] %s", n, merr.Error()))
+			merr = fmt.Errorf("[jsonReader: %d] %s", n, merr.Error())
 			if ok := errHandler(merr, raw); !ok {
 				// caused reader termination
 				return merr

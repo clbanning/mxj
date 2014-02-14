@@ -7,7 +7,7 @@
 package mxj
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -240,20 +240,20 @@ func getSubKeyMap(kv ...string) (map[string]interface{}, error) {
 				// ParseBool treats "1"==true & "0"==false
 				b, err := strconv.ParseBool(vv[1])
 				if err != nil {
-					return nil, errors.New("can't convert subkey value to bool: " + vv[1])
+					return nil, fmt.Errorf("can't convert subkey value to bool: %s", vv[1])
 				}
 				m[vv[0]] = interface{}(b)
 			case "float", "float64", "num", "number", "numeric":
 				f, err := strconv.ParseFloat(vv[1], 64)
 				if err != nil {
-					return nil, errors.New("can't convert subkey value to float: " + vv[1])
+					return nil, fmt.Errorf("can't convert subkey value to float: %s", vv[1])
 				}
 				m[vv[0]] = interface{}(f)
 			default:
-				return nil, errors.New("unknown subkey conversion spec: " + v)
+				return nil, fmt.Errorf("unknown subkey conversion spec: %s", v)
 			}
 		default:
-			return nil, errors.New("unknown subkey spec: " + v)
+			return nil, fmt.Errorf("unknown subkey spec: %s", v)
 		}
 	}
 	return m, nil

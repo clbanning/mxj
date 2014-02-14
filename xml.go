@@ -9,7 +9,6 @@
 package mxj
 
 import (
-	// "fmt"
 	"bytes"
 	"encoding/xml"
 	"errors"
@@ -217,7 +216,7 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 		}
 	}
 	// Logically we can't get here, but provide an error message anyway.
-	return nil, errors.New("Unknown parse error in xmlToTree() for: " + n.key)
+	return nil, fmt.Errorf("Unknown parse error in xmlToTree() for: %s", n.key)
 }
 
 // (*node)markDuplicateKeys - set node.dup flag for loading map[string]interface{}.
@@ -400,7 +399,7 @@ func mapToXml(s *string, key string, value interface{}) error {
 					*s += ` ` + k[1:] + `="` + fmt.Sprintf("%v", string(v.([]byte))) + `"`
 					cntAttr++
 				default:
-					return errors.New("invalid attribute value for: " + k)
+					return fmt.Errorf("invalid attribute value for: %s", k)
 				}
 			}
 		}
@@ -410,7 +409,7 @@ func mapToXml(s *string, key string, value interface{}) error {
 		}
 		// simple element? Note: '#text" is an invalid XML tag.
 		if v, ok := vv["#text"]; ok {
-			if cntAttr+1 < lenvv {
+			if cntAttr+1 < lenvv {	// cntAttr + 1 for #text should be everything
 				return errors.New("#text key occurs with other non-attribute keys")
 			}
 			*s += ">" + fmt.Sprintf("%v", v)
@@ -490,7 +489,7 @@ func HandleXmlReader(xmlReader io.Reader, mapHandler func(Map) bool, errHandler 
 
 		// handle error condition with errhandler
 		if merr != nil && merr != io.EOF {
-			merr = errors.New(fmt.Sprintf("[xmlReader: %d] %s", n, merr.Error()))
+			merr = fmt.Errorf("[xmlReader: %d] %s", n, merr.Error())
 			if ok := errHandler(merr); !ok {
 				// caused reader termination
 				return merr
@@ -530,7 +529,7 @@ func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, *[]byte) bool,
 
 		// handle error condition with errhandler
 		if merr != nil && merr != io.EOF {
-			merr = errors.New(fmt.Sprintf("[xmlReader: %d] %s", n, merr.Error()))
+			merr = fmt.Errorf("[xmlReader: %d] %s", n, merr.Error())
 			if ok := errHandler(merr, raw); !ok {
 				// caused reader termination
 				return merr
@@ -560,7 +559,7 @@ func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, *[]byte) bool,
 
 // This is a clone of io.TeeReader with the addition method t.ReadByte().
 // Thus, this TeeReader is also an io.ByteReader.
-// This is necssary because xml.NewDecoder uses a ByteReader not a Reader.
+// This is necessary because xml.NewDecoder uses a ByteReader not a Reader.
 // If NewDecoder is passed a Reader that does not satisfy ByteReader it wraps the Reader with
 // bufio.NewReader and uses ReadByte rather than Read that runs the TeeReader pipe logic.
 
@@ -606,6 +605,8 @@ func (mv Map)XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error)
 	p.padding = prefix
 
 	if len(m) == 1 && len(rootTag) == 0 {
+		// this can extract the key for the single map element
+		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
 				err = p.mapToXmlIndent(s, DefaultRootTag, m)
@@ -667,7 +668,7 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 					*s += ` ` + k[1:] + `="` + fmt.Sprintf("%v", string(v.([]byte))) + `"`
 					cntAttr++
 				default:
-					return errors.New("invalid attribute value for: " + k)
+					return fmt.Errorf("invalid attribute value for: %s", k)
 				}
 			}
 		}
