@@ -17,7 +17,7 @@ var doc1 = []byte(`
 <doc> 
    <books>
       <book seq="1">
-         <author>William H. Gaddis</author>
+         <author>William T. Gaddis</author>
          <title>The Recognitions</title>
          <review>One of the great seminal American novels of the 20th century.</review>
       </book>
@@ -47,7 +47,7 @@ var doc2 = []byte(`
 <doc>
    <books>
       <book seq="1">
-         <author>William H. Gaddis</author>
+         <author>William T. Gaddis</author>
          <title>The Recognitions</title>
          <review>One of the great seminal American novels of the 20th century.</review>
       </book>
@@ -118,8 +118,8 @@ func TestValuesForKey(t *testing.T) {
 		fmt.Println("... ss.v:", v)
 	}
 
-	fmt.Println("ValuesForKey, doc1#book, author:William H. Gaddis")
-	ss, sserr = m.ValuesForKey("book", "author:William H. Gaddis")
+	fmt.Println("ValuesForKey, doc1#book, author:William T. Gaddis")
+	ss, sserr = m.ValuesForKey("book", "author:William T. Gaddis")
 	if sserr != nil {
 		t.Fatal("sserr:", sserr.Error())
 	}
