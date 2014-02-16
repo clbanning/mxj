@@ -87,7 +87,7 @@ func NewMapXmlReader(xmlReader io.Reader, recast ...bool) (Map, error) {
 //	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
 //	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
 //	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
-//	      you CAN use it to efficiently unmarhal an XML and retrieve the raw XML in a single call.
+//	      you CAN use it to efficiently unmarshal an XML and retrieve the raw XML in a single call.
 func NewMapXmlReaderRaw(xmlReader io.Reader, recast ...bool) (Map, *[]byte, error) {
 	var r bool
 	if len(recast) == 1 {
