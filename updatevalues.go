@@ -15,8 +15,8 @@ import (
 // Update value based on path and possible sub-key values.
 // A count of the number of values changed and any error are returned.
 // If the count == 0, then no path (and subkeys) matched.
-//	'newVal' can be a map[string]interface{} value with a single 'key' that is the key to be modified
-//	             or a value: "key:value[:type]" where type is "bool" or "num" to cast the value.
+//	'newVal' can be a Map or map[string]interface{} value with a single 'key' that is the key to be modified
+//	             or a string value "key:value[:type]" where type is "bool" or "num" to cast the value.
 //	'path' is dot-notation list of keys to traverse; last key in path can be newVal key
 //	'subkeys' are "key:value[:type]" entries that must match for path node
 func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...string) (int, error) {
