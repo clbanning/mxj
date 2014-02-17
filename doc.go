@@ -44,8 +44,9 @@ SUMMARY
 	or structure to a Map value, 'm', or cast a map[string]interface{} value to a Map value, 'm', then:
 		paths := m.PathsForKey(key)
 		path := m.PathForKeyShortest(key)
-		values, err := m.ValuesForKey(key)
-		values, err := m.ValuesForPath(path)
+		values, err := m.ValuesForKey(key, subkeys)
+		values, err := m.ValuesForPath(path, subkeys)
+		count, err := m.UpdateValuesForPath(newVal, path, subkeys)
 
 XML PARSING CONVENTIONS
 
