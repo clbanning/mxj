@@ -281,7 +281,7 @@ var biblioDoc = []byte(`
 	...
 
 	// change 'date' value from string type to float64 type
-	// Note: the following is equivalent to m, merr := NewMapXml(biblioDoc, mxj.Recast).
+	// Note: the following is equivalent to m, merr := NewMapXml(biblioDoc, mxj.Cast).
 	path := m.PathForKeyShortest("date")
 	v, err := m.ValuesForPath(path)
 	if err != nil {

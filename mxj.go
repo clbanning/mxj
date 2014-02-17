@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	Recast = true // for clarity - e.g., mxj.NewMapXml(doc, mxj.Recast)
+	Cast = true // for clarity - e.g., mxj.NewMapXml(doc, mxj.Cast)
 )
 
 type Map map[string]interface{}

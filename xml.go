@@ -34,7 +34,7 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 
 // NewMapXml - convert an XML doc into a Map
 // (This is analogous to unmarshalling a JSON string to map[string]interface{} using json.Unmarshal().)
-//	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
+//	If the optional argument 'cast' is 'true', then values will be converted to boolean or float64 if possible.
 //
 //	Converting XML to JSON is a simple as:
 //		...
@@ -46,10 +46,10 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //		if jerr != nil {
 //			// handle error
 //		}
-func NewMapXml(xmlVal []byte, recast ...bool) (Map, error) {
+func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
-	if len(recast) == 1 {
-		r = recast[0]
+	if len(cast) == 1 {
+		r = cast[0]
 	}
 	n, err := xmlToTree(xmlVal)
 	if err != nil {
@@ -63,10 +63,10 @@ func NewMapXml(xmlVal []byte, recast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
-func NewMapXmlReader(xmlReader io.Reader, recast ...bool) (Map, error) {
+func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
-	if len(recast) == 1 {
-		r = recast[0]
+	if len(cast) == 1 {
+		r = cast[0]
 	}
 
 	// build the node tree
@@ -88,10 +88,10 @@ func NewMapXmlReader(xmlReader io.Reader, recast ...bool) (Map, error) {
 //	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
 //	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
 //	      you CAN use it to efficiently unmarshal an XML and retrieve the raw XML in a single call.
-func NewMapXmlReaderRaw(xmlReader io.Reader, recast ...bool) (Map, *[]byte, error) {
+func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, *[]byte, error) {
 	var r bool
-	if len(recast) == 1 {
-		r = recast[0]
+	if len(cast) == 1 {
+		r = cast[0]
 	}
 	// create TeeReader so we can retrieve raw XML
 	wb := new(bytes.Buffer)
@@ -237,17 +237,17 @@ func (n *node) markDuplicateKeys() {
 
 // (*node)treeToMap - convert a tree of nodes into a map[string]interface{}.
 //	(Parses to map that is structurally the same as from json.Unmarshal().)
-// Note: root is not instantiated; call with: "m[n.key] = n.treeToMap(recast)".
+// Note: root is not instantiated; call with: "m[n.key] = n.treeToMap(cast)".
 func (n *node) treeToMap(r bool) interface{} {
 	if len(n.nodes) == 0 {
-		return recast(n.val, r)
+		return cast(n.val, r)
 	}
 
 	m := make(map[string]interface{}, 0)
 	for _, v := range n.nodes {
 		// just a value
 		if !v.dup && len(v.nodes) == 0 {
-			m[v.key] = recast(v.val, r)
+			m[v.key] = cast(v.val, r)
 			continue
 		}
 
@@ -271,8 +271,8 @@ func (n *node) treeToMap(r bool) interface{} {
 	return interface{}(m)
 }
 
-// recast - try to cast string values to bool or float64
-func recast(s string, r bool) interface{} {
+// cast - try to cast string values to bool or float64
+func cast(s string, r bool) interface{} {
 	if r {
 		// handle numeric strings ahead of boolean
 		if f, err := strconv.ParseFloat(s, 64); err == nil {
