@@ -10,6 +10,10 @@ import (
 	"strconv"
 )
 
+const (
+	Recast = true // for clarity - e.g., mxj.NewMapXml(doc, mxj.Recast)
+)
+
 type Map map[string]interface{}
 
 // Allocate a Map.

@@ -244,3 +244,58 @@ func ExampleMap_ValuesForKeyPath() {
 	// 		 text1 : default:text
 	// 		 word1 : default:word
 }
+
+func ExampleMap_UpdateValuesForPath() {
+/*
+	
+var biblioDoc = []byte(`
+<biblio>
+	<author>
+		<name>William Gaddis</name>
+		<books>
+			<book>
+				<title>The Recognitions</title>
+				<date>1955</date>
+				<review>A novel that changed the face of American literature.</review>
+			</book>
+			<book>
+				<title>JR</title>
+				<date>1975</date>
+				<review>Winner of National Book Award for Fiction.</review>
+			</book>
+		</books>
+	</author>
+</biblio>`)
+
+	...
+	m, merr := NewMapXml(biblioDoc)
+	if merr != nil {
+		// handle error
+	}
+
+	// change 'review' for a book
+	count, err := m.UpdateValuesForPath("review:National Book Award winner." "*.*.*.*", "title:JR")
+	if err != nil {
+		// handle error
+	}
+	...
+
+	// change 'date' value from string type to float64 type
+	path := m.PathForKeyShortest("date")
+	v, err := m.ValuesForPath(path)
+	if err != nil {
+		// handle error
+	}
+	var total int
+	for _, vv := range v {
+		oldVal := "date:" + vv.(string)
+		newVal := "date:" + vv.(string) + ":num"
+		n, err := m.UpdateValuesForPath(newVal, path, oldVal)
+		if err != nil {
+			// handle error
+		}
+		total += n
+	}
+	...
+*/
+}

@@ -234,7 +234,7 @@ func getSubKeyMap(kv ...string) (map[string]interface{}, error) {
 			m[vv[0]] = interface{}(vv[1])
 		case 3:
 			switch vv[3] {
-			case "string", "char":
+			case "string", "char", "text":
 				m[vv[0]] = interface{}(vv[1])
 			case "bool", "boolean":
 				// ParseBool treats "1"==true & "0"==false
