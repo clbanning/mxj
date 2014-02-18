@@ -189,6 +189,7 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 					(*cnt)++
 				}
 			}
+			return
 		}
 
 		// so value is for an element of endVal
@@ -239,5 +240,5 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 		}
 	}
 
-	return
+	// return
 }
