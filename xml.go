@@ -375,6 +375,30 @@ func (mv Map) XmlWriterRaw(xmlWriter io.Writer, rootTag ...string) (*[]byte, err
 	return &x, err
 }
 
+// Writes the Map as pretty XML on the Writer. 
+// See Xml() for encoding rules.
+func (mv Map) XmlIndentWriter(xmlWriter io.Writer, prefix, indent string, rootTag ...string) error {
+	x, err := mv.XmlIndent(prefix, indent, rootTag...)
+	if err != nil {
+		return err
+	}
+
+	_, err = xmlWriter.Write(x)
+	return err
+}
+
+// Writes the Map as pretty XML on the Writer. *[]byte is the raw XML that was written.
+// See Xml() for encoding rules.
+func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, rootTag ...string) (*[]byte, error) {
+	x, err := mv.XmlIndent(prefix, indent, rootTag...)
+	if err != nil {
+		return &x, err
+	}
+
+	_, err = xmlWriter.Write(x)
+	return &x, err
+}
+
 // where the work actually happens
 // returns an error if an attribute is not atomic
 func mapToXml(s *string, key string, value interface{}) error {

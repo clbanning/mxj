@@ -25,7 +25,7 @@ SUMMARY
 		m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' points to the raw XML that was decoded
 
 	Marshal Map value, 'm', to an XML Writer (io.Writer):
-		err := m.XmlWriter(xmlWriter)
+		err := m.XmlWriter(xmlWriter)         // or: m.XmlIndentWriter(xmlWriter, prefix, indent)
 		err, raw := m.XmlWriterRaw(xmlWriter) // 'raw' points to the raw XML that was written on xmlWriter
 
 	Bulk process XML with error handling:

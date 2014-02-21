@@ -78,6 +78,30 @@ func (mv Map) JsonWriterRaw(jsonWriter io.Writer, safeEncoding ...bool) (*[]byte
 	return &b, err
 }
 
+// Writes the Map as pretty JSON on the Writer.
+// If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
+func (mv Map) JsonIndentWriter(jsonWriter io.Writer, prefix, indent string, safeEncoding ...bool) error {
+	b, err := mv.JsonIndent(prefix, indent, safeEncoding...)
+	if err != nil {
+		return err
+	}
+
+	_, err = jsonWriter.Write(b)
+	return err
+}
+
+// Writes the Map as pretty JSON on the Writer. *[]byte is the raw JSON that was written.
+// If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
+func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string,  safeEncoding ...bool) (*[]byte, error) {
+	b, err := mv.JsonIndent(prefix, indent, safeEncoding...)
+	if err != nil {
+		return &b, err
+	}
+
+	_, err = jsonWriter.Write(b)
+	return &b, err
+}
+
 // --------------------------- read JSON -----------------------------
 
 // Just a wrapper on json.Unmarshal
