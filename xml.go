@@ -659,7 +659,7 @@ func (p *pretty)Indent() {
 	p.cnt++
 }
 
-func (p *pretty)Dedent() {
+func (p *pretty)Outdent() {
 	if p.cnt > 0 {
 		p.padding = p.padding[:len(p.padding)-len(p.indent)]
 		p.cnt--
@@ -727,7 +727,7 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 			switch v.(type) {
 			case []interface{}:	// handled in []interface{} case
 			default:
-				if !p.inList { p.Dedent() }
+				if !p.inList { p.Outdent() }
 			}
 		}
 		p.inMap = false
@@ -737,7 +737,7 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 		for _, v := range value.([]interface{}) {
 			p.Indent()
 			p.mapToXmlIndent(s, key, v)
-			p.Dedent()
+			p.Outdent()
 		}
 		p.inList = false
 		return nil
@@ -767,20 +767,19 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 
 	if endTag {
 		if !isSimple {
-			if p.inList { p.Dedent() }
+			if p.inList { p.Outdent() }
 			*s += p.padding
 		}
 		switch value.(type) {
 		case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
 			*s += `</` + key + ">"
 		}
-		// *s += "</" + key + ">"
 	} else {
 		*s += "/>"
 	}
 	*s += "\n"
 	if !p.inList && !p.inMap {
-		p.Dedent()
+		p.Outdent()
 	}
 
 	return nil
