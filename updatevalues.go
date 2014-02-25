@@ -37,7 +37,7 @@ func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...st
 	var val interface{}
 	switch newVal.(type) {
 	case map[string]interface{}, Map:
-		switch newVal.(type) {
+		switch newVal.(type) { // "fallthrough is not permitted in type switch" (Spec)
 		case Map:
 			newVal = newVal.(Map).Old()
 		}
@@ -166,6 +166,7 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 				if len(subkeys) == 0 {
 					(m.(map[string]interface{}))[keys0] = value
 					(*cnt)++
+					break
 				}
 				nv := make([]interface{}, 0)
 				var valmodified bool
