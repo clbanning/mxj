@@ -20,7 +20,9 @@ import (
 //		         By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //		         For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
 //		         If the 'key' refers to a list, then "key:value" could select a list member of the list.
-//             The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//	            The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//	            If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
+//	            exclusion critera - e.g., "!author:William T. Gaddis".
 func (mv Map) ValuesForKey(key string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
@@ -82,7 +84,9 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 //		         By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //		         For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
 //		         If the 'path' refers to a list, then "tag:value" would select a list member of the list.
-//             The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//	            The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//	            If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
+//	            exclusion critera - e.g., "!author:William T. Gaddis".
 func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
@@ -186,29 +190,54 @@ func hasSubKeys(v interface{}, subkeys map[string]interface{}) bool {
 		// do all subKey name:value pairs match?
 		mv := v.(map[string]interface{})
 		for skey, sval := range subkeys {
+			isNotKey := false
+			if skey[:1] == "!" { // a NOT-key
+				skey = skey[1:]
+				isNotKey = true
+			}
 			vv, ok := mv[skey]
 			if !ok { // key doesn't exist
+				if isNotKey {	// key not there, but that's what we want
+					if kv, ok := sval.(string); ok && kv == "*" {
+						continue
+					}
+				}
 				return false
 			}
 			// wildcard check
 			if kv, ok := sval.(string); ok && kv == "*" {
+				if isNotKey {	// key is there, and we don't want it
+					return false
+				}
 				continue
 			}
 			switch sval.(type) {
 			case string:
 				if s, ok := vv.(string); ok && s == sval.(string) {
+					if isNotKey {
+						return false
+					}
 					continue
 				}
 			case bool:
 				if b, ok := vv.(bool); ok && b == sval.(bool) {
+					if isNotKey {
+						return false
+					}
 					continue
 				}
 			case float64:
 				if f, ok := vv.(float64); ok && f == sval.(float64) {
+					if isNotKey {
+						return false
+					}
 					continue
 				}
 			}
 			// key there but didn't match subkey value
+			if isNotKey {  // that's what we want
+				continue
+			}
 			return false
 		}
 		// all subkeys matched

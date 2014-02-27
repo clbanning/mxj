@@ -132,7 +132,7 @@ func TestValuesForKey(t *testing.T) {
 	if sserr != nil {
 		t.Fatal("sserr:", sserr.Error())
 	}
-	for _, v := range ss {
+	for _, v := range ss {	// should be len(ss) == 0
 		fmt.Println("... ss.v:", v)
 	}
 }
@@ -189,3 +189,36 @@ func TestValuesForPath(t *testing.T) {
 	}
 }
 
+func TestValuesForNotKey( t *testing.T) {
+	fmt.Println("ValuesForNotKey ...")
+	m, merr := NewMapXml(doc1)
+	if merr != nil {
+		t.Fatal("merr:", merr.Error())
+	}
+	fmt.Println("ValuesForPath, doc.books.book !author:William T. Gaddis")
+	ss, sserr := m.ValuesForPath("doc.books.book", "!author:William T. Gaddis")
+	if sserr != nil {
+		t.Fatal("sserr:", sserr.Error())
+	}
+	for _, v := range ss {
+		fmt.Println("... ss.v:", v)
+	}
+
+	fmt.Println("ValuesForPath, doc.books.book !author:*")
+	ss, sserr = m.ValuesForPath("doc.books.book", "!author:*")
+	if sserr != nil {
+		t.Fatal("sserr:", sserr.Error())
+	}
+	for _, v := range ss {	// expect len(ss) == 0
+		fmt.Println("... ss.v:", v)
+	}
+
+	fmt.Println("ValuesForPath, doc.books.book !unknown:*")
+	ss, sserr = m.ValuesForPath("doc.books.book", "!unknown:*")
+	if sserr != nil {
+		t.Fatal("sserr:", sserr.Error())
+	}
+	for _, v := range ss {
+		fmt.Println("... ss.v:", v)
+	}
+}

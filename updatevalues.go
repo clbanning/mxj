@@ -19,6 +19,9 @@ import (
 //	             or a string value "key:value[:type]" where type is "bool" or "num" to cast the value.
 //	'path' is dot-notation list of keys to traverse; last key in path can be newVal key
 //	'subkeys' are "key:value[:type]" entries that must match for path node
+//	            The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//	            If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
+//	            exclusion critera - e.g., "!author:William T. Gaddis".
 func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...string) (int, error) {
 	m := map[string]interface{}(mv)
 
