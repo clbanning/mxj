@@ -201,9 +201,9 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 		case xml.CharData:
 			tt := string(t.(xml.CharData))
 			// clean up possible noise
-			tt = strings.Trim(tt,"\t\r\b\n ")
+			tt = strings.Trim(tt, "\t\r\b\n ")
 			if len(n.nodes) > 0 && len(tt) > 0 {
-			// if len(n.nodes) > 0 {
+				// if len(n.nodes) > 0 {
 				nn := new(node)
 				nn.key = "#text"
 				nn.val = tt
@@ -279,8 +279,11 @@ func cast(s string, r bool) interface{} {
 			return interface{}(f)
 		}
 		// ParseBool treats "1"==true & "0"==false
-		if b, err := strconv.ParseBool(s); err == nil {
-			return interface{}(b)
+		// but be more strick - only allow TRUE, true, FALSE, false
+		if s != "t" && s != "T" && s != "f" && s != "F" {
+			if b, err := strconv.ParseBool(s); err == nil {
+				return interface{}(b)
+			}
 		}
 	}
 	return interface{}(s)
@@ -298,9 +301,9 @@ var useGoXmlEmptyElemSyntax bool
 
 // XmlGoEmptyElemSyntax() - <tag ...></tag> rather than <tag .../>.
 //	Go's encoding/xml package marshals empty XML elements as <tag ...></tag>.  By default this package
-//	encodes empty elements as <tag .../>.  If you're marshaling Map values that include structures 
+//	encodes empty elements as <tag .../>.  If you're marshaling Map values that include structures
 //	(which are passed to xml.Marshal for encoding), this will let you conform to the standard package.
-//	Alternatively, you can replace the encoding/xml/marshal.go file in the standard libary with the 
+//	Alternatively, you can replace the encoding/xml/marshal.go file in the standard libary with the
 //	patched version in the "xml_marshal" folder in this package.
 func XmlGoEmptyElemSyntax() {
 	useGoXmlEmptyElemSyntax = true
@@ -351,7 +354,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 // The following implementation is provided only for symmetry with NewMapXmlReader[Raw]
 // The names will also provide a key for the number of return arguments.
 
-// Writes the Map as  XML on the Writer. 
+// Writes the Map as  XML on the Writer.
 // See Xml() for encoding rules.
 func (mv Map) XmlWriter(xmlWriter io.Writer, rootTag ...string) error {
 	x, err := mv.Xml(rootTag...)
@@ -375,7 +378,7 @@ func (mv Map) XmlWriterRaw(xmlWriter io.Writer, rootTag ...string) (*[]byte, err
 	return &x, err
 }
 
-// Writes the Map as pretty XML on the Writer. 
+// Writes the Map as pretty XML on the Writer.
 // See Xml() for encoding rules.
 func (mv Map) XmlIndentWriter(xmlWriter io.Writer, prefix, indent string, rootTag ...string) error {
 	x, err := mv.XmlIndent(prefix, indent, rootTag...)
@@ -433,7 +436,7 @@ func mapToXml(s *string, key string, value interface{}) error {
 		}
 		// simple element? Note: '#text" is an invalid XML tag.
 		if v, ok := vv["#text"]; ok {
-			if cntAttr+1 < lenvv {	// cntAttr + 1 for #text should be everything
+			if cntAttr+1 < lenvv { // cntAttr + 1 for #text should be everything
 				return errors.New("#text key occurs with other non-attribute keys")
 			}
 			*s += ">" + fmt.Sprintf("%v", v)
@@ -579,9 +582,9 @@ func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, *[]byte) bool,
 
 // ----------------- END: Handle XML stream by processing Map value --------------
 
-// --------  a hack of io.TeeReader ... need one thats an io.ByteReader for xml.NewDecoder() ----------
+// --------  a hack of io.TeeReader ... need one that's an io.ByteReader for xml.NewDecoder() ----------
 
-// This is a clone of io.TeeReader with the addition method t.ReadByte().
+// This is a clone of io.TeeReader with the additional method t.ReadByte().
 // Thus, this TeeReader is also an io.ByteReader.
 // This is necessary because xml.NewDecoder uses a ByteReader not a Reader.
 // If NewDecoder is passed a Reader that does not satisfy ByteReader it wraps the Reader with
@@ -598,7 +601,7 @@ func myTeeReader(r io.Reader, w io.Writer) io.Reader {
 	return &teeReader{r, w, b}
 }
 
-// need for io.Reader - but we don't use it ... 
+// need for io.Reader - but we don't use it ...
 func (t *teeReader) Read(p []byte) (n int, err error) {
 	return 0, nil
 }
@@ -619,7 +622,7 @@ func (t *teeReader) ReadByte() (c byte, err error) {
 
 // Encode a map[string]interface{} as a pretty XML string.
 // See Xml for encoding rules.
-func (mv Map)XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error) {
+func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 
 	var err error
@@ -647,19 +650,19 @@ func (mv Map)XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error)
 }
 
 type pretty struct {
-	indent string
-	cnt int
+	indent  string
+	cnt     int
 	padding string
-	inList bool
-	inMap bool
+	inList  bool
+	inMap   bool
 }
 
-func (p *pretty)Indent() {
+func (p *pretty) Indent() {
 	p.padding += p.indent
 	p.cnt++
 }
 
-func (p *pretty)Outdent() {
+func (p *pretty) Outdent() {
 	if p.cnt > 0 {
 		p.padding = p.padding[:len(p.padding)-len(p.indent)]
 		p.cnt--
@@ -668,7 +671,7 @@ func (p *pretty)Outdent() {
 
 // where the work actually happens
 // returns an error if an attribute is not atomic
-func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
+func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error {
 	var endTag bool
 	var isSimple bool
 
@@ -725,9 +728,11 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 			}
 			p.mapToXmlIndent(s, k, v)
 			switch v.(type) {
-			case []interface{}:	// handled in []interface{} case
+			case []interface{}: // handled in []interface{} case
 			default:
-				if !p.inList { p.Outdent() }
+				if !p.inList {
+					p.Outdent()
+				}
 			}
 		}
 		p.inMap = false
@@ -754,7 +759,7 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 		default:
 			var v []byte
 			var err error
-				v, err = xml.MarshalIndent(value,p.padding,p.indent)
+			v, err = xml.MarshalIndent(value, p.padding, p.indent)
 			if err != nil {
 				*s += ">UNKNOWN"
 			} else {
@@ -767,7 +772,9 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 
 	if endTag {
 		if !isSimple {
-			if p.inList { p.Outdent() }
+			if p.inList {
+				p.Outdent()
+			}
 			*s += p.padding
 		}
 		switch value.(type) {
@@ -784,4 +791,3 @@ func (p *pretty)mapToXmlIndent(s *string, key string, value interface{}) error {
 
 	return nil
 }
-
