@@ -650,9 +650,9 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 }
 
 type pretty struct {
-	indent  string
-	cnt     int
-	padding string
+	indent   string
+	cnt      int
+	padding  string
 	mapDepth int
 }
 
@@ -673,7 +673,7 @@ func (p *pretty) Outdent() {
 func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
-	p := &pretty{ pp.indent, pp.cnt, pp.padding, pp.mapDepth}
+	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth}
 
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
@@ -734,7 +734,7 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 			switch v.(type) {
 			case []interface{}: // handled in []interface{} case
 			default:
-					p.Outdent()
+				p.Outdent()
 			}
 			i--
 		}
@@ -756,7 +756,7 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 			*s += ">" + fmt.Sprintf("%v", value)
 		case []byte: // NOTE: byte is just an alias for uint8
 			// similar to how xml.Marshal handles []byte structure members
-			*s += ">" + fmt.Sprintf("%v", string(value.([]byte)))
+			*s += ">" + string(value.([]byte))
 		default:
 			var v []byte
 			var err error
@@ -782,6 +782,8 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 		case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
 			*s += `</` + key + ">"
 		}
+	} else if useGoXmlEmptyElemSyntax {
+		*s += "></" + key + ">"
 	} else {
 		*s += "/>"
 	}
