@@ -48,6 +48,11 @@ SUMMARY
 		values, err := m.ValuesForPath(path, subkeys)
 		count, err := m.UpdateValuesForPath(newVal, path, subkeys)
 
+	A new Map with whatever keys are desired can be created from the current Map and then encoded in XML
+	or JSON. (Note: keys can use dot-notation.)
+		newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
+		newXml := newMap.XML() // for example
+
 XML PARSING CONVENTIONS
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
