@@ -15,6 +15,10 @@ the tag for the variant spellings.
 Once we've retrieved the Map, we can parse it using the known keys - "disable",
 "text1" and "word1".
 
+gonuts1a.go - (03-mar-14)
+
+Here we just permute the tag labels using m.NewMap() to make all the messages
+consistent.  Then they can be decoded into a single structure definition.
 
 gonuts2.go - 
 

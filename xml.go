@@ -636,15 +636,15 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				err = p.mapToXmlIndent(s, DefaultRootTag, m)
+				err = mapToXmlIndent(s, DefaultRootTag, m, p)
 			} else {
-				err = p.mapToXmlIndent(s, key, value)
+				err = mapToXmlIndent(s, key, value, p)
 			}
 		}
 	} else if len(rootTag) == 1 {
-		err = p.mapToXmlIndent(s, rootTag[0], m)
+		err = mapToXmlIndent(s, rootTag[0], m, p)
 	} else {
-		err = p.mapToXmlIndent(s, DefaultRootTag, m)
+		err = mapToXmlIndent(s, DefaultRootTag, m, p)
 	}
 	return []byte(*s), err
 }
@@ -655,6 +655,7 @@ type pretty struct {
 	padding string
 	inList  bool
 	inMap   bool
+	mapDepth int
 }
 
 func (p *pretty) Indent() {
@@ -671,9 +672,10 @@ func (p *pretty) Outdent() {
 
 // where the work actually happens
 // returns an error if an attribute is not atomic
-func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error {
+func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
+	p := &pretty{ pp.indent, pp.cnt, pp.padding, pp.inList, pp.inMap, pp.mapDepth}
 
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
@@ -717,6 +719,8 @@ func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error 
 		*s += "\n"
 		// something more complex
 		p.inMap = false
+		p.mapDepth++
+		var i int
 		for k, v := range vv {
 			if k[:1] == "-" {
 				continue
@@ -724,27 +728,31 @@ func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error 
 			switch v.(type) {
 			case []interface{}:
 			default:
-				if !p.inMap {
+				if !p.inMap || i == 0 {
 					p.Indent()
 				}
 			}
+			i++
 			p.inMap = true
-			p.mapToXmlIndent(s, k, v)
+			mapToXmlIndent(s, k, v, p)
 			switch v.(type) {
 			case []interface{}: // handled in []interface{} case
+			case map[string]interface{}:
 			default:
-				if !p.inList {
+				if !p.inList && i > 0 {
 					p.Outdent()
 				}
 			}
+			i--
 		}
 		p.inMap = false
+		p.mapDepth--
 		endTag = true
 	case []interface{}:
 		p.inList = true
 		for _, v := range value.([]interface{}) {
 			p.Indent()
-			p.mapToXmlIndent(s, key, v)
+			mapToXmlIndent(s, key, v, p)
 			p.Outdent()
 		}
 		p.inList = false
@@ -775,7 +783,7 @@ func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error 
 
 	if endTag {
 		if !isSimple {
-			if p.inList {
+			if p.inList || p.mapDepth == 0 {
 				p.Outdent()
 			}
 			*s += p.padding
@@ -788,7 +796,7 @@ func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error 
 		*s += "/>"
 	}
 	*s += "\n"
-	if !p.inList && !p.inMap {
+	if !p.inList {
 		p.Outdent()
 	}
 
