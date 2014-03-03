@@ -334,19 +334,20 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 	var err error
 	s := new(string)
+	p := new(pretty)	// just a stub
 
 	if len(m) == 1 && len(rootTag) == 0 {
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				err = mapToXml(s, DefaultRootTag, m)
+				err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
 			} else {
-				err = mapToXml(s, key, value)
+				err = mapToXmlIndent(false, s, key, value, p)
 			}
 		}
 	} else if len(rootTag) == 1 {
-		err = mapToXml(s, rootTag[0], m)
+		err = mapToXmlIndent(false, s, rootTag[0], m, p)
 	} else {
-		err = mapToXml(s, DefaultRootTag, m)
+		err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
 	}
 	return []byte(*s), err
 }
@@ -400,97 +401,6 @@ func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, roo
 
 	_, err = xmlWriter.Write(x)
 	return &x, err
-}
-
-// where the work actually happens
-// returns an error if an attribute is not atomic
-func mapToXml(s *string, key string, value interface{}) error {
-	var endTag bool
-
-	if _, ok := value.([]interface{}); !ok {
-		*s += `<` + key
-	}
-	switch value.(type) {
-	case map[string]interface{}:
-		vv := value.(map[string]interface{})
-		lenvv := len(vv)
-		// scan out attributes - keys have prepended hyphen, '-'
-		var cntAttr int
-		for k, v := range vv {
-			if k[:1] == "-" {
-				switch v.(type) {
-				case string, float64, bool, int, int32, int64, float32:
-					*s += ` ` + k[1:] + `="` + fmt.Sprintf("%v", v) + `"`
-					cntAttr++
-				case []byte: // allow standard xml pkg []byte transform, as below
-					*s += ` ` + k[1:] + `="` + fmt.Sprintf("%v", string(v.([]byte))) + `"`
-					cntAttr++
-				default:
-					return fmt.Errorf("invalid attribute value for: %s", k)
-				}
-			}
-		}
-		// only attributes?
-		if cntAttr == lenvv {
-			break
-		}
-		// simple element? Note: '#text" is an invalid XML tag.
-		if v, ok := vv["#text"]; ok {
-			if cntAttr+1 < lenvv { // cntAttr + 1 for #text should be everything
-				return errors.New("#text key occurs with other non-attribute keys")
-			}
-			*s += ">" + fmt.Sprintf("%v", v)
-			endTag = true
-			break
-		}
-		// close tag with possible attributes
-		*s += ">"
-		// something more complex
-		for k, v := range vv {
-			if k[:1] == "-" {
-				continue
-			}
-			mapToXml(s, k, v)
-		}
-		endTag = true
-	case []interface{}:
-		for _, v := range value.([]interface{}) {
-			mapToXml(s, key, v)
-		}
-		return nil
-	case nil:
-		// terminate the tag
-		break
-	default: // handle anything - even goofy stuff
-		var tmp string
-		switch value.(type) {
-		case string, float64, bool, int, int32, int64, float32:
-			tmp = fmt.Sprintf("%v", value)
-		case []byte: // NOTE: byte is just an alias for uint8
-			// similar to how xml.Marshal handles []byte structure members
-			tmp = fmt.Sprintf("%v", string(value.([]byte)))
-		default:
-			v, err := xml.Marshal(value)
-			if err != nil {
-				tmp = "UNKNOWN"
-			} else {
-				tmp = string(v)
-			}
-		}
-		if len(tmp) > 0 {
-			*s += ">" + tmp
-			endTag = true
-		}
-	}
-
-	if endTag {
-		*s += "</" + key + ">"
-	} else if useGoXmlEmptyElemSyntax {
-		*s += "></" + key + ">"
-	} else {
-		*s += "/>"
-	}
-	return nil
 }
 
 // -------------------- END: mv.Xml & mv.XmlWriter -------------------------------
@@ -636,15 +546,15 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				err = mapToXmlIndent(s, DefaultRootTag, m, p)
+				err = mapToXmlIndent(true, s, DefaultRootTag, m, p)
 			} else {
-				err = mapToXmlIndent(s, key, value, p)
+				err = mapToXmlIndent(true, s, key, value, p)
 			}
 		}
 	} else if len(rootTag) == 1 {
-		err = mapToXmlIndent(s, rootTag[0], m, p)
+		err = mapToXmlIndent(true, s, rootTag[0], m, p)
 	} else {
-		err = mapToXmlIndent(s, DefaultRootTag, m, p)
+		err = mapToXmlIndent(true, s, DefaultRootTag, m, p)
 	}
 	return []byte(*s), err
 }
@@ -670,14 +580,17 @@ func (p *pretty) Outdent() {
 
 // where the work actually happens
 // returns an error if an attribute is not atomic
-func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error {
+func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth}
 
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
-		*s += p.padding + `<` + key
+		if doIndent {
+			*s += p.padding
+		}
+		*s += `<` + key
 	}
 	switch value.(type) {
 	case map[string]interface{}:
@@ -714,7 +627,9 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 		}
 		// close tag with possible attributes
 		*s += ">"
-		*s += "\n"
+		if doIndent {
+			*s += "\n"
+		}
 		// something more complex
 		p.mapDepth++
 		var i int
@@ -725,16 +640,18 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 			switch v.(type) {
 			case []interface{}:
 			default:
-				if i == 0 {
+				if i == 0 && doIndent {
 					p.Indent()
 				}
 			}
 			i++
-			mapToXmlIndent(s, k, v, p)
+			mapToXmlIndent(doIndent, s, k, v, p)
 			switch v.(type) {
 			case []interface{}: // handled in []interface{} case
 			default:
-				p.Outdent()
+				if doIndent {
+					p.Outdent()
+				}
 			}
 			i--
 		}
@@ -742,9 +659,13 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 		endTag = true
 	case []interface{}:
 		for _, v := range value.([]interface{}) {
-			p.Indent()
-			mapToXmlIndent(s, key, v, p)
-			p.Outdent()
+			if doIndent {
+				p.Indent()
+			}
+			mapToXmlIndent(doIndent, s, key, v, p)
+			if doIndent {
+				p.Outdent()
+			}
 		}
 		return nil
 	case nil:
@@ -760,7 +681,11 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 		default:
 			var v []byte
 			var err error
-			v, err = xml.MarshalIndent(value, p.padding, p.indent)
+			if doIndent {
+				v, err = xml.MarshalIndent(value, p.padding, p.indent)
+			} else {
+				v, err = xml.Marshal(value)
+			}
 			if err != nil {
 				*s += ">UNKNOWN"
 			} else {
@@ -772,11 +697,13 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 	}
 
 	if endTag {
-		if !isSimple {
-			if p.mapDepth == 0 {
-				p.Outdent()
+		if doIndent {
+			if !isSimple {
+				if p.mapDepth == 0 {
+					p.Outdent()
+				}
+				*s += p.padding
 			}
-			*s += p.padding
 		}
 		switch value.(type) {
 		case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
@@ -787,8 +714,10 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 	} else {
 		*s += "/>"
 	}
-	*s += "\n"
-	p.Outdent()
+	if doIndent {
+		*s += "\n"
+		p.Outdent()
+	}
 
 	return nil
 }
