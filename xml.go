@@ -725,7 +725,6 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 			switch v.(type) {
 			case []interface{}:
 			default:
-				// if !p.inMap || i == 0 {
 				if i == 0 {
 					p.Indent()
 				}
