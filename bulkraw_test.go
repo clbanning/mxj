@@ -30,9 +30,9 @@ func TestXmlReaderRaw(t *testing.T) {
 		t.Fatal("err:", err.Error())
 	}
 
-	// get the JSON
-	j := make([]byte, jsonWriterRaw.Len())
-	_, _ = jsonWriterRaw.Read(j)
+	// get the XML
+	x := make([]byte, xmlWriterRaw.Len())
+	_, _ = xmlWriterRaw.Read(x)
 
 	// get the errors
 	e := make([]byte, xmlErrLogRaw.Len())
@@ -41,20 +41,20 @@ func TestXmlReaderRaw(t *testing.T) {
 	// print the input
 	fmt.Println("XmlReaderRaw, xmldata:\n", string(xmldata))
 	// print the result
-	fmt.Println("XmlReaderRaw, result :\n", string(j))
+	fmt.Println("XmlReaderRaw, result :\n", string(x))
 	// print the errors
 	fmt.Println("XmlReaderRaw, errors :\n", string(e))
 }
 
 func bxmaphandlerRaw(m Map, raw *[]byte) bool {
-	j, err := m.JsonIndent("", "  ", true)
+	x, err := m.XmlIndent("", "  ")
 	if err != nil {
 		return false
 	}
 
-	_, _ = jsonWriterRaw.Write(j)
+	_, _ = xmlWriterRaw.Write(x)
 	// put in a NL to pretty up printing the Writer
-	_, _ = jsonWriterRaw.Write([]byte("\n"))
+	_, _ = xmlWriterRaw.Write([]byte("\n"))
 	return true
 }
 
@@ -76,9 +76,9 @@ func TestJsonReaderRaw(t *testing.T) {
 		t.Fatal("err:", err.Error())
 	}
 
-	// get the XML
-	x := make([]byte, xmlWriterRaw.Len())
-	_, _ = xmlWriterRaw.Read(x)
+	// get the JSON
+	j := make([]byte, jsonWriterRaw.Len())
+	_, _ = jsonWriterRaw.Read(j)
 
 	// get the errors
 	e := make([]byte, jsonErrLogRaw.Len())
@@ -87,19 +87,19 @@ func TestJsonReaderRaw(t *testing.T) {
 	// print the input
 	fmt.Println("JsonReaderRaw, jsondata:\n", string(jsondata))
 	// print the result
-	fmt.Println("JsonReaderRaw, result  :\n", string(x))
+	fmt.Println("JsonReaderRaw, result  :\n", string(j))
 	// print the errors
 	fmt.Println("JsonReaderRaw, errors :\n", string(e))
 }
 
 func bjmaphandlerRaw(m Map, raw *[]byte) bool {
-	x, err := m.XmlIndent("  ", "  ")
+	j, err := m.JsonIndent("  ", "  ", Cast)
 	if err != nil {
 		return false
 	}
-	_, _ = xmlWriterRaw.Write(x)
+	_, _ = jsonWriterRaw.Write(j)
 	// put in a NL to pretty up printing the Writer
-	_, _ = xmlWriterRaw.Write([]byte("\n"))
+	_, _ = jsonWriterRaw.Write([]byte("\n"))
 	return true
 }
 

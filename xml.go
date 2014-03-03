@@ -279,7 +279,7 @@ func cast(s string, r bool) interface{} {
 			return interface{}(f)
 		}
 		// ParseBool treats "1"==true & "0"==false
-		// but be more strick - only allow TRUE, true, FALSE, false
+		// but be more strick - only allow TRUE, True, true, FALSE, False, false
 		if s != "t" && s != "T" && s != "f" && s != "F" {
 			if b, err := strconv.ParseBool(s); err == nil {
 				return interface{}(b)
@@ -716,7 +716,7 @@ func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error 
 		*s += ">"
 		*s += "\n"
 		// something more complex
-		p.inMap = true
+		p.inMap = false
 		for k, v := range vv {
 			if k[:1] == "-" {
 				continue
@@ -724,8 +724,11 @@ func (p *pretty) mapToXmlIndent(s *string, key string, value interface{}) error 
 			switch v.(type) {
 			case []interface{}:
 			default:
-				p.Indent()
+				if !p.inMap {
+					p.Indent()
+				}
 			}
+			p.inMap = true
 			p.mapToXmlIndent(s, k, v)
 			switch v.(type) {
 			case []interface{}: // handled in []interface{} case
