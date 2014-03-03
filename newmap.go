@@ -119,12 +119,16 @@ func addNewVal(n *map[string]interface{}, path []string, val []interface{}) {
 		case []interface{}:
 			// add a map and nm points to new map unless there's already
 			// a map in the array, then nm points there
+			// The placement of the next value in the array is dependent
+			// on the sequence of members - could land on a map or a nil
+			// value first.  TODO: how to test this.
 			a := make([]interface{},0)
 			var foundmap bool
 			for _, vv := range m[k].([]interface{}) {
 				switch vv.(type) {
-				case nil:
+				case nil: // doesn't appear that this occurs, need a test case
 					if foundmap { // use the first one in array
+						a = append(a, vv)
 						continue
 					}
 					nm = make(map[string]interface{}, 0)
@@ -132,6 +136,7 @@ func addNewVal(n *map[string]interface{}, path []string, val []interface{}) {
 					foundmap = true
 				case map[string]interface{}:
 					if foundmap { // use the first one in array
+						a = append(a, vv)
 						continue
 					}
 					nm = vv.(map[string]interface{})
