@@ -51,7 +51,8 @@ SUMMARY
 	A new Map with whatever keys are desired can be created from the current Map and then encoded in XML
 	or JSON. (Note: keys can use dot-notation.)
 		newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
-		newXml := newMap.XML() // for example
+		newXml := newMap.Xml()     // for example
+		newJson := newMap.Json()   // ditto 
 
 XML PARSING CONVENTIONS
 
