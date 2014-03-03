@@ -653,8 +653,6 @@ type pretty struct {
 	indent  string
 	cnt     int
 	padding string
-	inList  bool
-	inMap   bool
 	mapDepth int
 }
 
@@ -675,7 +673,7 @@ func (p *pretty) Outdent() {
 func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
-	p := &pretty{ pp.indent, pp.cnt, pp.padding, pp.inList, pp.inMap, pp.mapDepth}
+	p := &pretty{ pp.indent, pp.cnt, pp.padding, pp.mapDepth}
 
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
@@ -718,7 +716,6 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 		*s += ">"
 		*s += "\n"
 		// something more complex
-		p.inMap = false
 		p.mapDepth++
 		var i int
 		for k, v := range vv {
@@ -728,34 +725,28 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 			switch v.(type) {
 			case []interface{}:
 			default:
-				if !p.inMap || i == 0 {
+				// if !p.inMap || i == 0 {
+				if i == 0 {
 					p.Indent()
 				}
 			}
 			i++
-			p.inMap = true
 			mapToXmlIndent(s, k, v, p)
 			switch v.(type) {
 			case []interface{}: // handled in []interface{} case
-			case map[string]interface{}:
 			default:
-				if !p.inList && i > 0 {
 					p.Outdent()
-				}
 			}
 			i--
 		}
-		p.inMap = false
 		p.mapDepth--
 		endTag = true
 	case []interface{}:
-		p.inList = true
 		for _, v := range value.([]interface{}) {
 			p.Indent()
 			mapToXmlIndent(s, key, v, p)
 			p.Outdent()
 		}
-		p.inList = false
 		return nil
 	case nil:
 		// terminate the tag
@@ -783,7 +774,7 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 
 	if endTag {
 		if !isSimple {
-			if p.inList || p.mapDepth == 0 {
+			if p.mapDepth == 0 {
 				p.Outdent()
 			}
 			*s += p.padding
@@ -796,9 +787,7 @@ func mapToXmlIndent(s *string, key string, value interface{}, pp *pretty) error 
 		*s += "/>"
 	}
 	*s += "\n"
-	if !p.inList {
-		p.Outdent()
-	}
+	p.Outdent()
 
 	return nil
 }
