@@ -10,9 +10,9 @@ import (
 	"io"
 )
 
-// Demo how to relable a key using mv.NewMap()
-// Need to normalize from an XML stream the values for "netid" and "idnet".
-// Solution: make everything "netid"
+// Demo how to re-label a key using mv.NewMap().
+// Need to normalize from an XML stream the tags "netid" and "idnet".
+// Solution: make everything "netid".
 
 var msg1 = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
