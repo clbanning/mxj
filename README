@@ -45,7 +45,7 @@ SUMMARY
    or JSON. (Note: keys can use dot-notation.)
       newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
       newXml := newMap.Xml()   // for example
-		newJson := newMap.Json() // ditto
+      newJson := newMap.Json() // ditto
 
 USAGE
 
