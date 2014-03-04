@@ -17,5 +17,10 @@ With the new marshal.go, you can then force all XML using encoding/xml to use <t
 than the <tag ...></tag> syntax.
 
 NOTE:
-If you install this patch then only use either xml.SetUseNullEndTag() or maputil.XmlGoEmptyElemSyntax()
+If you install this patch then only use either 
+
+    - xml.SetUseNullEndTag() 
+or 
+    - mxj.XmlGoEmptyElemSyntax()
+
 to have consistent encoding of empty XML elements.
