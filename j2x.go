@@ -91,5 +91,54 @@ func JsonValuesForKeyPath(jsonVal []byte, path string, subkeys ...string) ([]int
 	}
 	return m.ValuesForPath(path, subkeys...)
 }
+
+// Wrap UpdateValuesForPath for JSON
+//	'jsonVal' is XML value
+//	'newKeyValue' is the value to replace an existing value at the end of 'path'
+//	'path' is the dot-notation path with the key whose value is to be replaced at the end
+//	       (can include wildcard character, '*')
+//	'subkeys' are key:value pairs of key:values that must match for the key
+func JsonUpdateValsForPath(jsonVal []byte, newKeyValue interface{}, path string, subkeys ...string) ([]byte, error) {
+	m, merr := NewMapJson(jsonVal)
+	if merr != nil {
+		return 0, err
+	}
+	n, err := m.UpdateValuesForPath(newJsonValue, path, subkeys...)
+	if err != nil {
+		return nil, err
+	}
+	return m.Json() 
+}
+
+// Wrap NewMap for JSON and return as JSON
+// 'jsonVal' is an JSON value
+// 'keypairs' are "oldKey:newKey" values that conform to 'keypairs' in (Map)NewMap.
+func JsonNewJson(jsonVal []byte, keypairs ...string) ([]byte, error) (
+	m, merr := NewMapJson(jsonVal)
+	if merr != nil {
+		return nil, merr
+	}
+	n, nerr := m.NewMap(keypairs...)
+	if nerr != nil {
+		return nil, nerr
+	}
+	return n.Json()
+}
+
+// Wrap NewMap for JSON and return as XML
+// 'jsonVal' is an JSON value
+// 'keypairs' are "oldKey:newKey" values that conform to 'keypairs' in (Map)NewMap.
+func JsonNewXml(jsonVal []byte, keypairs ...string) ([]byte, error) (
+	m, merr := NewMapJson(jsonVal)
+	if merr != nil {
+		return nil, merr
+	}
+	n, nerr := m.NewMap(tagpairs...)
+	if nerr != nil {
+		return nil, nerr
+	}
+	return n.Xml()
+}
+
 */
 

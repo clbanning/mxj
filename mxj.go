@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	Cast = true // for clarity - e.g., mxj.NewMapXml(doc, mxj.Cast)
+	Cast         = true // for clarity - e.g., mxj.NewMapXml(doc, mxj.Cast)
+	SafeEncoding = true // ditto - e.g., mv.Json(mxj.SafeEncoding)
 )
 
 type Map map[string]interface{}
@@ -23,7 +24,7 @@ func New() Map {
 }
 
 // Cast a Map to map[string]interface{}
-func (mv Map)Old() map[string]interface{} {
+func (mv Map) Old() map[string]interface{} {
 	return mv
 }
 

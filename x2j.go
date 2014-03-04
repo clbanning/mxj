@@ -92,5 +92,54 @@ func XmlValuesForTagPath(xmlVal []byte, path string, attrs ...string) ([]interfa
 	}
 	return m.ValuesForPath(path, attrs...)
 }
+
+// Wrap UpdateValuesForPath for XML
+//	'xmlVal' is XML value
+//	'newTagValue' is the value to replace an existing value at the end of 'path'
+//	'path' is the dot-notation path with the tag whose value is to be replaced at the end
+//	       (can include wildcard character, '*')
+//	'subkeys' are key:value pairs of tag:values that must match for the tag
+func XmlUpdateValsForPath(xmlVal []byte, newTagValue interface{}, path string, subkeys ...string) ([]byte, error) {
+	m, merr := NewMapXml(xmlVal)
+	if merr != nil {
+		return 0, err
+	}
+	n, err := m.UpdateValuesForPath(newTagValue, path, subkeys...)
+	if err != nil {
+		return nil, err
+	}
+	return m.Xml() 
+}
+
+// Wrap NewMap for XML and return as XML
+// 'xmlVal' is an XML value
+// 'tagpairs' are "oldTag:newTag" values that conform to 'keypairs' in (Map)NewMap.
+func XmlNewXml(xmlVal []byte, tagpairs ...string) ([]byte, error) (
+	m, merr := NewMapXml(xmlVal)
+	if merr != nil {
+		return nil, merr
+	}
+	n, nerr := m.NewMap(tagpairs...)
+	if nerr != nil {
+		return nil, nerr
+	}
+	return n.Xml()
+}
+
+// Wrap NewMap for XML and return as JSON
+// 'xmlVal' is an XML value
+// 'tagpairs' are "oldTag:newTag" values that conform to 'keypairs' in (Map)NewMap.
+func XmlNewJson(xmlVal []byte, tagpairs ...string) ([]byte, error) (
+	m, merr := NewMapXml(xmlVal)
+	if merr != nil {
+		return nil, merr
+	}
+	n, nerr := m.NewMap(tagpairs...)
+	if nerr != nil {
+		return nil, nerr
+	}
+	return n.Json()
+}
+
 */
 

@@ -23,8 +23,8 @@ import (
 )
 
 // (Map)NewMap - create a new Map from data in the current Map. 
-//	'keypairs' are key mappings "oldKey:newKey" that specify that the current value of
-//	'oldKey' should be the value for 'newKey' in the returned Map. 
+//	'keypairs' are key mappings "oldKey:newKey" that specify that the current value of 'oldKey'
+//	should be the value for 'newKey' in the returned Map. 
 //		- 'oldKey' supports dot-notation as described for (Map)ValuesForPath()
 //		- 'newKey' supports dot-notation with the exception of the wildcard, '*', character
 //		- "oldKey" is shorthand for for the keypair value "oldKey:oldKey"
@@ -33,7 +33,7 @@ import (
 //		  "null" is not supported unless it is the current Map.
 //		- see newmap_test.go for several syntax examples
 //	
-//	NOTE: m.NewMap() == mxj.New().
+//	NOTE: mv.NewMap() == mxj.New().
 func (mv Map) NewMap(keypairs ...string) (Map, error) {
 	n := make(map[string]interface{}, 0)
 	if len(keypairs) == 0 {
