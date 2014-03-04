@@ -303,8 +303,10 @@ var useGoXmlEmptyElemSyntax bool
 //	Go's encoding/xml package marshals empty XML elements as <tag ...></tag>.  By default this package
 //	encodes empty elements as <tag .../>.  If you're marshaling Map values that include structures
 //	(which are passed to xml.Marshal for encoding), this will let you conform to the standard package.
+//
 //	Alternatively, you can replace the encoding/xml/marshal.go file in the standard libary with the
-//	patched version in the "xml_marshal" folder in this package.
+//	patched version in the "xml_marshal" folder in this package. Then use xml.SetUseNullEndTag(true)
+//	to have all XML encoding use <tag .../> for empty elements.
 func XmlGoEmptyElemSyntax() {
 	useGoXmlEmptyElemSyntax = true
 }
@@ -334,7 +336,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 	var err error
 	s := new(string)
-	p := new(pretty)	// just a stub
+	p := new(pretty) // just a stub
 
 	if len(m) == 1 && len(rootTag) == 0 {
 		for key, value := range m {
