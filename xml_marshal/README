@@ -9,7 +9,7 @@ The marshal.go.v1_2 file in this repo does that for Go v1.2; use it in place of 
 marshal.go file.
 
 The example_test.go.v1_2 file extends the package example_test.go file in the src/pkg/encoding/xml
-directoiry to provide an example of the SetUseNullEndTag() function that you'll see in the new godoc 
+directory to provide an example of the SetUseNullEndTag() function that you'll see in the new godoc 
 documentation for encoding/xml.  xml.SetUseNullEndTag(true) causes xml.Marshal() to encode empty XML 
 elements as <tag .../>, just like this package.
 
