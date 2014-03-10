@@ -15,10 +15,12 @@ the tag for the variant spellings.
 Once we've retrieved the Map, we can parse it using the known keys - "disable",
 "text1" and "word1".
 
+
 gonuts1a.go - (03-mar-14)
 
 Here we just permute the tag labels using m.NewMap() to make all the messages
 consistent.  Then they can be decoded into a single structure definition.
+
 
 gonuts2.go - 
 
@@ -69,6 +71,12 @@ gonuts4.go -
 
 Here we use the ValuesForPath to extract attribute values for country names.  The attribute
 is included in the 'path' argument by prepending it with a hyphen: ""doc.some_tag.geoInfo.country.-name".
+
+
+gonuts5.go (10-mar-14) - 
+
+Extract a node of values using ValuesForPath based on name="list3-1-1-1".  Then get the values
+for the 'int' entries based on attribute 'name' values - mv.ValuesForKey("int", "-name:"+n).
 
 
 EAT YOUR OWN DOG FOOD ... 
