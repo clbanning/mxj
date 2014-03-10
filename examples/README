@@ -78,6 +78,12 @@ gonuts5.go (10-mar-14) -
 Extract a node of values using ValuesForPath based on name="list3-1-1-1".  Then get the values
 for the 'int' entries based on attribute 'name' values - mv.ValuesForKey("int", "-name:"+n).
 
+gonuts5a.go (10-mar-14) - 
+
+Extract a node of values using ValuesForPath based on name="list3-1-1-1".  Then get the values
+for the 'int' entries based on attribute 'name' values - mv.ValuesForKey("*", "-name:"+n).
+(Same as gonuts5.go but with wildcarded key value, since we're matching elements on subkey.)
+
 
 EAT YOUR OWN DOG FOOD ... 
 

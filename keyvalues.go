@@ -64,6 +64,29 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 				}
 			}
 		}
+
+		// wildcard case
+		if key == "*" {
+			for _, v := range vv {
+				switch v.(type) {
+				case map[string]interface{}:
+					if hasSubKeys(v, subkeys) {
+						*ret = append(*ret, v)
+					}
+				case []interface{}:
+					for _, av := range v.([]interface{}) {
+						if hasSubKeys(av, subkeys) {
+							*ret = append(*ret, av)
+						}
+					}
+				default:
+					if len(subkeys) == 0 {
+						*ret = append(*ret, v)
+					}
+				}
+			}
+		}
+
 		// scan the rest
 		for _, v := range vv {
 			hasKey(v, key, ret, subkeys)
@@ -197,7 +220,7 @@ func hasSubKeys(v interface{}, subkeys map[string]interface{}) bool {
 			}
 			vv, ok := mv[skey]
 			if !ok { // key doesn't exist
-				if isNotKey {	// key not there, but that's what we want
+				if isNotKey { // key not there, but that's what we want
 					if kv, ok := sval.(string); ok && kv == "*" {
 						continue
 					}
@@ -206,7 +229,7 @@ func hasSubKeys(v interface{}, subkeys map[string]interface{}) bool {
 			}
 			// wildcard check
 			if kv, ok := sval.(string); ok && kv == "*" {
-				if isNotKey {	// key is there, and we don't want it
+				if isNotKey { // key is there, and we don't want it
 					return false
 				}
 				continue
@@ -235,7 +258,7 @@ func hasSubKeys(v interface{}, subkeys map[string]interface{}) bool {
 				}
 			}
 			// key there but didn't match subkey value
-			if isNotKey {  // that's what we want
+			if isNotKey { // that's what we want
 				continue
 			}
 			return false
