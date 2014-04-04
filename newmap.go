@@ -23,7 +23,7 @@ import (
 )
 
 // (Map)NewMap - create a new Map from data in the current Map. 
-//	'keypairs' are key mappings "oldKey:newKey" that specify that the current value of 'oldKey'
+//	'keypairs' are key mappings "oldKey:newKey" and specify that the current value of 'oldKey'
 //	should be the value for 'newKey' in the returned Map. 
 //		- 'oldKey' supports dot-notation as described for (Map)ValuesForPath()
 //		- 'newKey' supports dot-notation with the exception of the wildcard, '*', character

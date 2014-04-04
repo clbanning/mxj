@@ -28,8 +28,8 @@ import (
 //	     github.com/clbanning/mxj
 //	 )
 //   ...
-//   mu.XmlCharsetReader = charset.NewReader
-//   m, merr := mu.NewMapXml(xmlValue)
+//   mxj.XmlCharsetReader = charset.NewReader
+//   m, merr := mxj.NewMapXml(xmlValue)
 var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 
 // NewMapXml - convert an XML doc into a Map

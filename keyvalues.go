@@ -322,9 +322,9 @@ func getSubKeyMap(kv ...string) (map[string]interface{}, error) {
 func (mv Map) PathsForKey(key string) []string {
 	m := map[string]interface{}(mv)
 	breadbasket := make(map[string]bool, 0)
-	breadcrumb := ""
+	breadcrumbs := ""
 
-	hasKeyPath(breadcrumb, m, key, breadbasket)
+	hasKeyPath(breadcrumbs, m, key, breadbasket)
 	if len(breadbasket) == 0 {
 		return nil
 	}
@@ -369,34 +369,34 @@ func (mv Map) PathForKeyShortest(key string) string {
 
 // hasKeyPath - if the map 'key' exists append it to KeyPath.path and increment KeyPath.depth
 // This is really just a breadcrumber that saves all trails that hit the prescribed 'key'.
-func hasKeyPath(crumb string, iv interface{}, key string, basket map[string]bool) {
+func hasKeyPath(crumbs string, iv interface{}, key string, basket map[string]bool) {
 	switch iv.(type) {
 	case map[string]interface{}:
 		vv := iv.(map[string]interface{})
 		if _, ok := vv[key]; ok {
-			if crumb == "" {
-				crumb = key
+			if crumbs == "" {
+				crumbs = key
 			} else {
-				crumb += "." + key
+				crumbs += "." + key
 			}
 			// *basket = append(*basket, crumb)
-			basket[crumb] = true
+			basket[crumbs] = true
 		}
 		// walk on down the path, key could occur again at deeper node
 		for k, v := range vv {
 			// create a new breadcrumb, intialized with the one we have
 			var nbc string
-			if crumb == "" {
+			if crumbs == "" {
 				nbc = k
 			} else {
-				nbc = crumb + "." + k
+				nbc = crumbs + "." + k
 			}
 			hasKeyPath(nbc, v, key, basket)
 		}
 	case []interface{}:
 		// crumb-trail doesn't change, pass it on
 		for _, v := range iv.([]interface{}) {
-			hasKeyPath(crumb, v, key, basket)
+			hasKeyPath(crumbs, v, key, basket)
 		}
 	}
 }
