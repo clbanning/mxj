@@ -57,7 +57,7 @@ func TestNewMapXmlReader(t *testing.T) {
 		if err == io.EOF && len(m) == 0 {
 			break
 		}
-		fmt.Println("NewMapXmlReader, raw:", string(*raw))
+		fmt.Println("NewMapXmlReader, raw:", string(raw))
 		fmt.Println("NewMapXmlReader, m  :", m)
 	}
 }
@@ -91,7 +91,7 @@ func TestXmlWriter(t *testing.T) {
 		t.Fatal("err:", err.Error())
 	}
 
-	fmt.Println("XmlWriter, raw:", string(*raw))
+	fmt.Println("XmlWriter, raw:", string(raw))
 	fmt.Println("XmlWriter, b  :", string(b))
 }
 
@@ -112,19 +112,19 @@ func TestHandleXmlReader(t *testing.T) {
 
 var xt *testing.T
 
-func xmhandler(m Map, raw *[]byte) bool {
+func xmhandler(m Map, raw []byte) bool {
 	x, xerr := m.Xml()
 	if xerr != nil {
 		xt.Fatal("... xmhandler:", xerr.Error())
 		return false
 	}
 
-	fmt.Println("... xmhandler, raw:", string(*raw))
+	fmt.Println("... xmhandler, raw:", string(raw))
 	fmt.Println("... xmhandler, x  :", string(x))
 	return true
 }
 
-func xehandler(err error, raw *[]byte) bool {
+func xehandler(err error, raw []byte) bool {
 	if err == nil {
 		// shouldn't be here
 		xt.Fatal("... xehandler: <nil>")
@@ -134,7 +134,7 @@ func xehandler(err error, raw *[]byte) bool {
 		return true
 	}
 
-	fmt.Println("... xehandler raw:", string(*raw))
+	fmt.Println("... xehandler raw:", string(raw))
 	fmt.Println("... xehandler err:", err.Error())
 	return true
 }

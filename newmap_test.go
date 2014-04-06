@@ -107,7 +107,7 @@ func TestNetId(t *testing.T) {
 		n, _ := m.NewMap("data.netid", "data.idnet:data.netid")
 		x, _ := n.XmlIndent("", "  ")
 
-		fmt.Println("original value:", string(*raw))
+		fmt.Println("original value:", string(raw))
 		fmt.Println("new value:")
 		fmt.Println(string(x))
 	}

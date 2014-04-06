@@ -59,7 +59,7 @@ func TestNewMapJsonReader(t *testing.T) {
 			break
 		}
 
-		fmt.Println("NewMapJsonReader, jb:", string(*jb))
+		fmt.Println("NewMapJsonReader, jb:", string(jb))
 		fmt.Println("NewMapJsonReader, m :", m)
 	}
 }
@@ -95,6 +95,6 @@ func TestJsonWriter(t *testing.T) {
 		t.Fatal("err:", err.Error())
 	}
 
-	fmt.Println("JsonWriter, raw:", string(*raw))
+	fmt.Println("JsonWriter, raw:", string(raw))
 	fmt.Println("JsonWriter, b  :", string(b))
 }

@@ -58,9 +58,8 @@ func bxmaphandler(m Map) bool {
 
 func bxerrhandler(err error) bool {
 	// write errors to file
-	_, _ = xmlErrLog.Write([]byte(err.Error())) 
-	// _, _ = xmlErrWriter.Write(*raw) // used for HandleXmlReader, no raw XML passed
-	 _, _ = xmlErrLog.Write([]byte("\n")) // pretty up
+	_, _ = xmlErrLog.Write([]byte(err.Error()))
+	_, _ = xmlErrLog.Write([]byte("\n")) // pretty up
 	return true
 }
 

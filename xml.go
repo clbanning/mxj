@@ -32,7 +32,7 @@ import (
 //   m, merr := mxj.NewMapXml(xmlValue)
 var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 
-// NewMapXml - convert an XML doc into a Map
+// NewMapXml - convert a XML doc into a Map
 // (This is analogous to unmarshalling a JSON string to map[string]interface{} using json.Unmarshal().)
 //	If the optional argument 'cast' is 'true', then values will be converted to boolean or float64 if possible.
 //
@@ -83,12 +83,12 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and pointer to raw XML.
-//	NOTE: Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to *[]byte
+//	NOTE: Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
 //	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
 //	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
 //	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
-//	      you CAN use it to efficiently unmarshal an XML and retrieve the raw XML in a single call.
-func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, *[]byte, error) {
+//	      you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
+func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
 		r = cast[0]
@@ -105,14 +105,14 @@ func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, *[]byte, error)
 	_, _ = wb.Read(b)
 
 	if err != nil {
-		return nil, &b, err
+		return nil, b, err
 	}
 
 	// create the Map value
 	m := make(map[string]interface{})
 	m[n.key] = n.treeToMap(r)
 
-	return m, &b, nil
+	return m, b, nil
 }
 
 // xmlReaderToTree() - parse a XML io.Reader to a tree of nodes
@@ -132,7 +132,7 @@ type node struct {
 	nodes []*node
 }
 
-// xmlToTree - convert an XML doc into a tree of nodes.
+// xmlToTree - convert a XML doc into a tree of nodes.
 func xmlToTree(doc []byte) (*node, error) {
 	// xml.Decoder doesn't properly handle whitespace in some doc
 	// see songTextString.xml test case ...
@@ -369,16 +369,16 @@ func (mv Map) XmlWriter(xmlWriter io.Writer, rootTag ...string) error {
 	return err
 }
 
-// Writes the Map as  XML on the Writer. *[]byte is the raw XML that was written.
+// Writes the Map as  XML on the Writer. []byte is the raw XML that was written.
 // See Xml() for encoding rules.
-func (mv Map) XmlWriterRaw(xmlWriter io.Writer, rootTag ...string) (*[]byte, error) {
+func (mv Map) XmlWriterRaw(xmlWriter io.Writer, rootTag ...string) ([]byte, error) {
 	x, err := mv.Xml(rootTag...)
 	if err != nil {
-		return &x, err
+		return x, err
 	}
 
 	_, err = xmlWriter.Write(x)
-	return &x, err
+	return x, err
 }
 
 // Writes the Map as pretty XML on the Writer.
@@ -393,16 +393,16 @@ func (mv Map) XmlIndentWriter(xmlWriter io.Writer, prefix, indent string, rootTa
 	return err
 }
 
-// Writes the Map as pretty XML on the Writer. *[]byte is the raw XML that was written.
+// Writes the Map as pretty XML on the Writer. []byte is the raw XML that was written.
 // See Xml() for encoding rules.
-func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, rootTag ...string) (*[]byte, error) {
+func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, rootTag ...string) ([]byte, error) {
 	x, err := mv.XmlIndent(prefix, indent, rootTag...)
 	if err != nil {
-		return &x, err
+		return x, err
 	}
 
 	_, err = xmlWriter.Write(x)
-	return &x, err
+	return x, err
 }
 
 // -------------------- END: mv.Xml & mv.XmlWriter -------------------------------
@@ -454,13 +454,13 @@ func HandleXmlReader(xmlReader io.Reader, mapHandler func(Map) bool, errHandler 
 
 // Bulk process XML using handlers that process a Map value and the raw XML.
 //	'rdr' is an io.Reader for XML (stream)
-//	'mapHandler' is the Map and raw XML - *[]byte - processing handler. Return of 'false' stops further processing.
+//	'mapHandler' is the Map and raw XML - []byte - processing handler. Return of 'false' stops further processing.
 //	'errHandler' is the error and raw XML processing handler. Return of 'false' stops further processing and returns the error.
 //	Note: mapHandler() and errHandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass argument(s) to a go routine in handler and return true.
 //	See NewMapXmlReaderRaw for comment on performance associated with retrieving raw XML from a Reader.
-func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, *[]byte) bool, errHandler func(error, *[]byte) bool) error {
+func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, []byte) bool, errHandler func(error, []byte) bool) error {
 	var n int
 	for {
 		m, raw, merr := NewMapXmlReaderRaw(xmlReader)

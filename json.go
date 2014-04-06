@@ -66,16 +66,16 @@ func (mv Map) JsonWriter(jsonWriter io.Writer, safeEncoding ...bool) error {
 	return err
 }
 
-// Writes the Map as JSON on the Writer. *[]byte is the raw JSON that was written.
+// Writes the Map as JSON on the Writer. []byte is the raw JSON that was written.
 // If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
-func (mv Map) JsonWriterRaw(jsonWriter io.Writer, safeEncoding ...bool) (*[]byte, error) {
+func (mv Map) JsonWriterRaw(jsonWriter io.Writer, safeEncoding ...bool) ([]byte, error) {
 	b, err := mv.Json(safeEncoding...)
 	if err != nil {
-		return &b, err
+		return b, err
 	}
 
 	_, err = jsonWriter.Write(b)
-	return &b, err
+	return b, err
 }
 
 // Writes the Map as pretty JSON on the Writer.
@@ -90,16 +90,16 @@ func (mv Map) JsonIndentWriter(jsonWriter io.Writer, prefix, indent string, safe
 	return err
 }
 
-// Writes the Map as pretty JSON on the Writer. *[]byte is the raw JSON that was written.
+// Writes the Map as pretty JSON on the Writer. []byte is the raw JSON that was written.
 // If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
-func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string,  safeEncoding ...bool) (*[]byte, error) {
+func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string,  safeEncoding ...bool) ([]byte, error) {
 	b, err := mv.JsonIndent(prefix, indent, safeEncoding...)
 	if err != nil {
-		return &b, err
+		return b, err
 	}
 
 	_, err = jsonWriter.Write(b)
-	return &b, err
+	return b, err
 }
 
 // --------------------------- read JSON -----------------------------
@@ -132,19 +132,20 @@ func NewMapJsonReader(jsonReader io.Reader) (Map, error) {
 	return NewMapJson(*jb)
 }
 
-// Retrieve a Map value and raw JSON - *[]byte - from an io.Reader.
-func NewMapJsonReaderRaw(jsonReader io.Reader) (Map, *[]byte, error) {
+// Retrieve a Map value and raw JSON - []byte - from an io.Reader.
+func NewMapJsonReaderRaw(jsonReader io.Reader) (Map, []byte, error) {
 	jb, err := getJson(jsonReader)
 	if err != nil || len(*jb) == 0 {
-		return nil, jb, err
+		return nil, *jb, err
 	}
 
 	// Unmarshal the 'presumed' JSON string
 	m, merr := NewMapJson(*jb)
-	return m, jb, merr
+	return m, *jb, merr
 }
 
 // Pull the next JSON string off the stream: just read from first '{' to its closing '}'.
+// Returning a pointer to the slice saves 16 bytes - maybe unnecessary, but internal to package.
 func getJson(rdr io.Reader) (*[]byte, error) {
 	bval := make([]byte, 1)
 	jb := make([]byte, 0)
@@ -157,9 +158,9 @@ func getJson(rdr io.Reader) (*[]byte, error) {
 		_, err := rdr.Read(bval)
 		if err != nil {
 			if err == io.EOF && inJson && parenCnt > 0 {
-				return nil, fmt.Errorf("no closing } for JSON string: %s", string(jb))
+				return &jb, fmt.Errorf("no closing } for JSON string: %s", string(jb))
 			}
-			return nil, err
+			return &jb, err
 		}
 		switch bval[0] {
 		case '{':
@@ -246,12 +247,12 @@ func HandleJsonReader(jsonReader io.Reader, mapHandler func(Map) bool, errHandle
 
 // Bulk process JSON using handlers that process a Map value and the raw JSON.
 //	'rdr' is an io.Reader for the JSON (stream).
-//	'mapHandler' is the Map and raw JSON - *[]byte - processing handler. Return of 'false' stops further processing.
+//	'mapHandler' is the Map and raw JSON - []byte - processing handler. Return of 'false' stops further processing.
 //	'errHandler' is the error and raw JSON processing handler. Return of err != nil stop processing and returns error.
 //	Note: mapHandler() and errHandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass argument(s) to a go routine in handler and return true.
-func HandleJsonReaderRaw(jsonReader io.Reader, mapHandler func(Map, *[]byte) bool, errHandler func(error, *[]byte) bool) error {
+func HandleJsonReaderRaw(jsonReader io.Reader, mapHandler func(Map, []byte) bool, errHandler func(error, []byte) bool) error {
 	var n int
 	for {
 		m, raw, merr := NewMapJsonReaderRaw(jsonReader)
