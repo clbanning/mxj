@@ -24,7 +24,7 @@ func TestXmlReaderRaw(t *testing.T) {
 	// create Reader for xmldata
 	xmlReader := bytes.NewReader(xmldata)
 
-	// read XML from Readerand pass Map value with the raw XML to handler
+	// read XML from Reader and pass Map value with the raw XML to handler
 	err := HandleXmlReaderRaw(xmlReader, bxmaphandlerRaw, bxerrhandlerRaw)
 	if err != nil {
 		t.Fatal("err:", err.Error())
