@@ -300,3 +300,47 @@ var biblioDoc = []byte(`
 	...
 */
 }
+
+func ExampleMap_Copy() {
+	// Hand-crafted Map values that include structures do NOT Copy() as expected,
+	// since to simulate a deep copy the original Map value is JSON encoded then decoded.
+
+	type str struct {
+		IntVal   int     `json:"int"`
+		StrVal   string  `json:"str"`
+		FloatVal float64 `json:"float"`
+		BoolVal  bool    `json:"bool"`
+		private  string
+	}
+	s := str{IntVal: 4, StrVal: "now's the time", FloatVal: 3.14159, BoolVal: true, private: "Skies are blue"}
+	m := make(map[string]interface{},0)
+	m["struct"] = interface{}(s)
+	m["struct_ptr"] = interface{}(&s)
+	m["misc"] = interface{}(`Now is the time`)
+
+
+	mv := mxj.Map(m)
+	cp,_ := mv.Copy()
+
+	fmt.Printf("mv:%s\n", mv.StringIndent(2))
+	fmt.Printf("cp:%s\n", cp.StringIndent(2))
+
+// Output:
+// mv:
+//     struct :[unknown] mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
+//     struct_ptr :[unknown] &mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
+//     misc :[string] Now is the time
+// cp:
+//     misc :[string] Now is the time
+//     struct :
+//       int :[float64] 4.00e+00
+//       str :[string] now's the time
+//       float :[float64] 3.14e+00
+//       bool :[bool] true
+//     struct_ptr :
+//       int :[float64] 4.00e+00
+//       str :[string] now's the time
+//       float :[float64] 3.14e+00
+//       bool :[bool] true
+}
+

@@ -28,6 +28,26 @@ func (mv Map) Old() map[string]interface{} {
 	return mv
 }
 
+// Return a copy of mv as a newly allocated Map.  If the Map only contains string,
+// numeric, map[string]interface{}, and []interface{} values, then it can be thought
+// of as a "deep copy."  Copying a structure (or structure reference) value is subject
+// to the noted restrictions.
+//	NOTE: If 'mv' includes structure values with, possibly, JSON encoding tags
+//	      then only public fields of the structure are in the new Map - and with
+//	      keys that conform to any encoding tag instructions. The structure itself will
+//	      be represented as a map[string]interface{} value.
+func (mv Map) Copy() (Map, error) {
+	// this is the poor-man's deep copy
+	// not efficient, but it works 
+	j, jerr := mv.Json()
+	// must handle, we don't know how mv got built
+	if jerr != nil {
+		return nil, jerr
+	}
+	m, _ := NewMapJson(j)
+	return m, nil
+}
+
 // --------------- StringIndent ... from x2j.WriteMap -------------
 
 // Pretty print a Map.
@@ -78,12 +98,11 @@ func writeMap(m interface{}, offset ...int) string {
 			for i := 0; i < indent; i++ {
 				s += "  "
 			}
-			// s += "[map[string]interface{}] "+k+" :"+writeMap(v,indent+1)
 			s += k + " :" + writeMap(v, indent+1)
 		}
 	default:
 		// shouldn't ever be here ...
-		s += fmt.Sprintf("unknown type for: %v", m)
+		s += fmt.Sprintf("[unknown] %#v", m)
 	}
 	return s
 }
