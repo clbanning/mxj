@@ -4,7 +4,7 @@
 // license that can be found in the LICENSE file
 
 /*
-Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract values from maps by key or key-path, including wildcards.
+Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract/modify values from maps by key or key-path, including wildcards.
 
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, just uncomment the content of x2j.go
 or j2x.go, which are included as part of this package.
@@ -30,7 +30,7 @@ SUMMARY
 
 	Bulk process XML with error handling:
 		err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))
-		err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, *[]byte), errHandler(error, *[]byte))
+		err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, []byte), errHandler(error, []byte))
 
 	Converting XML to JSON: see Examples for NewMapXml and HandleXmlReader.
 
