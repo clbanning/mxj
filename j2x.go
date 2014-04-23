@@ -22,31 +22,31 @@ func JsonToXml(jsonVal []byte) ([]byte, error) {
 }
 
 // FromJson() --> ToXmlWriter().
-func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) (*[]byte, error) {
+func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) ([]byte, error) {
 	m, merr := NewMapJson(jsonVal)
 	if merr != nil {
 		return nil, merr
 	}
-	return m.XmlWriter(xmlWriter)
+	return m.XmlWriterRaw(xmlWriter)
 }
 
 // FromJsonReader() --> ToXml().
-func JsonReaderToXml(jsonReader io.Reader) ([]byte, *[]byte, error) {
-	m, raw, merr := NewMapJsonReader(jsonReader)
-	if merr != nil {
-		return nil, raw, merr
-	}
-	x, xerr := m.Xml()
-	return x, raw, xerr
-}
-
-// FromJsonReader() --> ToXmlWriter().  Handy for transforming bulk message sets.
-func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) (*[]byte, *[]byte, error) {
-	m, jraw, merr := NewMapJsonReader(jsonReader)
+func JsonReaderToXml(jsonReader io.Reader) ([]byte, []byte, error) {
+	m, jraw, merr := NewMapJsonReaderRaw(jsonReader)
 	if merr != nil {
 		return jraw, nil, merr
 	}
-	xraw, xerr := m.XmlWriter(xmlWriter)
+	x, xerr := m.Xml()
+	return jraw, x, xerr
+}
+
+// FromJsonReader() --> ToXmlWriter().  Handy for transforming bulk message sets.
+func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) ([]byte, []byte, error) {
+	m, jraw, merr := NewMapJsonReaderRaw(jsonReader)
+	if merr != nil {
+		return jraw, nil, merr
+	}
+	xraw, xerr := m.XmlWriterRaw(xmlWriter)
 	return jraw, xraw, xerr
 }
 */
