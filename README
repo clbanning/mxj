@@ -15,15 +15,20 @@ SUMMARY
 
    Unmarshal XML from an io.Reader as a Map value, 'm':
       m, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
-      m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' points to the raw XML that was decoded
+      m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded
 
    Marshal Map value, 'm', to an XML Writer (io.Writer):
-      err := m.XmlWriter(xmlWriter)         // or: m.XmlIndentWriter(xmlWriter, prefix, indent)
-      err, raw := m.XmlWriterRaw(xmlWriter) // 'raw' points to the raw XML that was written on xmlWriter
+      err := m.XmlWriter(xmlWriter)
+      raw, err := m.XmlWriterRaw(xmlWriter) // 'raw' is the raw XML that was written on xmlWriter
+	
+   Also, for prettified output:
+      xmlValue, err := m.XmlIndent(prefix, indent, ...)
+      err := m.XmlIndentWriter(xmlWriter, prefix, indent, ...)
+      raw, err := m.XmlIndentWriterRaw(xmlWriter, prefix, indent, ...)
 
    Bulk process XML with error handling (note: handlers must return a boolean value):
       err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))
-      err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, *[]byte), errHandler(error, *[]byte))
+      err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, []byte), errHandler(error, []byte))
 
    Converting XML to JSON: see Examples for NewMapXml and HandleXmlReader.
 
