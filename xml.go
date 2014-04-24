@@ -415,11 +415,11 @@ var xhandlerPollInterval = time.Duration(1e6)
 
 // Bulk process XML using handlers that process a Map value.
 //	'rdr' is an io.Reader for XML (stream)
-//	'mapHandler' is the Map processing handler. Return of 'false' stops further processing.
-//	'errHandler' is the error processing handler. Return of 'false' stops further processing and returns the error.
+//	'mapHandler' is the Map processor. Return of 'false' stops further processing.
+//	'errHandler' is the error processor. Return of 'false' stops further processing and returns the error.
 //	Note: mapHandler() and errHandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
-//	      To have reading and handling run concurrently, pass argument(s) to a go routine in handler and return true.
+//	      To have reading and handling run concurrently, pass argument to a go routine in handler and return true.
 func HandleXmlReader(xmlReader io.Reader, mapHandler func(Map) bool, errHandler func(error) bool) error {
 	var n int
 	for {
@@ -454,8 +454,8 @@ func HandleXmlReader(xmlReader io.Reader, mapHandler func(Map) bool, errHandler 
 
 // Bulk process XML using handlers that process a Map value and the raw XML.
 //	'rdr' is an io.Reader for XML (stream)
-//	'mapHandler' is the Map and raw XML - []byte - processing handler. Return of 'false' stops further processing.
-//	'errHandler' is the error and raw XML processing handler. Return of 'false' stops further processing and returns the error.
+//	'mapHandler' is the Map and raw XML - []byte - processor. Return of 'false' stops further processing.
+//	'errHandler' is the error and raw XML processor. Return of 'false' stops further processing and returns the error.
 //	Note: mapHandler() and errHandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass argument(s) to a go routine in handler and return true.

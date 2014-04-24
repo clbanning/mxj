@@ -209,10 +209,10 @@ var jhandlerPollInterval = time.Duration(1e6)
 // Bulk process JSON using handlers that process a Map value.
 //	'rdr' is an io.Reader for the JSON (stream).
 //	'mapHandler' is the Map processing handler. Return of 'false' stops further processing.
-//	'errHandler' is the error. Return of 'false' stop processing and returns error.
+//	'errHandler' is the error processor. Return of 'false' stops processing and returns error.
 //	Note: mapHandler() and errHandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
-//	      To have reading and handling run concurrently, pass argument(s) to a go routine in handler and return true.
+//	      To have reading and handling run concurrently, pass argument to a go routine in handler and return true.
 func HandleJsonReader(jsonReader io.Reader, mapHandler func(Map) bool, errHandler func(error) bool) error {
 	var n int
 	for {
@@ -247,8 +247,8 @@ func HandleJsonReader(jsonReader io.Reader, mapHandler func(Map) bool, errHandle
 
 // Bulk process JSON using handlers that process a Map value and the raw JSON.
 //	'rdr' is an io.Reader for the JSON (stream).
-//	'mapHandler' is the Map and raw JSON - []byte - processing handler. Return of 'false' stops further processing.
-//	'errHandler' is the error and raw JSON processing handler. Return of err != nil stop processing and returns error.
+//	'mapHandler' is the Map and raw JSON - []byte - processor. Return of 'false' stops further processing.
+//	'errHandler' is the error and raw JSON processor. Return of err != nil stops processing and returns error.
 //	Note: mapHandler() and errHandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass argument(s) to a go routine in handler and return true.
