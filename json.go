@@ -92,7 +92,7 @@ func (mv Map) JsonIndentWriter(jsonWriter io.Writer, prefix, indent string, safe
 
 // Writes the Map as pretty JSON on the Writer. []byte is the raw JSON that was written.
 // If 'safeEncoding' is 'true', then "safe" encoding of '<', '>' and '&' is preserved.
-func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string,  safeEncoding ...bool) ([]byte, error) {
+func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string, safeEncoding ...bool) ([]byte, error) {
 	b, err := mv.JsonIndent(prefix, indent, safeEncoding...)
 	if err != nil {
 		return b, err
@@ -122,10 +122,10 @@ func NewMapJson(jsonVal []byte) (Map, error) {
 }
 
 // Retrieve a Map value from an io.Reader.
-//	NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an 
-//       os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte 
-//       value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal 
-//       a JSON object and retrieve the raw JSON in a single call.
+//  NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an
+//        os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte
+//        value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal
+//        a JSON object and retrieve the raw JSON in a single call.
 func NewMapJsonReader(jsonReader io.Reader) (Map, error) {
 	jb, err := getJson(jsonReader)
 	if err != nil || len(*jb) == 0 {
@@ -137,10 +137,10 @@ func NewMapJsonReader(jsonReader io.Reader) (Map, error) {
 }
 
 // Retrieve a Map value and raw JSON - []byte - from an io.Reader.
-//	NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an 
-//       os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte 
-//       value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal 
-//       a JSON object and retrieve the raw JSON in a single call.
+//  NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an
+//        os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte
+//        value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal
+//        a JSON object and retrieve the raw JSON in a single call.
 func NewMapJsonReaderRaw(jsonReader io.Reader) (Map, []byte, error) {
 	jb, err := getJson(jsonReader)
 	if err != nil || len(*jb) == 0 {
@@ -159,6 +159,7 @@ func getJson(rdr io.Reader) (*[]byte, error) {
 	jb := make([]byte, 0)
 	var inQuote, inJson bool
 	var parenCnt int
+	var previous byte
 
 	// scan the input for a matched set of {...}
 	// json.Unmarshal will handle syntax checking.
@@ -185,6 +186,9 @@ func getJson(rdr io.Reader) (*[]byte, error) {
 			}
 		case '"':
 			if inQuote {
+				if previous == '\\' {
+					break
+				}
 				inQuote = false
 			} else {
 				inQuote = true
@@ -195,11 +199,12 @@ func getJson(rdr io.Reader) (*[]byte, error) {
 			}
 		}
 		if inJson {
-			jb = append(jb, bval...)
+			jb = append(jb, bval[0])
 			if parenCnt == 0 {
 				break
 			}
 		}
+		previous = bval[0]
 	}
 
 	return &jb, nil
