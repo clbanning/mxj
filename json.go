@@ -122,6 +122,10 @@ func NewMapJson(jsonVal []byte) (Map, error) {
 }
 
 // Retrieve a Map value from an io.Reader.
+//	NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an 
+//       os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte 
+//       value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal 
+//       a JSON object and retrieve the raw JSON in a single call.
 func NewMapJsonReader(jsonReader io.Reader) (Map, error) {
 	jb, err := getJson(jsonReader)
 	if err != nil || len(*jb) == 0 {
@@ -133,6 +137,10 @@ func NewMapJsonReader(jsonReader io.Reader) (Map, error) {
 }
 
 // Retrieve a Map value and raw JSON - []byte - from an io.Reader.
+//	NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an 
+//       os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte 
+//       value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal 
+//       a JSON object and retrieve the raw JSON in a single call.
 func NewMapJsonReaderRaw(jsonReader io.Reader) (Map, []byte, error) {
 	jb, err := getJson(jsonReader)
 	if err != nil || len(*jb) == 0 {
