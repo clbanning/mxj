@@ -114,7 +114,7 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
 //             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //             - For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
-//             - If the 'path' refers to a list, then "tag:value" would select a list member of the list.
+//             - If the 'path' refers to a list, then "tag:value" would return member of the list.
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
