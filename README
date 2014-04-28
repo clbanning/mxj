@@ -2,6 +2,9 @@ Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extrac
 
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, just uncomment the content of x2j.go or j2x.go, which are included as part of this package.
 
+NOTES:
+   2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
+
 SUMMARY
 
    type Map map[string]interface{}

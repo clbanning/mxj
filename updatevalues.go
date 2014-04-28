@@ -18,6 +18,7 @@ import (
 //	'newVal' can be a Map or map[string]interface{} value with a single 'key' that is the key to be modified
 //	             or a string value "key:value[:type]" where type is "bool" or "num" to cast the value.
 //	'path' is dot-notation list of keys to traverse; last key in path can be newVal key
+//	       NOTE: 'path' spec does not currently support indexed array references.
 //	'subkeys' are "key:value[:type]" entries that must match for path node
 //	            The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //	            If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an

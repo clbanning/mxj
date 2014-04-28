@@ -222,3 +222,191 @@ func TestValuesForNotKey( t *testing.T) {
 		fmt.Println("... ss.v:", v)
 	}
 }
+
+func TestIAHeader(t *testing.T) {
+	fmt.Println("\n----------------  indexedarray_test.go ...\n")
+}
+
+var ak_data = []byte(`{ "section1":{"data" : [{"F1" : "F1 data","F2" : "F2 data"},{"F1" : "demo 123","F2" : "abc xyz"}]}}`)
+var j_data = []byte(`{ "stuff":[ { "data":[ { "F":1 }, { "F":2 }, { "F":3 } ] }, { "data":[ 4, 5, 6 ] } ] }`)
+var x_data = []byte(`
+<doc>
+	<stuff>
+		<data seq="1.1">
+			<F>1</F>
+		</data>
+		<data seq="1.2">
+			<F>2</F>
+		</data>
+		<data seq="1.3">
+			<F>3</F>
+		</data>
+	</stuff>
+	<stuff>
+		<data seq="2.1">
+			<F>4</F>
+		</data>
+		<data seq="2.2">
+			<F>5</F>
+		</data>
+		<data seq="2.3">
+			<F>6</F>
+		</data>
+	</stuff>
+</doc>`)
+
+func TestValuesForIndexedArray(t *testing.T) {
+	j_main(t)
+	x_main(t)
+	ak_main(t)
+}
+
+func ak_main(t *testing.T) {
+	fmt.Println("\nak_data:", string(ak_data))
+	m, merr := NewMapJson(ak_data)
+	if merr != nil {
+		t.Fatal("merr:", merr.Error())
+		return
+	}
+	fmt.Println("m:", m)
+
+	v, verr := m.ValuesForPath("section1.data[0].F1")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("section1.data[0].F1:", v)
+}
+
+func j_main(t *testing.T) {
+	fmt.Println("j_data:", string(j_data))
+	m, merr := NewMapJson(j_data)
+	if merr != nil {
+		t.Fatal("merr:", merr.Error())
+		return
+	}
+	fmt.Println("m:", m)
+
+	v, verr := m.ValuesForPath("stuff[0]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff[0]:", v)
+
+	v, verr = m.ValuesForPath("stuff.data")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff.data:", v)
+
+	v, verr = m.ValuesForPath("stuff[0].data")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff[0].data:", v)
+
+	v, verr = m.ValuesForPath("stuff.data[0]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff.data[0]:", v)
+
+	v, verr = m.ValuesForPath("stuff.*[2]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff.*[2]:", v)
+
+	v, verr = m.ValuesForPath("stuff.data.F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff.data.F:", v)
+
+	v, verr = m.ValuesForPath("*.*.F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("*.*.F:", v)
+
+	v, verr = m.ValuesForPath("stuff.data[0].F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff.data[0].F:", v)
+
+	v, verr = m.ValuesForPath("stuff.data[1].F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff.data[1].F:", v)
+
+	v, verr = m.ValuesForPath("stuff[0].data[2]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff[0].data[2]:", v)
+
+	v, verr = m.ValuesForPath("stuff[1].data[1]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff[1].data[1]:", v)
+
+	v, verr = m.ValuesForPath("stuff[1].data[1].F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff[1].data[1].F", v)
+
+	v, verr = m.ValuesForPath("stuff[1].data.F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("stuff[1].data.F:", v)
+}
+
+func x_main(t *testing.T) {
+	fmt.Println("\nx_data:", string(x_data))
+	m, merr := NewMapXml(x_data)
+	if merr != nil {
+		t.Fatal("merr:", merr.Error())
+		return
+	}
+	fmt.Println("m:", m)
+
+	v, verr := m.ValuesForPath("doc.stuff[0]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("doc.stuff[0]:", v)
+
+	v, verr = m.ValuesForPath("doc.stuff.data[0]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("doc.stuff.data[0]:", v)
+
+	v, verr = m.ValuesForPath("doc.stuff.data[0]", "-seq:2.1")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("doc.stuff.data[0] -seq:2.1:", v)
+
+	v, verr = m.ValuesForPath("doc.stuff.data[0].F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("doc.stuff.data[0].F:", v)
+
+	v, verr = m.ValuesForPath("doc.stuff[0].data[2]")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("doc.stuff[0].data[2]:", v)
+
+	v, verr = m.ValuesForPath("doc.stuff[1].data[1].F")
+	if verr != nil {
+		t.Fatal("verr:", verr.Error())
+	}
+	fmt.Println("doc.stuff[1].data[1].F:", v)
+}

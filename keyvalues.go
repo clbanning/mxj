@@ -100,17 +100,188 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 
 // -----------------------  get everything for a node in the Map ---------------------------
 
+// Allow indexed arrays in "path" specification. (Request from Abhijit Kadam - abhijitk100@gmail.com.)
+// 2014.04.28 - implementation note.
+// Implemented as a wrapper of (old)ValuesForPath() because we need look-ahead logic to handle expansion
+// of wildcards and unindexed arrays.  Embedding such logic into valuesForKeyPath() would have made the 
+// code much more complicated; this wrapper is straightforward, easy to debug, and doesn't add significant overhead.
+
 // Retrieve all values for a path from the Map.  If len(returned_values) == 0, then no match.
 // On error, the returned array is 'nil'.
 //   'path' is a dot-separated path of key values. If a node in the path is '*', then everything beyond is walked.
+//          'path' can contained indexed array references, such as, "*.data[1]" and "msgs[2].data[0].field" - 
+//           even "*[2].*[0].field".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
-//		         By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
-//		         For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
-//		         If the 'path' refers to a list, then "tag:value" would select a list member of the list.
-//	            The subkey can be wildcarded - "key:*" - to require that it's there with some value.
-//	            If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
-//	            exclusion critera - e.g., "!author:William T. Gaddis".
-func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
+//             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
+//             - For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
+//             - If the 'path' refers to a list, then "tag:value" would select a list member of the list.
+//             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
+//             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
+//               exclusion critera - e.g., "!author:William T. Gaddis".
+func (mv Map)ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
+	// If there are no array indexes in path, use ValuesForPath() logic.
+	if strings.Index(path,"[") < 0 {
+		return mv.oldValuesForPath(path, subkeys...)
+	}
+
+	var subKeyMap map[string]interface{}
+	if len(subkeys) > 0 {
+		var err error
+		subKeyMap, err = getSubKeyMap(subkeys...)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	keys, kerr := parsePath(path)
+	if kerr != nil {
+		return nil, kerr
+	}
+
+	vals, verr := valuesForArray(keys, mv)
+	if verr != nil {
+		return nil, verr // Vals may be nil, but return empty array.
+	}
+
+	// Need to handle subkeys ... only return members of vals that satisfy conditions.
+	retvals := make([]interface{}, 0)
+	for _, v := range vals {
+		if hasSubKeys(v, subKeyMap) {
+			retvals = append(retvals, v)
+		}
+	}
+	return retvals, nil
+}
+
+func valuesForArray(keys []*key, m Map) ([]interface{}, error) {
+	var tmppath string
+	var haveFirst bool
+	var vals []interface{}
+	var verr error
+
+	lastkey := len(keys) - 1
+	for i := 0; i <= lastkey; i++ {
+		if !haveFirst {
+			tmppath = keys[i].name
+			haveFirst = true
+		} else {
+			tmppath += "." + keys[i].name
+		}
+
+		// Look-ahead: explode wildcards and unindexed arrays.
+		// Need to handle un-indexed list recursively:
+		// e.g., path is "stuff.data[0]" rather than "stuff[0].data[0]".
+		// Need to treat it as "stuff[0].data[0]", "stuff[1].data[0]", ...
+		if !keys[i].isArray && i < lastkey && keys[i+1].isArray {
+			// Can't pass subkeys because we may not be at literal end of path.
+			vv, vverr := m.oldValuesForPath(tmppath)
+			if vverr != nil {
+				return nil, vverr
+			}
+			for _, v := range vv {
+				// See if we can walk the value.
+				am, ok := v.(map[string]interface{})
+				if !ok {
+					continue
+				}
+				// Work the backend.
+				nvals, nvalserr := valuesForArray(keys[i+1:], Map(am))
+				if nvalserr != nil {
+					return nil, nvalserr
+				}
+				vals = append(vals, nvals...)
+			}
+			break // have recursed the whole path - return
+		}
+
+		if keys[i].isArray || i == lastkey {
+			// Don't pass subkeys because may not be at literal end of path.
+			vals, verr = m.oldValuesForPath(tmppath)
+		} else {
+			continue
+		}
+		if verr != nil {
+			return nil, verr
+		}
+
+		if i == lastkey && !keys[i].isArray {
+			break
+		}
+
+		// Now we're looking at an array - supposedly.
+		// Is index in range of vals?
+		if len(vals) <= keys[i].position {
+			vals = nil
+			break
+		}
+
+		// Return the array member of interest, if at end of path.
+		if i == lastkey {
+			vals = vals[keys[i].position:(keys[i].position + 1)]
+			break
+		}
+
+		// Extract the array member of interest.
+		am := vals[keys[i].position:(keys[i].position + 1)]
+
+		// must be a map[string]interface{} value so we can keep walking the path
+		amm, ok := am[0].(map[string]interface{})
+		if !ok {
+			vals = nil
+			break
+		}
+
+		m = Map(amm)
+		haveFirst = false
+	}
+
+	return vals, nil
+}
+
+type key struct {
+	name     string
+	isArray  bool
+	position int
+}
+
+func parsePath(s string) ([]*key, error) {
+	keys := strings.Split(s, ".")
+
+	ret := make([]*key, 0)
+
+	for i := 0; i < len(keys); i++ {
+		if keys[i] == "" {
+			continue
+		}
+
+		newkey := new(key)
+		if strings.Index(keys[i], "[") < 0 {
+			newkey.name = keys[i]
+			ret = append(ret, newkey)
+			continue
+		}
+
+		p := strings.Split(keys[i], "[")
+		newkey.name = p[0]
+		p = strings.Split(p[1], "]")
+		if p[0] == "" { // no right bracket
+			return nil, fmt.Errorf("no right bracket on key index: %s", keys[i])
+		}
+		// convert p[0] to a int value
+		pos, nerr := strconv.ParseInt(p[0], 10, 32)
+		if nerr != nil {
+			return nil, fmt.Errorf("cannot convert index to int value: %s", p[0])
+		}
+		newkey.position = int(pos)
+		newkey.isArray = true
+		ret = append(ret, newkey)
+	}
+
+	return ret, nil
+}
+
+// legacy ValuesForPath() - now wrapped to handle special case of indexed arrays in 'path'.
+func (mv Map) oldValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
 	if len(subkeys) > 0 {
@@ -122,6 +293,9 @@ func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, erro
 	}
 
 	keys := strings.Split(path, ".")
+	if keys[len(keys)-1] == "" {
+		keys = keys[:len(keys)-1]
+	}
 	ivals := make([]interface{}, 0)
 	valuesForKeyPath(&ivals, m, keys, subKeyMap)
 	return ivals, nil

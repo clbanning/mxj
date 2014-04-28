@@ -26,7 +26,7 @@ import (
 //	'keypairs' are key mappings "oldKey:newKey" and specify that the current value of 'oldKey'
 //	should be the value for 'newKey' in the returned Map. 
 //		- 'oldKey' supports dot-notation as described for (Map)ValuesForPath()
-//		- 'newKey' supports dot-notation with the exception of the wildcard, '*', character
+//		- 'newKey' supports dot-notation but with no wildcards, '*', or indexed arrays
 //		- "oldKey" is shorthand for for the keypair value "oldKey:oldKey"
 //		- "oldKey:" and ":newKey" are invalid keypair values
 //		- if 'oldKey' does not exist in the current Map, it is not written to the new Map.
@@ -62,6 +62,9 @@ func (mv Map) NewMap(keypairs ...string) (Map, error) {
 		strings.TrimSpace(newKey)
 		if i := strings.Index(newKey, "*"); i > -1 {
 			return n, errors.New("newKey value cannot contain wildcard character - " + v)
+		}
+		if i := strings.Index(newKey, "["); i > -1 {
+			return n, errors.New("newKey value cannot contain indexed arrays - " + v)
 		}
 		if oldKey == "" || newKey == "" {
 			return n, errors.New("oldKey or newKey is not specified - " +  v)

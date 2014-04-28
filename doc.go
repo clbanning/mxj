@@ -50,11 +50,11 @@ SUMMARY
       paths := m.PathsForKey(key)
       path := m.PathForKeyShortest(key)
       values, err := m.ValuesForKey(key, subkeys)
-      values, err := m.ValuesForPath(path, subkeys)
+      values, err := m.ValuesForPath(path, subkeys) // 'path' can be dot-notation with wildcards and indexed arrays.
       count, err := m.UpdateValuesForPath(newVal, path, subkeys)
 
    A new Map with whatever keys are desired can be created from the current Map and then encoded in XML
-   or JSON. (Note: keys can use dot-notation.)
+   or JSON. (Note: keys can use dot-notation. 'oldKey' can also use wildcards and indexed arrays.)
       newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
       newXml := newMap.Xml()   // for example
       newJson := newMap.Json() // ditto
