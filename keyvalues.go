@@ -108,9 +108,10 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 
 // Retrieve all values for a path from the Map.  If len(returned_values) == 0, then no match.
 // On error, the returned array is 'nil'.
-//   'path' is a dot-separated path of key values. If a node in the path is '*', then everything beyond is walked.
-//          'path' can contained indexed array references, such as, "*.data[1]" and "msgs[2].data[0].field" - 
-//           even "*[2].*[0].field".
+//   'path' is a dot-separated path of key values. 
+//          - If a node in the path is '*', then everything beyond is walked.
+//          - 'path' can contain indexed array references, such as, "*.data[1]" and "msgs[2].data[0].field" - 
+//            even "*[2].*[0].field".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
 //             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //             - For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
