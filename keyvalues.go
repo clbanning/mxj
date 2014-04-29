@@ -14,6 +14,24 @@ import (
 
 // ----------------------------- get everything FOR a single key -------------------------
 
+const (
+	minArraySize = 32
+)
+
+var defaultArraySize int = minArraySize
+
+// Adjust the buffers for expected number of values to return from ValuesForKey() and ValuesForPath().
+// This can have the effect of significantly reducing memory allocation-copy functions for large data sets.
+// Returns the initial buffer size.
+func SetArraySize(size int) int {
+	if size > minArraySize {
+		defaultArraySize = size
+	} else {
+		defaultArraySize = minArraySize
+	}
+	return defaultArraySize
+}
+
 // Return all values in Map, 'mv', associated with a 'key'. If len(returned_values) == 0, then no match.
 // On error, the returned array is 'nil'. NOTE: 'key' can be wildcard, "*".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
@@ -34,14 +52,19 @@ func (mv Map) ValuesForKey(key string, subkeys ...string) ([]interface{}, error)
 		}
 	}
 
-	ret := make([]interface{}, 0)
-	hasKey(m, key, &ret, subKeyMap)
-	return ret, nil
+	ret := make([]interface{}, 0, defaultArraySize)
+	var cnt int
+	hasKey(m, key, &ret, &cnt, subKeyMap)
+	return ret[:cnt], nil
+	// ret := make([]interface{}, 0)
+	// hasKey(m, key, &ret, subKeyMap)
+	// return ret, nil
 }
 
 // hasKey - if the map 'key' exists append it to array
 //          if it doesn't do nothing except scan array and map values
-func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]interface{}) {
+func hasKey(iv interface{}, key string, ret *[]interface{}, cnt *int, subkeys map[string]interface{}) {
+	// func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]interface{}) {
 	switch iv.(type) {
 	case map[string]interface{}:
 		vv := iv.(map[string]interface{})
@@ -51,16 +74,19 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 			case map[string]interface{}:
 				if hasSubKeys(v, subkeys) {
 					*ret = append(*ret, v)
+					*cnt++
 				}
 			case []interface{}:
 				for _, av := range v.([]interface{}) {
 					if hasSubKeys(av, subkeys) {
 						*ret = append(*ret, av)
+						*cnt++
 					}
 				}
 			default:
 				if len(subkeys) == 0 {
 					*ret = append(*ret, v)
+					*cnt++
 				}
 			}
 		}
@@ -72,16 +98,19 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 				case map[string]interface{}:
 					if hasSubKeys(v, subkeys) {
 						*ret = append(*ret, v)
+						*cnt++
 					}
 				case []interface{}:
 					for _, av := range v.([]interface{}) {
 						if hasSubKeys(av, subkeys) {
 							*ret = append(*ret, av)
+							*cnt++
 						}
 					}
 				default:
 					if len(subkeys) == 0 {
 						*ret = append(*ret, v)
+						*cnt++
 					}
 				}
 			}
@@ -89,11 +118,13 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 
 		// scan the rest
 		for _, v := range vv {
-			hasKey(v, key, ret, subkeys)
+			hasKey(v, key, ret, cnt, subkeys)
+			// hasKey(v, key, ret, subkeys)
 		}
 	case []interface{}:
 		for _, v := range iv.([]interface{}) {
-			hasKey(v, key, ret, subkeys)
+			hasKey(v, key, ret, cnt, subkeys)
+			// hasKey(v, key, ret, subkeys)
 		}
 	}
 }
@@ -103,14 +134,14 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 // Allow indexed arrays in "path" specification. (Request from Abhijit Kadam - abhijitk100@gmail.com.)
 // 2014.04.28 - implementation note.
 // Implemented as a wrapper of (old)ValuesForPath() because we need look-ahead logic to handle expansion
-// of wildcards and unindexed arrays.  Embedding such logic into valuesForKeyPath() would have made the 
+// of wildcards and unindexed arrays.  Embedding such logic into valuesForKeyPath() would have made the
 // code much more complicated; this wrapper is straightforward, easy to debug, and doesn't add significant overhead.
 
 // Retrieve all values for a path from the Map.  If len(returned_values) == 0, then no match.
 // On error, the returned array is 'nil'.
-//   'path' is a dot-separated path of key values. 
+//   'path' is a dot-separated path of key values.
 //          - If a node in the path is '*', then everything beyond is walked.
-//          - 'path' can contain indexed array references, such as, "*.data[1]" and "msgs[2].data[0].field" - 
+//          - 'path' can contain indexed array references, such as, "*.data[1]" and "msgs[2].data[0].field" -
 //            even "*[2].*[0].field".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
 //             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
@@ -119,9 +150,9 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, subkeys map[string]i
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
-func (mv Map)ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
+func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
 	// If there are no array indexes in path, use ValuesForPath() logic.
-	if strings.Index(path,"[") < 0 {
+	if strings.Index(path, "[") < 0 {
 		return mv.oldValuesForPath(path, subkeys...)
 	}
 
@@ -297,12 +328,16 @@ func (mv Map) oldValuesForPath(path string, subkeys ...string) ([]interface{}, e
 	if keys[len(keys)-1] == "" {
 		keys = keys[:len(keys)-1]
 	}
-	ivals := make([]interface{}, 0)
-	valuesForKeyPath(&ivals, m, keys, subKeyMap)
-	return ivals, nil
+	// ivals := make([]interface{}, 0)
+	// valuesForKeyPath(&ivals, m, keys, subKeyMap)
+	// return ivals, nil
+	ivals := make([]interface{}, 0, defaultArraySize)
+	var cnt int
+	valuesForKeyPath(&ivals, &cnt, m, keys, subKeyMap)
+	return ivals[:cnt], nil
 }
 
-func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys map[string]interface{}) {
+func valuesForKeyPath(ret *[]interface{}, cnt *int, m interface{}, keys []string, subkeys map[string]interface{}) {
 	lenKeys := len(keys)
 
 	// load 'm' values into 'ret'
@@ -316,6 +351,7 @@ func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys 
 				}
 			}
 			*ret = append(*ret, m)
+			*cnt++
 		case []interface{}:
 			for i, v := range m.([]interface{}) {
 				if subkeys != nil {
@@ -324,12 +360,14 @@ func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys 
 					}
 				}
 				*ret = append(*ret, (m.([]interface{}))[i])
+				*cnt++
 			}
 		default:
 			if subkeys != nil {
 				return // must be map[string]interface{} if there are subkeys
 			}
 			*ret = append(*ret, m)
+			*cnt++
 		}
 		return
 	}
@@ -341,7 +379,8 @@ func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys 
 		switch m.(type) {
 		case map[string]interface{}:
 			for _, v := range m.(map[string]interface{}) {
-				valuesForKeyPath(ret, v, keys[1:], subkeys)
+				// valuesForKeyPath(ret, v, keys[1:], subkeys)
+				valuesForKeyPath(ret, cnt, v, keys[1:], subkeys)
 			}
 		case []interface{}:
 			for _, v := range m.([]interface{}) {
@@ -349,10 +388,12 @@ func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys 
 				// flatten out a list of maps - keys are processed
 				case map[string]interface{}:
 					for _, vv := range v.(map[string]interface{}) {
-						valuesForKeyPath(ret, vv, keys[1:], subkeys)
+						// valuesForKeyPath(ret, vv, keys[1:], subkeys)
+						valuesForKeyPath(ret, cnt, vv, keys[1:], subkeys)
 					}
 				default:
-					valuesForKeyPath(ret, v, keys[1:], subkeys)
+					// valuesForKeyPath(ret, v, keys[1:], subkeys)
+					valuesForKeyPath(ret, cnt, v, keys[1:], subkeys)
 				}
 			}
 		}
@@ -360,14 +401,16 @@ func valuesForKeyPath(ret *[]interface{}, m interface{}, keys []string, subkeys 
 		switch m.(type) {
 		case map[string]interface{}:
 			if v, ok := m.(map[string]interface{})[key]; ok {
-				valuesForKeyPath(ret, v, keys[1:], subkeys)
+				// valuesForKeyPath(ret, v, keys[1:], subkeys)
+				valuesForKeyPath(ret, cnt, v, keys[1:], subkeys)
 			}
 		case []interface{}: // may be buried in list
 			for _, v := range m.([]interface{}) {
 				switch v.(type) {
 				case map[string]interface{}:
 					if vv, ok := v.(map[string]interface{})[key]; ok {
-						valuesForKeyPath(ret, vv, keys[1:], subkeys)
+						// valuesForKeyPath(ret, vv, keys[1:], subkeys)
+						valuesForKeyPath(ret, cnt, vv, keys[1:], subkeys)
 					}
 				}
 			}
