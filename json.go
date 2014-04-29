@@ -104,6 +104,9 @@ func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string, s
 
 // --------------------------- read JSON -----------------------------
 
+// Parse numeric values as string literals
+var JsonUseNumber bool
+
 // Just a wrapper on json.Unmarshal
 //	Converting JSON to XML is a simple as:
 //		...
@@ -117,7 +120,13 @@ func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string, s
 //		}
 func NewMapJson(jsonVal []byte) (Map, error) {
 	m := make(Map)
-	err := json.Unmarshal(jsonVal, &m)
+	// err := json.Unmarshal(jsonVal, &m)
+	buf := bytes.NewReader(jsonVal)
+	dec := json.NewDecoder(buf)
+	if JsonUseNumber {
+		dec.UseNumber()
+	}
+	err := dec.Decode(&m)
 	return m, err
 }
 

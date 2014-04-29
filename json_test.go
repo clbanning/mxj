@@ -23,7 +23,22 @@ func TestNewMapJson(t *testing.T) {
 	}
 
 	fmt.Println("NewMapJson, jdata:", string(jdata))
-	fmt.Println("NewMapJson, m    :", m)
+	fmt.Printf("NewMapJson, m    : %#v\n", m)
+}
+
+func TestNewMapJsonNumber(t *testing.T) {
+
+	JsonUseNumber = true
+
+	m, merr := NewMapJson(jdata)
+	if merr != nil {
+		t.Fatal("NewMapJson, merr:", merr.Error())
+	}
+
+	fmt.Println("NewMapJson, jdata:", string(jdata))
+	fmt.Printf("NewMapJson, m    : %#v\n", m)
+
+	JsonUseNumber = false
 }
 
 func TestNewMapJsonError(t *testing.T) {
@@ -60,8 +75,30 @@ func TestNewMapJsonReader(t *testing.T) {
 		}
 
 		fmt.Println("NewMapJsonReader, jb:", string(jb))
-		fmt.Println("NewMapJsonReader, m :", m)
+		fmt.Printf("NewMapJsonReader, m : %#v\n", m)
 	}
+}
+
+func TestNewMapJsonReaderNumber(t *testing.T) {
+
+	JsonUseNumber = true
+
+	rdr := bytes.NewBuffer(jdata2)
+
+	for {
+		m, jb, merr := NewMapJsonReaderRaw(rdr)
+		if merr != nil && merr != io.EOF {
+			t.Fatal("NewMapJsonReader, merr:", merr.Error())
+		}
+		if merr == io.EOF {
+			break
+		}
+
+		fmt.Println("NewMapJsonReader, jb:", string(jb))
+		fmt.Printf("NewMapJsonReader, m : %#v\n", m)
+	}
+
+	JsonUseNumber = false
 }
 
 func TestJson(t *testing.T) {
