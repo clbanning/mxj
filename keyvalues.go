@@ -151,7 +151,7 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, cnt *int, subkeys ma
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
 func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
-	// If there are no array indexes in path, use ValuesForPath() logic.
+	// If there are no array indexes in path, use legacy ValuesForPath() logic.
 	if strings.Index(path, "[") < 0 {
 		return mv.oldValuesForPath(path, subkeys...)
 	}
