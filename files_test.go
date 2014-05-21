@@ -32,6 +32,29 @@ func TestReadJsonFile(t *testing.T) {
 	fmt.Println("caught error: ", err.Error())
 }
 
+func TestReadJsonFileRaw(t *testing.T) {
+	fmt.Println("ReadMapsFromJsonFileRaw()")
+	mr, err := ReadMapsFromJsonFileRaw("files_test.json")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	for _, v := range mr {
+		fmt.Printf("%v\n", v)
+	}
+
+	mr, err = ReadMapsFromJsonFileRaw("nil")
+	if err == nil {
+		t.Fatal("no error returned for read of nil file")
+	}
+	fmt.Println("caught error: ", err.Error())
+
+	mr, err = ReadMapsFromJsonFileRaw("files_test.badjson")
+	if err == nil {
+		t.Fatal("no error returned for read of badjson file")
+	}
+	fmt.Println("caught error: ", err.Error())
+}
+
 func TestReadXmFile(t *testing.T) {
 	fmt.Println("ReadMapsFromXmlFile()")
 	am, err := ReadMapsFromXmlFile("files_test.xml")
@@ -49,6 +72,29 @@ func TestReadXmFile(t *testing.T) {
 	fmt.Println("caught error: ", err.Error())
 
 	am, err = ReadMapsFromXmlFile("files_test.badxml")
+	if err == nil {
+		t.Fatal("no error returned for read of badjson file")
+	}
+	fmt.Println("caught error: ", err.Error())
+}
+
+func TestReadXmFileRaw(t *testing.T) {
+	fmt.Println("ReadMapsFromXmlFileRaw()")
+	mr, err := ReadMapsFromXmlFileRaw("files_test.xml")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	for _, v := range mr {
+		fmt.Printf("%v\n", v)
+	}
+
+	mr, err = ReadMapsFromXmlFileRaw("nil")
+	if err == nil {
+		t.Fatal("no error returned for read of nil file")
+	}
+	fmt.Println("caught error: ", err.Error())
+
+	mr, err = ReadMapsFromXmlFileRaw("files_test.badxml")
 	if err == nil {
 		t.Fatal("no error returned for read of badjson file")
 	}

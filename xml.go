@@ -82,19 +82,25 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	return m, nil
 }
 
-// Get next XML doc from an io.Reader as a Map value.  Returns Map value and pointer to raw XML.
-//	NOTE: Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
-//	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
-//	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
-//	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
-//	      you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
+// XmlWriterBufSize - set the size of io.Writer for the TeeReader used by NewMapXmlReaderRaw()
+// and HandleXmlReaderRaw().  This reduces repeated memory allocations and copy() calls in most cases.
+var XmlWriterBufSize int = 256
+
+// Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
+//	NOTES: 1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
+//	          using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
+//	          See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
+//	          data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
+//	          you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
+//	       2. The 'raw' return value may be larger than the XML text value.  To log it, cast it to a string.
 func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
 		r = cast[0]
 	}
 	// create TeeReader so we can retrieve raw XML
-	wb := new(bytes.Buffer)
+	buf := make([]byte, XmlWriterBufSize)
+	wb := bytes.NewBuffer(buf)
 	trdr := myTeeReader(xmlReader, wb) // see code at EOF
 
 	// build the node tree
