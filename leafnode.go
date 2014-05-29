@@ -16,11 +16,11 @@ type LeafNode struct {
 // LeafNodes - returns an array of all LeafNode values for the Map
 func (mv Map)LeafNodes() []LeafNode {
 	l := make([]LeafNode, 0)
-	getLeafNotes("", "", map[string]interface{}(mv), &l)
+	getLeafNodes("", "", map[string]interface{}(mv), &l)
 	return l
 }
 
-func getLeafNotes(path, node string, mv interface{}, l *[]LeafNode) {
+func getLeafNodes(path, node string, mv interface{}, l *[]LeafNode) {
 	if path != "" {
 		path += "."
 	}
@@ -28,11 +28,11 @@ func getLeafNotes(path, node string, mv interface{}, l *[]LeafNode) {
 	switch mv.(type) {
 	case map[string]interface{}:
 		for k, v := range mv.(map[string]interface{}) {
-			getLeafNotes(path, k, v, l)
+			getLeafNodes(path, k, v, l)
 		}
 	case []interface{}:
 		for i, v := range mv.([]interface{}) {
-			getLeafNotes(path, strconv.Itoa(i), v, l)
+			getLeafNodes(path, strconv.Itoa(i), v, l)
 		}
 	default:
 		// can't walk any further, so create leaf
