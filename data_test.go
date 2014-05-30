@@ -4,7 +4,7 @@ var xmldata = []byte(`
 <book>
 	<author>William H. Gaddis</author>
 	<title>The Recognitions</title>
-	<review>One of the great seminal American novels of the 20th century.</review>
+	<review>One of the seminal American novels of the 20th century.</review>
 </book>
 <book>
 	<author>William H. Gaddis</author>
