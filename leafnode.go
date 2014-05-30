@@ -18,7 +18,7 @@ type LeafNode struct {
 }
 
 // LeafNodes - returns an array of all LeafNode values for the Map.
-// The option attr argument suppresses attribute values - keys with prepended hyphens, '-' -
+// The option no_attr argument suppresses attribute values (keys with prepended hyphen, '-')
 // as well as the "#text" key for the associated simple element value.
 func (mv Map)LeafNodes(no_attr ...bool) []LeafNode {
 	var a bool
