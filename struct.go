@@ -11,7 +11,7 @@ import (
 )
 
 // Create a new Map value from a structure.  Error returned if argument is not a structure
-// or a pointer or if there is a json.Marshal or json.Unmarshal error.
+// or if there is a json.Marshal or json.Unmarshal error.
 //	Only public structure fields are decoded in the Map value. Also, json.Marshal structure encoding rules
 //	are followed for decoding the structure fields.
 func NewMapStruct(structVal interface{}) (Map, error) {
