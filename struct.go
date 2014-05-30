@@ -16,9 +16,7 @@ import (
 //	are followed for decoding the structure fields.
 func NewMapStruct(structVal interface{}) (Map, error) {
 	if reflect.ValueOf(structVal).Kind() != reflect.Struct {
-		if reflect.ValueOf(structVal).Kind() != reflect.Ptr {
-			return nil, errors.New("NewMapStruct() error: argument is not type Struct")
-		}
+		return nil, errors.New("NewMapStruct() error: argument is not type Struct")
 	}
 	j, err := json.Marshal(structVal)
 	if err != nil {

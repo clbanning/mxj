@@ -27,7 +27,7 @@ func TestNewMapStruct(t *testing.T) {
 	fmt.Printf("NewMapStruct, s: %#v\n",s)
 	fmt.Printf("NewMapStruct, m: %#v\n",m)
 
-	m, merr = NewMapStruct(&s)
+	m, merr = NewMapStruct(s)
 	if merr != nil {
 		t.Fatal("merr:", merr.Error())
 	}

@@ -1,9 +1,7 @@
 package mxj
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"testing"
 )
 
@@ -56,18 +54,24 @@ func TestLeafNodes(t *testing.T) {
 		fmt.Printf("%#v\n", v)
 	}
 
-	fmt.Println("\nxmldata-LeafNodes:")
-	r := bytes.NewReader(xmldata)
-	for {
-		m, err := NewMapXmlReader(r)
-		if err == io.EOF {
-			break
-		}
-		ln = m.LeafNodes()
-		for _, v := range ln {
-			fmt.Printf("%#v\n", v)
-		}
+	json3 := []byte(`{ "a":"list", "of":["data", "of", 3, "types", true]}`)
+	m, _ = NewMapJson(json3)
+	ln = m.LeafNodes()
+	fmt.Println("\njson3-LeafNodes:")
+	for _, v := range ln {
+		fmt.Printf("%#v\n", v)
 	}
+	v = m.LeafValues()
+	fmt.Println("\njson3-LeafValues:")
+	for _, v := range v {
+		fmt.Printf("%#v\n", v)
+	}
+	p = m.LeafPaths()
+	fmt.Println("\njson3-LeafPaths:")
+	for _, v := range p {
+		fmt.Printf("%#v\n", v)
+	}
+
 
 	xmldata2 := []byte(`
 		<doc>
