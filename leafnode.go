@@ -34,7 +34,7 @@ func (mv Map)LeafNodes(no_attr ...bool) []LeafNode {
 func getLeafNodes(path, node string, mv interface{}, l *[]LeafNode, noattr bool) {
 	// if stripping attributes, then also strip "#text" key
 	if !noattr || node != "#text" {
-		if path != "" {
+		if path != "" && node[:1] != "[" {
 			path += "."
 		}
 		path += node
@@ -49,7 +49,7 @@ func getLeafNodes(path, node string, mv interface{}, l *[]LeafNode, noattr bool)
 		}
 	case []interface{}:
 		for i, v := range mv.([]interface{}) {
-			getLeafNodes(path, strconv.Itoa(i), v, l, noattr)
+			getLeafNodes(path, "["+strconv.Itoa(i)+"]", v, l, noattr)
 		}
 	default:
 		// can't walk any further, so create leaf
