@@ -8,13 +8,13 @@ package j2x
 
 
 import (
-	"github.com/clbanning/mxj"
+	. "github.com/clbanning/mxj"
 	"io"
 )
 
 // FromJson() --> ToXml().
 func JsonToXml(jsonVal []byte) ([]byte, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func JsonToXml(jsonVal []byte) ([]byte, error) {
 
 // FromJson() --> ToXmlWriter().
 func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) ([]byte, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) ([]byte, error) {
 
 // FromJsonReader() --> ToXml().
 func JsonReaderToXml(jsonReader io.Reader) ([]byte, []byte, error) {
-	m, jraw, err := mxj.NewMapJsonReaderRaw(jsonReader)
+	m, jraw, err := NewMapJsonReaderRaw(jsonReader)
 	if err != nil {
 		return jraw, nil, err
 	}
@@ -42,7 +42,7 @@ func JsonReaderToXml(jsonReader io.Reader) ([]byte, []byte, error) {
 
 // FromJsonReader() --> ToXmlWriter().  Handy for transforming bulk message sets.
 func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) ([]byte, []byte, error) {
-	m, jraw, err := mxj.NewMapJsonReaderRaw(jsonReader)
+	m, jraw, err := NewMapJsonReaderRaw(jsonReader)
 	if err != nil {
 		return jraw, nil, err
 	}
@@ -54,7 +54,7 @@ func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) ([]byte, [
 
 // Wrap PathsForKey for JSON.
 func JsonPathsForKey(jsonVal []byte, key string) ([]string, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func JsonPathsForKey(jsonVal []byte, key string) ([]string, error) {
 
 // Wrap PathForKeyShortest for JSON.
 func JsonPathForKeyShortest(jsonVal []byte, key string) (string, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +74,7 @@ func JsonPathForKeyShortest(jsonVal []byte, key string) (string, error) {
 
 // Wrap ValuesForKey for JSON.
 func JsonValuesForKey(jsonVal []byte, key string, subkeys ...string) ([]interface{}, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func JsonValuesForKey(jsonVal []byte, key string, subkeys ...string) ([]interfac
 
 // Wrap ValuesForKeyPath for JSON.
 func JsonValuesForKeyPath(jsonVal []byte, path string, subkeys ...string) ([]interface{}, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func JsonValuesForKeyPath(jsonVal []byte, path string, subkeys ...string) ([]int
 //	       (can include wildcard character, '*')
 //	'subkeys' are key:value pairs of key:values that must match for the key
 func JsonUpdateValsForPath(jsonVal []byte, newKeyValue interface{}, path string, subkeys ...string) ([]byte, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func JsonUpdateValsForPath(jsonVal []byte, newKeyValue interface{}, path string,
 // 'jsonVal' is an JSON value
 // 'keypairs' are "oldKey:newKey" values that conform to 'keypairs' in (Map)NewMap.
 func JsonNewJson(jsonVal []byte, keypairs ...string) ([]byte, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func JsonNewJson(jsonVal []byte, keypairs ...string) ([]byte, error) {
 // 'jsonVal' is an JSON value
 // 'keypairs' are "oldKey:newKey" values that conform to 'keypairs' in (Map)NewMap.
 func JsonNewXml(jsonVal []byte, keypairs ...string) ([]byte, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +140,8 @@ func JsonNewXml(jsonVal []byte, keypairs ...string) ([]byte, error) {
 
 // Wrap LeafNodes for JSON.
 // 'jsonVal' is an JSON value
-func JsonLeafNodes(jsonVal []byte) ([]mxj.LeafNode, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+func JsonLeafNodes(jsonVal []byte) ([]LeafNode, error) {
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func JsonLeafNodes(jsonVal []byte) ([]mxj.LeafNode, error) {
 // Wrap LeafValues for JSON.
 // 'jsonVal' is an JSON value
 func JsonLeafValues(jsonVal []byte) ([]interface{}, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func JsonLeafValues(jsonVal []byte) ([]interface{}, error) {
 // Wrap LeafPath for JSON.
 // 'xmlVal' is an JSON value
 func JsonLeafPath(jsonVal []byte) ([]string, error) {
-	m, err := mxj.NewMapJson(jsonVal)
+	m, err := NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}

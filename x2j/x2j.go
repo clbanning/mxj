@@ -7,13 +7,13 @@
 package x2j
 
 import (
-	"github.com/clbanning/mxj"
+	. "github.com/clbanning/mxj"
 	"io"
 )
 
 // FromXml() --> ToJson().
 func XmlToJson(xmlVal []byte, safeEncoding ...bool) ([]byte, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func XmlToJson(xmlVal []byte, safeEncoding ...bool) ([]byte, error) {
 
 // FromXml() --> ToJsonWriter().
 func XmlToJsonWriter(xmlVal []byte, jsonWriter io.Writer, safeEncoding ...bool) ([]byte, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return  nil, err
 	}
@@ -31,7 +31,7 @@ func XmlToJsonWriter(xmlVal []byte, jsonWriter io.Writer, safeEncoding ...bool) 
 
 // FromXmlReader() --> ToJson().
 func XmlReaderToJson(xmlReader io.Reader, safeEncoding ...bool) ([]byte, []byte, error) {
-	m, xraw, err := mxj.NewMapXmlReaderRaw(xmlReader)
+	m, xraw, err := NewMapXmlReaderRaw(xmlReader)
 	if err != nil {
 		return xraw, nil, err
 	}
@@ -41,7 +41,7 @@ func XmlReaderToJson(xmlReader io.Reader, safeEncoding ...bool) ([]byte, []byte,
 
 // FromXmlReader() --> ToJsonWriter().  Handy for bulk transformation of documents.
 func XmlReaderToJsonWriter(xmlReader io.Reader, jsonWriter io.Writer, safeEncoding ...bool) ([]byte, []byte, error) {
-	m, xraw, err := mxj.NewMapXmlReaderRaw(xmlReader)
+	m, xraw, err := NewMapXmlReaderRaw(xmlReader)
 	if err != nil {
 		return xraw, nil, err
 	}
@@ -53,7 +53,7 @@ func XmlReaderToJsonWriter(xmlReader io.Reader, jsonWriter io.Writer, safeEncodi
 
 // Wrap PathsForKey for XML.
 func XmlPathsForTag(xmlVal []byte, tag string) ([]string, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func XmlPathsForTag(xmlVal []byte, tag string) ([]string, error) {
 
 // Wrap PathForKeyShortest for XML.
 func XmlPathForTagShortest(xmlVal []byte, tag string) (string, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return "", err
 	}
@@ -74,7 +74,7 @@ func XmlPathForTagShortest(xmlVal []byte, tag string) (string, error) {
 // Wrap ValuesForKey for XML.
 // 'attrs' are key:value pairs for attributes, where key is attribute label prepended with a hypen, '-'.
 func XmlValuesForTag(xmlVal []byte, tag string, attrs ...string) ([]interface{}, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func XmlValuesForTag(xmlVal []byte, tag string, attrs ...string) ([]interface{},
 // Wrap ValuesForPath for XML.
 // 'attrs' are key:value pairs for attributes, where key is attribute label prepended with a hypen, '-'.
 func XmlValuesForPath(xmlVal []byte, path string, attrs ...string) ([]interface{}, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func XmlValuesForPath(xmlVal []byte, path string, attrs ...string) ([]interface{
 //	       (can include wildcard character, '*')
 //	'subkeys' are key:value pairs of tag:values that must match for the tag
 func XmlUpdateValsForPath(xmlVal []byte, newTagValue interface{}, path string, subkeys ...string) ([]byte, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func XmlUpdateValsForPath(xmlVal []byte, newTagValue interface{}, path string, s
 // 'xmlVal' is an XML value
 // 'tagpairs' are "oldTag:newTag" values that conform to 'keypairs' in (Map)NewMap.
 func XmlNewXml(xmlVal []byte, tagpairs ...string) ([]byte, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func XmlNewXml(xmlVal []byte, tagpairs ...string) ([]byte, error) {
 // 'xmlVal' is an XML value
 // 'tagpairs' are "oldTag:newTag" values that conform to 'keypairs' in (Map)NewMap.
 func XmlNewJson(xmlVal []byte, tagpairs ...string) ([]byte, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -141,8 +141,8 @@ func XmlNewJson(xmlVal []byte, tagpairs ...string) ([]byte, error) {
 
 // Wrap LeafNodes for XML.
 // 'xmlVal' is an XML value
-func XmlLeafNodes(xmlVal []byte) ([]mxj.LeafNode, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+func XmlLeafNodes(xmlVal []byte) ([]LeafNode, error) {
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func XmlLeafNodes(xmlVal []byte) ([]mxj.LeafNode, error) {
 // Wrap LeafValues for XML.
 // 'xmlVal' is an XML value
 func XmlLeafValues(xmlVal []byte) ([]interface{}, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func XmlLeafValues(xmlVal []byte) ([]interface{}, error) {
 // Wrap LeafPath for XML.
 // 'xmlVal' is an XML value
 func XmlLeafPath(xmlVal []byte) ([]string, error) {
-	m, err := mxj.NewMapXml(xmlVal)
+	m, err := NewMapXml(xmlVal)
 	if err != nil {
 		return nil, err
 	}
