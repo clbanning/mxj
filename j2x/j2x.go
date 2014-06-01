@@ -2,39 +2,39 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
-// j2x.go - wrappers for end-to-end transformatioin of JSON to XML
-// For (mostly) backwards compatibility with j2x package.
+// j2x.go - For (mostly) backwards compatibility with legacy j2x package.
+// Wrappers for end-to-end JSON to XML transformation and value manipulation.
+package j2x
 
-package mxj
 
-// Wrappers for end-to-end JSON to XML transformation.
-
-/*
-import "io"
+import (
+	"github.com/clbanning/mxj"
+	"io"
+)
 
 // FromJson() --> ToXml().
 func JsonToXml(jsonVal []byte) ([]byte, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
 	return m.Xml()
 }
 
 // FromJson() --> ToXmlWriter().
 func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) ([]byte, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
 	return m.XmlWriterRaw(xmlWriter)
 }
 
 // FromJsonReader() --> ToXml().
 func JsonReaderToXml(jsonReader io.Reader) ([]byte, []byte, error) {
-	m, jraw, merr := NewMapJsonReaderRaw(jsonReader)
-	if merr != nil {
-		return jraw, nil, merr
+	m, jraw, err := mxj.NewMapJsonReaderRaw(jsonReader)
+	if err != nil {
+		return jraw, nil, err
 	}
 	x, xerr := m.Xml()
 	return jraw, x, xerr
@@ -42,23 +42,21 @@ func JsonReaderToXml(jsonReader io.Reader) ([]byte, []byte, error) {
 
 // FromJsonReader() --> ToXmlWriter().  Handy for transforming bulk message sets.
 func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) ([]byte, []byte, error) {
-	m, jraw, merr := NewMapJsonReaderRaw(jsonReader)
-	if merr != nil {
-		return jraw, nil, merr
+	m, jraw, err := mxj.NewMapJsonReaderRaw(jsonReader)
+	if err != nil {
+		return jraw, nil, err
 	}
 	xraw, xerr := m.XmlWriterRaw(xmlWriter)
 	return jraw, xraw, xerr
 }
-*/
 
 // JSON wrappers for Map methods implementing key path and value functions.
 
-/*
 // Wrap PathsForKey for JSON.
 func JsonPathsForKey(jsonVal []byte, key string) ([]string, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
 	paths := m.PathsForKey(key)
 	return paths, nil
@@ -66,9 +64,9 @@ func JsonPathsForKey(jsonVal []byte, key string) ([]string, error) {
 
 // Wrap PathForKeyShortest for JSON.
 func JsonPathForKeyShortest(jsonVal []byte, key string) (string, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return "", merr
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return "", err
 	}
 	path := m.PathForKeyShortest(key)
 	return path, nil
@@ -76,18 +74,18 @@ func JsonPathForKeyShortest(jsonVal []byte, key string) (string, error) {
 
 // Wrap ValuesForKey for JSON.
 func JsonValuesForKey(jsonVal []byte, key string, subkeys ...string) ([]interface{}, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
 	return m.ValuesForKey(key, subkeys...)
 }
 
 // Wrap ValuesForKeyPath for JSON.
 func JsonValuesForKeyPath(jsonVal []byte, path string, subkeys ...string) ([]interface{}, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
 	return m.ValuesForPath(path, subkeys...)
 }
@@ -99,28 +97,28 @@ func JsonValuesForKeyPath(jsonVal []byte, path string, subkeys ...string) ([]int
 //	       (can include wildcard character, '*')
 //	'subkeys' are key:value pairs of key:values that must match for the key
 func JsonUpdateValsForPath(jsonVal []byte, newKeyValue interface{}, path string, subkeys ...string) ([]byte, error) {
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return 0, err
-	}
-	n, err := m.UpdateValuesForPath(newJsonValue, path, subkeys...)
+	m, err := mxj.NewMapJson(jsonVal)
 	if err != nil {
 		return nil, err
 	}
-	return m.Json() 
+	_, err = m.UpdateValuesForPath(newKeyValue, path, subkeys...)
+	if err != nil {
+		return nil, err
+	}
+	return m.Json()
 }
 
 // Wrap NewMap for JSON and return as JSON
 // 'jsonVal' is an JSON value
 // 'keypairs' are "oldKey:newKey" values that conform to 'keypairs' in (Map)NewMap.
-func JsonNewJson(jsonVal []byte, keypairs ...string) ([]byte, error) (
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+func JsonNewJson(jsonVal []byte, keypairs ...string) ([]byte, error) {
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
-	n, nerr := m.NewMap(keypairs...)
-	if nerr != nil {
-		return nil, nerr
+	n, err := m.NewMap(keypairs...)
+	if err != nil {
+		return nil, err
 	}
 	return n.Json()
 }
@@ -128,17 +126,44 @@ func JsonNewJson(jsonVal []byte, keypairs ...string) ([]byte, error) (
 // Wrap NewMap for JSON and return as XML
 // 'jsonVal' is an JSON value
 // 'keypairs' are "oldKey:newKey" values that conform to 'keypairs' in (Map)NewMap.
-func JsonNewXml(jsonVal []byte, keypairs ...string) ([]byte, error) (
-	m, merr := NewMapJson(jsonVal)
-	if merr != nil {
-		return nil, merr
+func JsonNewXml(jsonVal []byte, keypairs ...string) ([]byte, error) {
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
 	}
-	n, nerr := m.NewMap(tagpairs...)
-	if nerr != nil {
-		return nil, nerr
+	n, err := m.NewMap(keypairs...)
+	if err != nil {
+		return nil, err
 	}
 	return n.Xml()
 }
 
-*/
+// Wrap LeafNodes for JSON.
+// 'jsonVal' is an JSON value
+func JsonLeafNodes(jsonVal []byte) ([]mxj.LeafNode, error) {
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
+	}
+	return m.LeafNodes(), nil
+}
 
+// Wrap LeafValues for JSON.
+// 'jsonVal' is an JSON value
+func JsonLeafValues(jsonVal []byte) ([]interface{}, error) {
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
+	}
+	return m.LeafValues(), nil
+}
+
+// Wrap LeafPath for JSON.
+// 'xmlVal' is an JSON value
+func JsonLeafPath(jsonVal []byte) ([]string, error) {
+	m, err := mxj.NewMapJson(jsonVal)
+	if err != nil {
+		return nil, err
+	}
+	return m.LeafPaths(), nil
+}
