@@ -104,7 +104,7 @@ func (mv Map) JsonIndentWriterRaw(jsonWriter io.Writer, prefix, indent string, s
 
 // --------------------------- read JSON -----------------------------
 
-// Parse numeric values as string literals
+// Parse numeric values as json.Number types - see encoding/json#Number
 var JsonUseNumber bool
 
 // Just a wrapper on json.Unmarshal
