@@ -20,6 +20,11 @@ func XmlToMap(xmlVal []byte) (map[string]interface{}, error) {
 	return map[string]interface{}(m), nil
 }
 
+// map[string]interface{} --> ToXml()
+func MapToXml(m map[string]interface{}) ([]byte, error) {
+	return Map(m).Xml()
+}
+
 // FromXml() --> ToJson().
 func XmlToJson(xmlVal []byte, safeEncoding ...bool) ([]byte, error) {
 	m, err := NewMapXml(xmlVal)

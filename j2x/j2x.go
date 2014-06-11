@@ -12,6 +12,16 @@ import (
 	"io"
 )
 
+// FromJson() --> map[string]interface{}
+func JsonToMap(jsonVal []byte) (map[string]interface{}, error) {
+	return NewMapJson(jsonVal)
+}
+
+// interface{} --> ToJson (w/o safe encoding, default) {
+func MapToJson(m map[string]interface{}, safeEncoding ...bool) ([]byte, error) {
+	return Map(m).Json()
+}
+
 // FromJson() --> ToXml().
 func JsonToXml(jsonVal []byte) ([]byte, error) {
 	m, err := NewMapJson(jsonVal)
