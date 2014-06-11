@@ -11,6 +11,15 @@ import (
 	"io"
 )
 
+// FromXml() --> map[string]interface{}
+func XmlToMap(xmlVal []byte) (map[string]interface{}, error) {
+	m, err := NewMapXml(xmlVal)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}(m), nil
+}
+
 // FromXml() --> ToJson().
 func XmlToJson(xmlVal []byte, safeEncoding ...bool) ([]byte, error) {
 	m, err := NewMapXml(xmlVal)
@@ -20,7 +29,7 @@ func XmlToJson(xmlVal []byte, safeEncoding ...bool) ([]byte, error) {
 	return m.Json(safeEncoding...)
 }
 
-// FromXml() --> ToJsonWriter().
+// FromXml() --> ToJsonWriterRaw().
 func XmlToJsonWriter(xmlVal []byte, jsonWriter io.Writer, safeEncoding ...bool) ([]byte, error) {
 	m, err := NewMapXml(xmlVal)
 	if err != nil {
@@ -29,7 +38,7 @@ func XmlToJsonWriter(xmlVal []byte, jsonWriter io.Writer, safeEncoding ...bool) 
 	return m.JsonWriterRaw(jsonWriter, safeEncoding...)
 }
 
-// FromXmlReader() --> ToJson().
+// FromXmlReaderRaw() --> ToJson().
 func XmlReaderToJson(xmlReader io.Reader, safeEncoding ...bool) ([]byte, []byte, error) {
 	m, xraw, err := NewMapXmlReaderRaw(xmlReader)
 	if err != nil {
