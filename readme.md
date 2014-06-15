@@ -1,4 +1,4 @@
-<h2>mxj - maps from XML and JSON</2>
+<h2>mxj - maps from XML and JSON</h2>
 Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract/modify values from maps by key or key-path, including wildcards.  
 
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
@@ -7,7 +7,6 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
    2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
 
 <h4>Basic Unmarshal XML / JSON / struct</h4>
-
    type Map map[string]interface{}
 
    Create a Map value, 'm', from any map[string]interface{} value, 'v':
@@ -61,13 +60,13 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
       newXml := newMap.Xml()   // for example
       newJson := newMap.Json() // ditto
 
-USAGE
+<h4>Usage</h4>
 
 The package is fairly well self-documented with examples. (http://godoc.org/github.com/clbanning/mxj)
 
 Also, the subdirectory "examples" contains a wide range of examples, several taken from golang-nuts discussions.
 
-XML PARSING CONVENTIONS
+<h4>XML parsing conventions</h4>
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
      to the attribute label.
@@ -75,13 +74,13 @@ XML PARSING CONVENTIONS
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
-RUNNING "GO TEST"
+<h4>Running "go test"</h4>
 
 Because there are no guarantees on the sequence map elements are retrieved, the tests have been 
 written for visual verification in most cases.  One advantage is that you can easily use the 
 output from running "go test" as examples of calling the various functions and methods.
 
-MOTIVATION
+<h4>Motivation</h4>
 
 I make extensive use of JSON for messaging and typically unmarshal the messages into
 map[string]interface{} variables.  This is easily done using json.Unmarshal from the
@@ -97,7 +96,7 @@ a couple of small functions to fill this gap and released them as the x2j packag
 
 Over the next year and a half additional features were added, and the companion j2x
 package was released to address XML encoding of arbitrary JSON and map[string]interface{}
-values.  As part of a refactoring of our production system and looking at how we'd been
+values.  As part of a refactoring of our production system and looking at how we had been
 using the x2j and j2x packages we found that we rarely performed direct XML-to-JSON or
 JSON-to_XML conversion and that working with the XML or JSON as map[string]interface{}
 values was the primary value.  Thus, everything was refactored into the mxj package.
