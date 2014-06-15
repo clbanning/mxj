@@ -145,7 +145,7 @@ func xmlToTree(doc []byte) (*node, error) {
 	reg, _ := regexp.Compile("[ \t\n\r]*<")
 	doc = reg.ReplaceAll(doc, []byte("<"))
 
-	b := bytes.NewBuffer(doc)
+	b := bytes.NewReader(doc)
 	p := xml.NewDecoder(b)
 	p.CharsetReader = XmlCharsetReader
 	n, berr := xmlToTreeParser("", nil, p)
@@ -176,6 +176,9 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 	for {
 		t, err := p.Token()
 		if err != nil {
+			if err != io.EOF {
+				return nil, errors.New("xml.Decoder.Token() - " + err.Error())
+			}
 			return nil, err
 		}
 		switch t.(type) {
