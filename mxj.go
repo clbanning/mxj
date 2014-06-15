@@ -44,8 +44,7 @@ func (mv Map) Copy() (Map, error) {
 	if jerr != nil {
 		return nil, jerr
 	}
-	m, _ := NewMapJson(j)
-	return m, nil
+	return NewMapJson(j)
 }
 
 // --------------- StringIndent ... from x2j.WriteMap -------------

@@ -1,11 +1,15 @@
+mxj - maps from XML and JSON
+==========
 Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract/modify values from maps by key or key-path, including wildcards.  
 
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
-NOTES:
+Notices
+----------
    2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
 
-SUMMARY
+Basic Unmarshal XML / JSON / struct
+-----------
 
    type Map map[string]interface{}
 
@@ -40,6 +44,9 @@ SUMMARY
    Arbitrary structure values can be decoded to / encoded from Map values:
       m, err := NewMapStruct(structVal)
       err := m.Struct(structPointer)
+
+Extract / modify Map values
+----------
 
    To work with XML tag values, JSON or Map key values or structure field values, decode the XML, JSON
    or structure to a Map value, 'm', or cast a map[string]interface{} value to a Map value, 'm', then:
