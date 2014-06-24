@@ -89,7 +89,7 @@ XML messages; in those environments the applications would have to be refitted t
 interoperate with my components.
 
 The better solution is to just provide an alternative HTTP handler that receives
-XML doc messages and parses it into a map[string]interface{} variable and then reuse
+XML messages and parses it into a map[string]interface{} variable and then reuse
 all the JSON-based code.  The Go xml.Unmarshal() function does not provide the same
 option of unmarshaling XML messages into map[string]interface{} variables. So I wrote
 a couple of small functions to fill this gap and released them as the x2j package.
