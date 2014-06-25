@@ -17,8 +17,8 @@ type MapRaw struct {
 	R []byte
 }
 
-// ReadMapsFromXmlFile - creates an array from a file of JSON values.
-func ReadMapsFromJsonFile(name string) (Maps, error) {
+// NewMapsFromXmlFile - creates an array from a file of JSON values.
+func NewMapsFromJsonFile(name string) (Maps, error) {
 	fi, err := os.Stat(name)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func ReadMapsFromJsonFile(name string) (Maps, error) {
 }
 
 // ReadMapsFromJsonFileRaw - creates an array of MapRaw from a file of JSON values.
-func ReadMapsFromJsonFileRaw(name string) ([]MapRaw, error) {
+func NewMapsFromJsonFileRaw(name string) ([]MapRaw, error) {
 	fi, err := os.Stat(name)
 	if err != nil {
 		return nil, err
@@ -82,8 +82,8 @@ func ReadMapsFromJsonFileRaw(name string) ([]MapRaw, error) {
 	return am, nil
 }
 
-// ReadMapsFromXmlFile - creates an array from a file of XML values.
-func ReadMapsFromXmlFile(name string) (Maps, error) {
+// NewMapsFromXmlFile - creates an array from a file of XML values.
+func NewMapsFromXmlFile(name string) (Maps, error) {
 	x := XmlWriterBufSize
 	XmlWriterBufSize = 0
 	defer func() {
@@ -120,10 +120,10 @@ func ReadMapsFromXmlFile(name string) (Maps, error) {
 	return am, nil
 }
 
-// ReadMapsFromXmlFileRaw - creates an array of MapRaw from a file of XML values.
+// NewMapsFromXmlFileRaw - creates an array of MapRaw from a file of XML values.
 // NOTE: the slice with the raw XML is clean with no extra capacity - unlike NewMapXmlReaderRaw().
 // It is slow at parsing a file from disk and is intended for relatively small utility files.
-func ReadMapsFromXmlFileRaw(name string) ([]MapRaw, error) {
+func NewMapsFromXmlFileRaw(name string) ([]MapRaw, error) {
 	x := XmlWriterBufSize
 	XmlWriterBufSize = 0
 	defer func() {
