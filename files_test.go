@@ -100,3 +100,25 @@ func TestReadXmFileRaw(t *testing.T) {
 	}
 	fmt.Println("caught error: ", err.Error())
 }
+
+func TestMaps(t *testing.T) {
+	fmt.Println("TestMaps()")
+	mvs := NewMaps()
+	for i := 0 ; i < 2 ; i++ {
+		m, _ := NewMapJson([]byte(`{ "this":"is", "a":"test" }`))
+		mvs = append(mvs, m)
+	}
+	fmt.Println("mvs:", mvs)
+
+	s, _ := mvs.JsonString()
+	fmt.Println("JsonString():", s)
+
+	s, _ = mvs.JsonStringIndent("", "  ")
+	fmt.Println("JsonStringIndent():", s)
+
+	s, _ = mvs.XmlString()
+	fmt.Println("XmlString():", s)
+
+	s, _ = mvs.XmlStringIndent("", "  ")
+	fmt.Println("XmlStringIndent():", s)
+}
