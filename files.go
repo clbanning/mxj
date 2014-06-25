@@ -44,7 +44,7 @@ func ReadMapsFromJsonFile(name string) ([]Map, error) {
 }
 
 // ReadMapsFromJsonFileRaw - creates an array of MapRaw from a file of JSON values.
-func ReadMapsFromJsonFileRaw(name string) ([]*MapRaw, error) {
+func ReadMapsFromJsonFileRaw(name string) ([]MapRaw, error) {
 	fi, err := os.Stat(name)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func ReadMapsFromJsonFileRaw(name string) ([]*MapRaw, error) {
 	}
 	defer fh.Close()
 
-	am := make([]*MapRaw,0)
+	am := make([]MapRaw,0)
 	for {
 		mr := new(MapRaw)
 		mr.M, mr.R, err = NewMapJsonReaderRaw(fh)
@@ -67,7 +67,7 @@ func ReadMapsFromJsonFileRaw(name string) ([]*MapRaw, error) {
 			return am, fmt.Errorf("error: %s - reading: %s", err.Error(), string(mr.R))
 		}
 		if len(mr.M) > 0 {
-			am = append(am, mr)
+			am = append(am, *mr)
 		}
 		if err == io.EOF {
 			break
@@ -117,7 +117,7 @@ func ReadMapsFromXmlFile(name string) ([]Map, error) {
 // ReadMapsFromXmlFileRaw - creates an array of MapRaw from a file of XML values.
 // NOTE: the slice with the raw XML is clean with no extra capacity - unlike NewMapXmlReaderRaw().
 // It is slow at parsing a file from disk and is intended for relatively small utility files.
-func ReadMapsFromXmlFileRaw(name string) ([]*MapRaw, error) {
+func ReadMapsFromXmlFileRaw(name string) ([]MapRaw, error) {
 	x := XmlWriterBufSize
 	XmlWriterBufSize = 0
 	defer func() {
@@ -139,7 +139,7 @@ func ReadMapsFromXmlFileRaw(name string) ([]*MapRaw, error) {
 	}
 	defer fh.Close()
 
-	am := make([]*MapRaw,0)
+	am := make([]MapRaw,0)
 	for {
 		mr := new(MapRaw)
 		mr.M, mr.R, err = NewMapXmlReaderRaw(fh)
@@ -147,7 +147,7 @@ func ReadMapsFromXmlFileRaw(name string) ([]*MapRaw, error) {
 			return am, fmt.Errorf("error: %s - reading: %s", err.Error(), string(mr.R))
 		}
 		if len(mr.M) > 0 {
-			am = append(am, mr)
+			am = append(am, *mr)
 		}
 		if err == io.EOF {
 			break
