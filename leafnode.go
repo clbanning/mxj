@@ -12,8 +12,9 @@ const (
 )
 
 // LeafNode - a terminal path value in a Map.
-// For XML Map values it represents an attribute or simple element value.
-// For JSON Map values it represents a string, numeric, boolean, or null value.
+// For XML Map values it represents an attribute or simple element value  - of type
+// string unless Map was created using Cast flag. For JSON Map values it represents
+// a string, numeric, boolean, or null value.
 type LeafNode struct {
 	Path  string      // a dot-notation representation of the path with array subscripting
 	Value interface{} // the value at the path termination
