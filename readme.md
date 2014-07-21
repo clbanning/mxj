@@ -74,6 +74,12 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
+<h4>XML encoding conventions</h4>
+
+   - 'nil' Map values, which may represent 'null' JSON values, are encoded as "<tag/>".
+      NOTE: the operation is not symmetric as "<tag/>" elements are decoded as 'tag:""' Map values,
+            which, then, encode in JSON as '"tag":""' values..
+
 <h4>Running "go test"</h4>
 
 Because there are no guarantees on the sequence map elements are retrieved, the tests have been 

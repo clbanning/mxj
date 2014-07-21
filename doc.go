@@ -71,5 +71,11 @@ XML PARSING CONVENTIONS
    - If the element is a simple element and has attributes, the element value
      is given the key '#text' for its map[string]interface{} representation. 
 
+XML ENCODING CONVENTIONS
+
+   - 'nil' Map values, which may represent 'null' JSON values, are encoded as "<tag/>".
+      NOTE: the operation is not symmetric as "<tag/>" elements are decoded as 'tag:""' Map values,
+            which, then, encode in JSON as '"tag":""' values..
+
 */
 package mxj
