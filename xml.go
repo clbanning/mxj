@@ -682,6 +682,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		return nil
 	case nil:
 		// terminate the tag
+		*s += "<" + key
 		break
 	default: // handle anything - even goofy stuff
 		switch value.(type) {

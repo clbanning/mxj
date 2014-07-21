@@ -65,7 +65,7 @@ func TestNewMapXmlReader(t *testing.T) {
 // ---------------------  Xml() and XmlWriter() test cases -------------------
 
 func TestXml(t *testing.T) {
-	mv := Map{"tag1": "some data", "tag2": "more data", "boolean": true, "float": 3.14159625}
+	mv := Map{"tag1": "some data", "tag2": "more data", "boolean": true, "float": 3.14159625, "null":nil}
 
 	x, err := mv.Xml()
 	if err != nil {
