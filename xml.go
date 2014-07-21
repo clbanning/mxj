@@ -507,8 +507,9 @@ func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, []byte) bool, 
 
 // This is a clone of io.TeeReader with the additional method t.ReadByte().
 // Thus, this TeeReader is also an io.ByteReader.
-// This is necessary because xml.NewDecoder uses a ByteReader not a Reader.
-// If NewDecoder is passed a Reader that does not satisfy ByteReader it wraps the Reader with
+// This is necessary because xml.NewDecoder uses a ByteReader not a Reader. It appears to have been written
+// with bufio.Reader or bytes.Reader in mind ... not a generic io.Reader, which doesn't have to have ReadByte()..
+// If NewDecoder is passed a Reader that does not satisfy ByteReader() it wraps the Reader with
 // bufio.NewReader and uses ReadByte rather than Read that runs the TeeReader pipe logic.
 
 type teeReader struct {
