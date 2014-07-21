@@ -76,8 +76,8 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
 
 <h4>XML encoding conventions</h4>
 
-   - 'nil' Map values, which may represent 'null' JSON values, are encoded as '<tag/>'.
-      NOTE: the operation is not symmetric as <tag/> elements are decoded as 'tag:""' Map values,
+   - 'nil' Map values, which may represent 'null' JSON values, are encoded as '\<tag/\>'.
+      NOTE: the operation is not symmetric as '\<tag/\>' elements are decoded as 'tag:""' Map values,
             which, then, encode in JSON as '"tag":""' values..
 
 <h4>Running "go test"</h4>
