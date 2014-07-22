@@ -122,3 +122,47 @@ func TestMaps(t *testing.T) {
 	s, _ = mvs.XmlStringIndent("", "  ")
 	fmt.Println("XmlStringIndent():", s)
 }
+
+func TestJsonFile(t *testing.T) {
+	am, err := NewMapsFromJsonFile("files_test.json")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	for _, v := range am {
+		fmt.Printf("%v\n", v)
+	}
+
+	err = am.JsonFile("files_test_dup.json")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	fmt.Println("files_test_dup.json written")
+
+	err = am.JsonFileIndent("files_test_indent.json","", "  ")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	fmt.Println("files_test_indent.json written")
+}
+
+func TestXmlFile(t *testing.T) {
+	am, err := NewMapsFromXmlFile("files_test.xml")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	for _, v := range am {
+		fmt.Printf("%v\n", v)
+	}
+
+	err = am.XmlFile("files_test_dup.xml")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	fmt.Println("files_test_dup.xml written")
+
+	err = am.XmlFileIndent("files_test_indent.xml","", "  ")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	fmt.Println("files_test_indent.xml written")
+}

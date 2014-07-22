@@ -197,7 +197,7 @@ func (mvs Maps) JsonStringIndent(prefix, indent string, safeEncoding ...bool) (s
 	return s, nil
 }
 
-// XmlString - analogous to mv.Json()
+// XmlString - analogous to mv.Xml()
 func (mvs Maps) XmlString() (string, error) {
 	var s string
 	for _, v := range mvs {
@@ -210,7 +210,7 @@ func (mvs Maps) XmlString() (string, error) {
 	return s, nil
 }
 
-// XmlStringIndent - analogous to mv.JsonIndent()
+// XmlStringIndent - analogous to mv.XmlIndent()
 func (mvs Maps) XmlStringIndent(prefix, indent string) (string, error) {
 	var s string
 	for _, v := range mvs {
