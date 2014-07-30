@@ -338,7 +338,7 @@ func XmlDefaultEmptyElemSyntax() {
 //          > structures, etc.: handed to xml.Marshal() - if there is an error, the element
 //            value is "UNKNOWN"
 //    - Elements with only attribute values or are null are terminated using "/>".
-//    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag.
+//    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag, possible.
 //      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
 //    - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
@@ -349,13 +349,28 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 
 	if len(m) == 1 && len(rootTag) == 0 {
 		for key, value := range m {
-				err = mapToXmlIndent(false, s, key, value, p)
+			// if it an array, see if all values are map[string]interface{}
+			// we force a new root tag if we'll end up with no key:value in the list
+			// so: key:[string_val, bool:true] --> <doc><key>string_val</key><bool>true</bool></key></doc>
+			switch value.(type) {
+			case []interface{}:
+				for _, v := range value.([]interface{}) {
+					switch v.(type) {
+					case map[string]interface{}: // noop
+					default: // anything else
+						err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
+						goto done
+					}
+				}
+			}
+			err = mapToXmlIndent(false, s, key, value, p)
 		}
 	} else if len(rootTag) == 1 {
 		err = mapToXmlIndent(false, s, rootTag[0], m, p)
 	} else {
 		err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
 	}
+done:
 	return []byte(*s), err
 }
 
