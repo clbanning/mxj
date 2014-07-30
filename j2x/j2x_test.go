@@ -1,3 +1,5 @@
+// thanks to Chris Malek (chris.r.malek@gmail.com) for suggestion to handle JSON list docs.
+
 package j2x
 
 import (
