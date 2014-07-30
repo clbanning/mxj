@@ -349,11 +349,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 
 	if len(m) == 1 && len(rootTag) == 0 {
 		for key, value := range m {
-			if _, ok := value.([]interface{}); ok {
-				err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
-			} else {
 				err = mapToXmlIndent(false, s, key, value, p)
-			}
 		}
 	} else if len(rootTag) == 1 {
 		err = mapToXmlIndent(false, s, rootTag[0], m, p)
