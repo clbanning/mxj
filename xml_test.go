@@ -115,6 +115,19 @@ func TestXml_4(t *testing.T) {
 	fmt.Println("Xml_4, x :", string(x))
 }
 
+func TestXml_5(t *testing.T) {
+	a := []interface{}{ "string", true, 36.4 }
+	mv := Map{"array": []interface{}{ map[string]interface{}{ "innerkey": []interface{}{a, "string2"} }, map[string]interface{}{"some":"more"} } }
+
+	x, err := mv.Xml()
+	if err != nil {
+		t.Fatal("err:", err.Error())
+	}
+
+	fmt.Println("Xml_5, mv:", mv)
+	fmt.Println("Xml_5, x :", string(x))
+}
+
 func TestXmlWriter(t *testing.T) {
 	mv := Map{"tag1": "some data", "tag2": "more data", "boolean": true, "float": 3.14159625}
 	w := new(bytes.Buffer)
