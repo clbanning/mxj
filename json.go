@@ -118,7 +118,14 @@ var JsonUseNumber bool
 //		if xerr != nil {
 //			// handle error
 //		}
+// NOTE: as a special case, passing a list, e.g., [{"some-null-value":"", "a-non-null-value":"bar"}],
+// will be interpreted as having the root key 'doc' prepended - {"doc":[ ... ]} - to unmarshal to a Map.
+// See mxj/j2x/j2x_test.go.
 func NewMapJson(jsonVal []byte) (Map, error) {
+	// handle a goofy case ...
+	if jsonVal[0] == '[' {
+		jsonVal = []byte(`{"doc":` + string(jsonVal) + `}`)
+	}
 	m := make(map[string]interface{})
 	// err := json.Unmarshal(jsonVal, &m)
 	buf := bytes.NewReader(jsonVal)
