@@ -119,7 +119,7 @@ var JsonUseNumber bool
 //			// handle error
 //		}
 func NewMapJson(jsonVal []byte) (Map, error) {
-	m := make(Map)
+	m := make(map[string]interface{})
 	// err := json.Unmarshal(jsonVal, &m)
 	buf := bytes.NewReader(jsonVal)
 	dec := json.NewDecoder(buf)
