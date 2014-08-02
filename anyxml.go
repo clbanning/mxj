@@ -93,9 +93,12 @@ func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]by
 						err = mapToXmlIndent(true, s, tag, val, p)
 					}
 				} else {
+					p.start = 1 // we 1 tag in
 					err = mapToXmlIndent(true, s, "element", vv, p)
+					*s += "\n"
 				}
 			default:
+				p.start = 0 // in case trailing p.start = 1
 				err = mapToXmlIndent(true, s, "element", vv, p)
 			}
 			if err != nil {

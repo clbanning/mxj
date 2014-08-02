@@ -18,9 +18,9 @@ var anydata = []byte(`[
         "somekey": "somevalue"
     },
     {
-        "somekey": "somevalue"
+        "somekey": "somevalue",
         "someotherkey": "someothervalue"
-    }
+    },
     "string",
     3.14159265,
     true
@@ -34,6 +34,9 @@ type MyStruct struct {
 func TestAnyXml(t *testing.T) {
 	var i interface{}
 	err := json.Unmarshal(anydata, &i)
+	if err != nil {
+		t.Fatal(err)
+	}
 	x, err := AnyXml(i)
 	if err != nil {
 		t.Fatal(err)
@@ -64,6 +67,9 @@ func TestAnyXml(t *testing.T) {
 func TestAnyXmlIndent(t *testing.T) {
 	var i interface{}
 	err := json.Unmarshal(anydata, &i)
+	if err != nil {
+		t.Fatal(err)
+	}
 	x, err := AnyXmlIndent(i, "", "  ")
 	if err != nil {
 		t.Fatal(err)

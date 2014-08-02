@@ -587,6 +587,7 @@ type pretty struct {
 	cnt      int
 	padding  string
 	mapDepth int
+	start int
 }
 
 func (p *pretty) Indent() {
@@ -606,7 +607,7 @@ func (p *pretty) Outdent() {
 func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
-	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth}
+	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
 
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
@@ -723,9 +724,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	if endTag {
 		if doIndent {
 			if !isSimple {
-				if p.mapDepth == 0 {
-					p.Outdent()
-				}
+//				if p.mapDepth == 0 {
+//					p.Outdent()
+//				}
 				*s += p.padding
 			}
 		}
@@ -739,7 +740,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		*s += "/>"
 	}
 	if doIndent {
-		if p.cnt > 0 {
+		if p.cnt > p.start {
 			*s += "\n"
 		}
 		p.Outdent()
