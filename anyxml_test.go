@@ -22,34 +22,53 @@ var anydata = []byte(`[
     }
 ]`)
 
+type MyStruct struct {
+	Somekey string  `xml:"somekey"`
+	B       float32 `xml:"floatval"`
+}
+
 func TestAnyXml(t *testing.T) {
 	var i interface{}
-	err := json.Unmarshal(anydata,&i)
+	err := json.Unmarshal(anydata, &i)
 	x, err := AnyXml(i)
 	if err != nil {
 		t.Fatal(err)
 	}
-   fmt.Println("[]->x:", string(x))
+	fmt.Println("[]->x:", string(x))
 
 	x, err = AnyXml(3.14159625)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println("f->x:", string(x))
+
+	s := MyStruct{"somevalue", 3.14159625}
+	x, err = AnyXml(s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("s->x:", string(x))
 }
 
 func TestAnyXmlIndent(t *testing.T) {
 	var i interface{}
-	err := json.Unmarshal(anydata,&i)
+	err := json.Unmarshal(anydata, &i)
 	x, err := AnyXmlIndent(i, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
-   fmt.Println("[]->x:\n", string(x))
+	fmt.Println("[]->x:\n", string(x))
 
 	x, err = AnyXmlIndent(3.14159625, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println("f->x:\n", string(x))
+
+	s := MyStruct{"somevalue", 3.14159625}
+	x, err = AnyXmlIndent(s, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("s->x:", string(x))
 }

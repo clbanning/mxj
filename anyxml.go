@@ -1,7 +1,16 @@
 package mxj
 
+import (
+	"encoding/xml"
+	"reflect"
+)
+
 // Encode arbitrary value as XML.  Note: there are no guarantees.
 func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
+	if reflect.TypeOf(v).Kind() == reflect.Struct {
+		return xml.Marshal(v)
+	}
+
 	var err error
 	s := new(string)
 	p := new(pretty)
@@ -36,7 +45,7 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 				break
 			}
 		}
-		ss += *s + "</" + rt + ">\n"
+		ss += *s + "</" + rt + ">"
 		b = []byte(ss)
 	case map[string]interface{}:
 		m := Map(v.(map[string]interface{}))
@@ -52,6 +61,10 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 
 // Encode an arbitrary value as a pretty XML string. Note: there are no guarantees.
 func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]byte, error) {
+	if reflect.TypeOf(v).Kind() == reflect.Struct {
+		return xml.MarshalIndent(v, prefix, indent)
+	}
+
 	var err error
 	s := new(string)
 	p := new(pretty)
@@ -89,7 +102,7 @@ func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]by
 				break
 			}
 		}
-		ss += *s + "</" + rt + ">\n"
+		ss += *s + "</" + rt + ">"
 		b = []byte(ss)
 	case map[string]interface{}:
 		m := Map(v.(map[string]interface{}))
