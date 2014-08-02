@@ -10,6 +10,9 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
+Note:
+	2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
+
 SUMMARY
 
    type Map map[string]interface{}
