@@ -23,9 +23,9 @@ var anydata = []byte(`[
 ]`)
 
 func TestAnyXml(t *testing.T) {
-	a := make([]interface{},3)
-	err := json.Unmarshal(anydata,&a)
-	x, err := AnyXml(a)
+	var i interface{}
+	err := json.Unmarshal(anydata,&i)
+	x, err := AnyXml(i)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,9 +40,9 @@ func TestAnyXml(t *testing.T) {
 }
 
 func TestAnyXmlIndent(t *testing.T) {
-	a := make([]interface{},3)
-	err := json.Unmarshal(anydata,&a)
-	x, err := AnyXmlIndent(a, "", "  ")
+	var i interface{}
+	err := json.Unmarshal(anydata,&i)
+	x, err := AnyXmlIndent(i, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

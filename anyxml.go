@@ -17,7 +17,7 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 	var b []byte
 	switch v.(type) {
 	case []interface{}:
-		ss = "<" + rt + ">\n"
+		ss = "<" + rt + ">"
 		for _, vv := range v.([]interface{}) {
 			switch vv.(type) {
 			case map[string]interface{}:
