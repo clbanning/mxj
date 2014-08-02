@@ -739,7 +739,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		*s += "/>"
 	}
 	if doIndent {
-		*s += "\n"
+		if p.cnt > 0 {
+			*s += "\n"
+		}
 		p.Outdent()
 	}
 
