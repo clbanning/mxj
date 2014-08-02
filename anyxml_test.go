@@ -31,8 +31,7 @@ func TestAnyXml(t *testing.T) {
 	}
    fmt.Println("[]->x:", string(x))
 
-	f := interface{}(3.14159625)
-	x, err = AnyXml(f)
+	x, err = AnyXml(3.14159625)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,8 +47,7 @@ func TestAnyXmlIndent(t *testing.T) {
 	}
    fmt.Println("[]->x:\n", string(x))
 
-	f := interface{}(3.14159625)
-	x, err = AnyXmlIndent(f, "", "  ")
+	x, err = AnyXmlIndent(3.14159625, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
