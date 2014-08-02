@@ -70,5 +70,5 @@ func TestAnyXmlIndent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println("s->x:", string(x))
+	fmt.Println("s->x:\n", string(x))
 }
