@@ -5,7 +5,7 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 
 <h4>Notices</h4>
    2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
-	2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
+   2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
 
 <h4>Basic Unmarshal XML / JSON / struct</h4>
    - type Map map[string]interface{}
