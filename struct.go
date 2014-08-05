@@ -7,6 +7,7 @@ package mxj
 import (
 	"encoding/json"
 	"errors"
+	"github.com/fatih/structure"
 	"reflect"
 )
 
@@ -18,6 +19,8 @@ func NewMapStruct(structVal interface{}) (Map, error) {
 	if reflect.ValueOf(structVal).Kind() != reflect.Struct {
 		return nil, errors.New("NewMapStruct() error: argument is not type Struct")
 	}
+	return structure.Map(structVal), nil
+	/*
 	j, err := json.Marshal(structVal)
 	if err != nil {
 		return nil, err
@@ -26,6 +29,7 @@ func NewMapStruct(structVal interface{}) (Map, error) {
 	m := make(map[string]interface{}, 0)
 	err = json.Unmarshal(j, &m)
 	return m, err
+	*/
 }
 
 // Marshal a map[string]interface{} into a structure referenced by 'structPtr'. Error returned
