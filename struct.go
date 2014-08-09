@@ -16,20 +16,10 @@ import (
 //	Only public structure fields are decoded in the Map value. Also, json.Marshal structure encoding rules
 //	are followed for decoding the structure fields.
 func NewMapStruct(structVal interface{}) (Map, error) {
-	if reflect.ValueOf(structVal).Kind() != reflect.Struct {
+	if !structure.IsStruct(structVal) {
 		return nil, errors.New("NewMapStruct() error: argument is not type Struct")
 	}
 	return structure.Map(structVal), nil
-	/*
-	j, err := json.Marshal(structVal)
-	if err != nil {
-		return nil, err
-	}
-
-	m := make(map[string]interface{}, 0)
-	err = json.Unmarshal(j, &m)
-	return m, err
-	*/
 }
 
 // Marshal a map[string]interface{} into a structure referenced by 'structPtr'. Error returned
