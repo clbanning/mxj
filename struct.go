@@ -7,7 +7,7 @@ package mxj
 import (
 	"encoding/json"
 	"errors"
-	"github.com/fatih/structure"
+	"github.com/fatih/structs"
 	"reflect"
 )
 
@@ -16,10 +16,10 @@ import (
 //	Only public structure fields are decoded in the Map value. Also, json.Marshal structure encoding rules
 //	are followed for decoding the structure fields.
 func NewMapStruct(structVal interface{}) (Map, error) {
-	if !structure.IsStruct(structVal) {
+	if !structs.IsStruct(structVal) {
 		return nil, errors.New("NewMapStruct() error: argument is not type Struct")
 	}
-	return structure.Map(structVal), nil
+	return structs.Map(structVal), nil
 }
 
 // Marshal a map[string]interface{} into a structure referenced by 'structPtr'. Error returned
