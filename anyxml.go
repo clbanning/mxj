@@ -6,6 +6,43 @@ import (
 )
 
 // Encode arbitrary value as XML.  Note: there are no guarantees.
+/*
+ Encode an arbitrary JSON object.<br>
+	package main
+	
+	import (
+		"encoding/json"
+		"fmt"
+		"github.com/clbanning/anyxml"
+	)
+	
+	func main() {
+		jasondata := []byte(`[
+			{ "somekey":"somevalue" },
+			"string",
+			3.14159265,
+			true
+		]`)
+		var i interface{}
+		err := json.Unmarshal(jsondata, &i)
+		if err != nil {
+			// do something
+		}
+		x, err := anyxml.XmlIndent(i, "", "  ", "mydoc")
+		if err != nil {
+			// do something else
+		}
+		fmt.Println(string(x))
+	}
+	
+	output:
+		<mydoc>
+			<somekey>somevalue</somekey>
+			<element>string</element>
+			<element>3.14159265</element>
+			<element>true</element>
+		</mydoc&gt;
+*/
 func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 	if reflect.TypeOf(v).Kind() == reflect.Struct {
 		return xml.Marshal(v)
