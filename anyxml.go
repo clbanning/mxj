@@ -17,7 +17,7 @@ import (
 	import (
 		"encoding/json"
 		"fmt"
-		"github.com/clbanning/anyxml"
+		"github/clbanning/mxj"
 	)
 	
 	func main() {
