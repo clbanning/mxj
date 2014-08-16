@@ -5,7 +5,11 @@ import (
 	"reflect"
 )
 
-// Encode arbitrary value as XML.  Note: there are no guarantees.
+// Encode arbitrary value as XML. 
+// 
+// Note: unmarshaling the resultant
+// XML may not return the original value, since tag labels may have been injected
+// to create the XML representation of the value.
 /*
  Encode an arbitrary JSON object.<br>
 	package main
@@ -96,7 +100,7 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 }
 
 
-// Encode an arbitrary value as a pretty XML string. Note: there are no guarantees.
+// Encode an arbitrary value as a pretty XML string.
 func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]byte, error) {
 	if reflect.TypeOf(v).Kind() == reflect.Struct {
 		return xml.MarshalIndent(v, prefix, indent)
