@@ -41,7 +41,7 @@ import (
 			<element>string</element>
 			<element>3.14159265</element>
 			<element>true</element>
-		</mydoc&gt;
+		</mydoc>
 */
 func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 	if reflect.TypeOf(v).Kind() == reflect.Struct {
