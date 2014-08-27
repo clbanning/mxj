@@ -11,7 +11,7 @@ import (
 // XML may not return the original value, since tag labels may have been injected
 // to create the XML representation of the value.
 /*
- Encode an arbitrary JSON object.<br>
+ Encode an arbitrary JSON object.
 	package main
 	
 	import (
@@ -41,10 +41,10 @@ import (
 	
 	output:
 		<mydoc>
-			<somekey>somevalue</somekey>
-			<element>string</element>
-			<element>3.14159265</element>
-			<element>true</element>
+		  <somekey>somevalue</somekey>
+		  <element>string</element>
+		  <element>3.14159265</element>
+		  <element>true</element>
 		</mydoc>
 */
 func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
