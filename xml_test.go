@@ -12,7 +12,7 @@ func TestXmlHeader(t *testing.T) {
 }
 
 func TestNewMapXml(t *testing.T) {
-	x := []byte(`<root2><newtag>something more</newtag><list><item>1</item><item>2</item></list></root2>`)
+	x := []byte(`<root2><newtag newattr="some_attr_value">something more</newtag><list listattr="val"><item>1</item><item>2</item></list></root2>`)
 
 	mv, merr := NewMapXml(x)
 	if merr != nil {
@@ -21,6 +21,20 @@ func TestNewMapXml(t *testing.T) {
 
 	fmt.Println("NewMapXml, x :", string(x))
 	fmt.Println("NewMapXml, mv:", mv)
+}
+
+func TestAttrHyphenFalse(t *testing.T) {
+	PrependAttrWithHyphen(false)
+	x := []byte(`<root2><newtag newattr="some_attr_value">something more</newtag><list listattr="val"><item>1</item><item>2</item></list></root2>`)
+
+	mv, merr := NewMapXml(x)
+	if merr != nil {
+		t.Fatal("merr:", merr.Error())
+	}
+
+	fmt.Println("AttrHyphenFalse, x :", string(x))
+	fmt.Println("AttrHyphenFalse, mv:", mv)
+	PrependAttrWithHyphen(true)
 }
 
 func TestNewMapXmlError(t *testing.T) {

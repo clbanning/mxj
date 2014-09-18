@@ -156,6 +156,18 @@ func xmlToTree(doc []byte) (*node, error) {
 	return n, nil
 }
 
+// we allow people to drop hyphen when unmarshaling the XML doc.
+var useHyphen bool = true
+
+// PrependAttrbuteHyphen. Prepend attribute tags with a hyphen.
+// Default is 'true'.
+//	Note:
+//		If 'false', unmarshaling and marshaling is not symmetric Attributes will be marshal'd as
+//		<attr_tag>attr</attr_tag> and may be part of a list.
+func PrependAttrWithHyphen(v bool) {
+	useHyphen = v
+}
+
 // xmlToTreeParser - load a 'clean' XML doc into a tree of *node.
 func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 	n := new(node)
@@ -167,7 +179,11 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 			for _, v := range a {
 				na := new(node)
 				na.attr = true
-				na.key = `-` + v.Name.Local
+				if useHyphen {
+					na.key = `-` + v.Name.Local
+				} else {
+					na.key = v.Name.Local
+				}
 				na.val = v.Value
 				n.nodes = append(n.nodes, na)
 			}
@@ -191,7 +207,11 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 					for _, v := range tt.Attr {
 						na := new(node)
 						na.attr = true
-						na.key = `-` + v.Name.Local
+						if useHyphen {
+							na.key = `-` + v.Name.Local
+						} else {
+							na.key = v.Name.Local
+						}
 						na.val = v.Value
 						n.nodes = append(n.nodes, na)
 					}
@@ -587,7 +607,7 @@ type pretty struct {
 	cnt      int
 	padding  string
 	mapDepth int
-	start int
+	start    int
 }
 
 func (p *pretty) Indent() {
@@ -724,9 +744,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	if endTag {
 		if doIndent {
 			if !isSimple {
-//				if p.mapDepth == 0 {
-//					p.Outdent()
-//				}
+				//				if p.mapDepth == 0 {
+				//					p.Outdent()
+				//				}
 				*s += p.padding
 			}
 		}

@@ -4,8 +4,9 @@ Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extrac
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
 <h4>Notices</h4>
-   - 2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
-   - 2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
+	2014-09-18: inspired by NYTimes fork, added PrependAttrWithHyphen() to allow stripping hyphen from attribute tag.
+	2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
+   2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
 
 <h4>Basic Unmarshal XML / JSON / struct</h4>
    - type Map map[string]interface{}
