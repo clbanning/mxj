@@ -159,11 +159,11 @@ func xmlToTree(doc []byte) (*node, error) {
 // we allow people to drop hyphen when unmarshaling the XML doc.
 var useHyphen bool = true
 
-// PrependAttrbuteHyphen. Prepend attribute tags with a hyphen.
+// PrependAttrWithHyphen. Prepend attribute tags with a hyphen.
 // Default is 'true'.
 //	Note:
-//		If 'false', unmarshaling and marshaling is not symmetric Attributes will be marshal'd as
-//		<attr_tag>attr</attr_tag> and may be part of a list.
+//		If 'false', unmarshaling and marshaling is not symmetric Attributes will be
+//		marshal'd as <attr_tag>attr</attr_tag> and may be part of a list.
 func PrependAttrWithHyphen(v bool) {
 	useHyphen = v
 }
