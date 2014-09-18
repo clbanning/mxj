@@ -71,7 +71,7 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
 <h4>XML parsing conventions</h4>
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
-     to the attribute label.
+     to the attribute label. (Unless overridden by PrependAttrWithHyphen(false).)
    - If the element is a simple element and has attributes, the element value
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
