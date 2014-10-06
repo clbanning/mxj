@@ -50,6 +50,12 @@ func TestAnyXml(t *testing.T) {
 	}
 	fmt.Println("a->x:", string(x))
 
+	x, err = AnyXml(a, "myRootTag", "myElementTag")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("a->x:", string(x))
+
 	x, err = AnyXml(3.14159625)
 	if err != nil {
 		t.Fatal(err)
@@ -84,6 +90,12 @@ func TestAnyXmlIndent(t *testing.T) {
 	fmt.Println("a->x:\n", string(x))
 
 	x, err = AnyXmlIndent(3.14159625, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("f->x:\n", string(x))
+
+	x, err = AnyXmlIndent(3.14159625, "", "  ", "myRootTag", "myElementTag")
 	if err != nil {
 		t.Fatal(err)
 	}

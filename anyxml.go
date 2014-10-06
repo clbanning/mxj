@@ -5,6 +5,10 @@ import (
 	"reflect"
 )
 
+const (
+	DefaultElementTag = "element"
+)
+
 // Encode arbitrary value as XML. 
 // 
 // Note: unmarshaling the resultant
@@ -47,7 +51,9 @@ import (
 		  <element>true</element>
 		</mydoc>
 */
-func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
+// Alternative values for DefaultRootTag and DefaultElementTag can be set as:
+// AnyXmlIndent( v, myRootTag, myElementTag).
+func AnyXml(v interface{}, tags ...string) ([]byte, error) {
 	if reflect.TypeOf(v).Kind() == reflect.Struct {
 		return xml.Marshal(v)
 	}
@@ -56,11 +62,16 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 	s := new(string)
 	p := new(pretty)
 
-	var rt string
-	if len(rootTag) == 1 {
-		rt = rootTag[0]
+	var rt, et string
+	if len(tags) == 1 || len(tags) == 2 {
+		rt = tags[0]
 	} else {
 		rt = DefaultRootTag
+	}
+	if len(tags) == 2 {
+		et = tags[1]
+	} else {
+		et = DefaultElementTag
 	}
 
 	var ss string
@@ -77,10 +88,10 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 						err = mapToXmlIndent(false, s, tag, val, p)
 					}
 				} else {
-					err = mapToXmlIndent(false, s, "element", vv, p)
+					err = mapToXmlIndent(false, s, et, vv, p)
 				}
 			default:
-				err = mapToXmlIndent(false, s, "element", vv, p)
+				err = mapToXmlIndent(false, s, et, vv, p)
 			}
 			if err != nil {
 				break
@@ -90,7 +101,7 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 		b = []byte(ss)
 	case map[string]interface{}:
 		m := Map(v.(map[string]interface{}))
-		b, err = m.Xml(rootTag...)
+		b, err = m.Xml(rt)
 	default:
 		err = mapToXmlIndent(false, s, rt, v, p)
 		b = []byte(*s)
@@ -101,7 +112,9 @@ func AnyXml(v interface{}, rootTag ...string) ([]byte, error) {
 
 
 // Encode an arbitrary value as a pretty XML string.
-func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]byte, error) {
+// Alternative values for DefaultRootTag and DefaultElementTag can be set as:
+// AnyXmlIndent( v, "", "  ", myRootTag, myElementTag).
+func AnyXmlIndent(v interface{}, prefix, indent string, tags ...string) ([]byte, error) {
 	if reflect.TypeOf(v).Kind() == reflect.Struct {
 		return xml.MarshalIndent(v, prefix, indent)
 	}
@@ -112,11 +125,16 @@ func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]by
 	p.indent = indent
 	p.padding = prefix
 
-	var rt string
-	if len(rootTag) == 1 {
-		rt = rootTag[0]
+	var rt, et string
+	if len(tags) == 1 || len(tags) == 2 {
+		rt = tags[0]
 	} else {
 		rt = DefaultRootTag
+	}
+	if len(tags) == 2 {
+		et = tags[1]
+	} else {
+		et = DefaultElementTag
 	}
 
 	var ss string
@@ -135,12 +153,12 @@ func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]by
 					}
 				} else {
 					p.start = 1 // we 1 tag in
-					err = mapToXmlIndent(true, s, "element", vv, p)
+					err = mapToXmlIndent(true, s, et, vv, p)
 					*s += "\n"
 				}
 			default:
 				p.start = 0 // in case trailing p.start = 1
-				err = mapToXmlIndent(true, s, "element", vv, p)
+				err = mapToXmlIndent(true, s, et, vv, p)
 			}
 			if err != nil {
 				break
@@ -150,7 +168,7 @@ func AnyXmlIndent(v interface{}, prefix, indent string, rootTag ...string) ([]by
 		b = []byte(ss)
 	case map[string]interface{}:
 		m := Map(v.(map[string]interface{}))
-		b, err = m.XmlIndent(prefix, indent, rootTag...)
+		b, err = m.XmlIndent(prefix, indent, rt)
 	default:
 		err = mapToXmlIndent(true, s, rt, v, p)
 		b = []byte(*s)
