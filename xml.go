@@ -168,10 +168,55 @@ func PrependAttrWithHyphen(v bool) {
 	useHyphen = v
 }
 
+// Include sequence id with inner tags. - per Sean Murphy, murphysean84@gmail.com.
+var includeTagSeqNum bool
+
+// IncludeTagSeqNum - include a "_seq":N key:value pair with each inner tag, denoting
+// its position when parsed. E.g.,
+/*
+		<Obj c="la" x="dee" h="da">
+			<IntObj id="3"/>
+			<IntObj1 id="1"/>
+			<IntObj id="2"/>
+			<StrObj>hello</StrObj>
+		</Obj>
+
+	parses as:
+
+		{
+		Obj:{
+			"-c":"la",
+			"-h":"da",
+			"-z":"dee",
+			"intObj":[
+				{
+					"-id"="3",
+					"_seq":"0" // if mxj.Cast is passed, then: "_seq":0
+				},
+				{
+					"-id"="2",
+					"_seq":"2"
+				}],
+			"intObj1":{
+				"-id":"1",
+				"_seq":"1"
+				},
+			"StrObj":{
+				"#text":"hello", // simple element value gets "#text" tag
+				"_seq":"3"
+				}
+			}
+		}
+*/
+func IncludeTagSeqNum(b bool) {
+	includeTagSeqNum = b
+}
+
 // xmlToTreeParser - load a 'clean' XML doc into a tree of *node.
 func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 	n := new(node)
 	n.nodes = make([]*node, 0)
+	var seq int // for includeTagSeqNum
 
 	if skey != "" {
 		n.key = skey
@@ -222,6 +267,11 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 					return nil, nnerr
 				}
 				n.nodes = append(n.nodes, nn)
+				if includeTagSeqNum { // 2014.11.09
+					sn := &node{false, false, "_seq", strconv.Itoa(seq), nil}
+					nn.nodes = append(nn.nodes, sn)
+					seq++
+				}
 			}
 		case xml.EndElement:
 			// scan n.nodes for duplicate n.key values
@@ -239,6 +289,17 @@ func xmlToTreeParser(skey string, a []xml.Attr, p *xml.Decoder) (*node, error) {
 				n.nodes = append(n.nodes, nn)
 			} else {
 				n.val = tt
+			}
+			if includeTagSeqNum { // 2014.11.09
+				if len(n.nodes) == 0 { // treat like a simple element with attributes
+					nn := new(node)
+					nn.key = "#text"
+					nn.val = tt
+					n.nodes = append(n.nodes, nn)
+				}
+				sn := &node{false, false, "_seq", strconv.Itoa(seq), nil}
+				n.nodes = append(n.nodes, sn)
+				seq++
 			}
 		default:
 			// noop
@@ -274,12 +335,19 @@ func (n *node) treeToMap(r bool) interface{} {
 
 	m := make(map[string]interface{}, 0)
 	for _, v := range n.nodes {
+		// 2014.11.9 - may have to back out
+		if includeTagSeqNum {
+			if len(v.nodes) == 1 {
+				m[v.key] = cast(v.val, r)
+				continue
+			}
+		}
+
 		// just a value
 		if !v.dup && len(v.nodes) == 0 {
 			m[v.key] = cast(v.val, r)
 			continue
 		}
-
 		// a list of values
 		if v.dup {
 			var a []interface{}
