@@ -47,4 +47,6 @@ func TestSeqNum(t *testing.T) {
 	fmt.Printf("m2: %#v\n", m)
 	j, _ = m.JsonIndent("", "  ")
 	fmt.Println(string(j))
+
+	IncludeTagSeqNum( false )
 }

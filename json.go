@@ -119,12 +119,12 @@ var JsonUseNumber bool
 //			// handle error
 //		}
 // NOTE: as a special case, passing a list, e.g., [{"some-null-value":"", "a-non-null-value":"bar"}],
-// will be interpreted as having the root key 'doc' prepended - {"doc":[ ... ]} - to unmarshal to a Map.
+// will be interpreted as having the root key 'object' prepended - {"object":[ ... ]} - to unmarshal to a Map.
 // See mxj/j2x/j2x_test.go.
 func NewMapJson(jsonVal []byte) (Map, error) {
 	// handle a goofy case ...
 	if jsonVal[0] == '[' {
-		jsonVal = []byte(`{"doc":` + string(jsonVal) + `}`)
+		jsonVal = []byte(`{"object":` + string(jsonVal) + `}`)
 	}
 	m := make(map[string]interface{})
 	// err := json.Unmarshal(jsonVal, &m)
@@ -141,7 +141,7 @@ func NewMapJson(jsonVal []byte) (Map, error) {
 //  NOTE: The raw JSON off the reader is buffered to []byte using a ByteReader. If the io.Reader is an
 //        os.File, there may be significant performance impact. If the io.Reader is wrapping a []byte
 //        value in-memory, however, such as http.Request.Body you CAN use it to efficiently unmarshal
-//        a JSON object and retrieve the raw JSON in a single call.
+//        a JSON object.
 func NewMapJsonReader(jsonReader io.Reader) (Map, error) {
 	jb, err := getJson(jsonReader)
 	if err != nil || len(*jb) == 0 {
