@@ -122,6 +122,11 @@ var JsonUseNumber bool
 // will be interpreted as having the root key 'object' prepended - {"object":[ ... ]} - to unmarshal to a Map.
 // See mxj/j2x/j2x_test.go.
 func NewMapJson(jsonVal []byte) (Map, error) {
+	// empty or nil begets empty
+	if len(jsonVal) == 0 {
+		m := make(map[string]interface{},0)
+		return m, nil
+	}
 	// handle a goofy case ...
 	if jsonVal[0] == '[' {
 		jsonVal = []byte(`{"object":` + string(jsonVal) + `}`)
