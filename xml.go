@@ -187,7 +187,7 @@ var includeTagSeqNum bool
 		Obj:{
 			"-c":"la",
 			"-h":"da",
-			"-z":"dee",
+			"-x":"dee",
 			"intObj":[
 				{
 					"-id"="3",
