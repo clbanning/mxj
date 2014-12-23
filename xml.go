@@ -439,7 +439,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 		for key, value := range m {
 			// if it an array, see if all values are map[string]interface{}
 			// we force a new root tag if we'll end up with no key:value in the list
-			// so: key:[string_val, bool:true] --> <doc><key>string_val</key><bool>true</bool></key></doc>
+			// so: key:[string_val, bool:true] --> <doc><key>string_val</key><bool>true</bool></doc>
 			switch value.(type) {
 			case []interface{}:
 				for _, v := range value.([]interface{}) {
