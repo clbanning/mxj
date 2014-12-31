@@ -1,5 +1,5 @@
 <h2>mxj - to/from maps, XML and JSON</h2>
-Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract/modify values from maps by key or key-path, including wildcards.  
+Marshal/Unmarshal XML to/from JSON and `map[string]interface{}` values, and extract/modify values from maps by key or key-path, including wildcards.  
 
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
@@ -11,58 +11,58 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 	2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
 
 <h4>Basic Unmarshal XML / JSON / struct</h4>
-   - type Map map[string]interface{}
+<pre>type Map map[string]interface{}</pre>
 
-Create a Map value, 'm', from any map[string]interface{} value, 'v':
-   - m := Map(v)
+Create a `Map` value, 'm', from any `map[string]interface{}` value, 'v':
+<pre>m := Map(v)</pre>
 
-Unmarshal / marshal XML as a Map value, 'm':
-   - m, err := NewMapXml(xmlValue) // unmarshal
-   - xmlValue, err := m.Xml()      // marshal
+Unmarshal / marshal XML as a `Map` value, 'm':
+<pre>m, err := NewMapXml(xmlValue) // unmarshal
+xmlValue, err := m.Xml()      // marshal</pre>
 
-Unmarshal XML from an io.Reader as a Map value, 'm':
-   - m, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
-   - m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded
+Unmarshal XML from an `io.Reader` as a `Map` value, 'm':
+<pre>m, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
+m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded</pre>
 
-Marshal Map value, 'm', to an XML Writer (io.Writer):
-   - err := m.XmlWriter(xmlWriter)<br>
-   - raw, err := m.XmlWriterRaw(xmlWriter) // 'raw' is the raw XML that was written on xmlWriter
-	
+Marshal `Map` value, 'm', to an XML Writer (`io.Writer`):
+<pre>err := m.XmlWriter(xmlWriter)
+raw, err := m.XmlWriterRaw(xmlWriter) // 'raw' is the raw XML that was written on xmlWriter</pre>
+   
 Also, for prettified output:
-   - xmlValue, err := m.XmlIndent(prefix, indent, ...)<br>
-   - err := m.XmlIndentWriter(xmlWriter, prefix, indent, ...)<br>
-   - raw, err := m.XmlIndentWriterRaw(xmlWriter, prefix, indent, ...)
+<pre>xmlValue, err := m.XmlIndent(prefix, indent, ...)
+err := m.XmlIndentWriter(xmlWriter, prefix, indent, ...)
+raw, err := m.XmlIndentWriterRaw(xmlWriter, prefix, indent, ...)</pre>
 
 Bulk process XML with error handling (note: handlers must return a boolean value):
-   - err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))<br>
-   - err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, []byte), errHandler(error, []byte))
+<pre>err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))
+err := HandleXmlReaderRaw(xmlReader, mapHandler(Map, []byte), errHandler(error, []byte))</pre>
 
-Converting XML to JSON: see Examples for NewMapXml and HandleXmlReader.
+Converting XML to JSON: see Examples for `NewMapXml` and `HandleXmlReader`.
 
 There are comparable functions and methods for JSON processing.
 
-Arbitrary structure values can be decoded to / encoded from Map values:
-   - m, err := NewMapStruct(structVal)<br>
-   - err := m.Struct(structPointer)
+Arbitrary structure values can be decoded to / encoded from `Map` values:
+<pre>m, err := NewMapStruct(structVal)
+err := m.Struct(structPointer)</pre>
 
 <h4>Extract / modify Map values</h4>
 To work with XML tag values, JSON or Map key values or structure field values, decode the XML, JSON
-or structure to a Map value, 'm', or cast a map[string]interface{} value to a Map value, 'm', then:
-   - paths := m.PathsForKey(key)<br>
-   - path := m.PathForKeyShortest(key)<br>
-   - values, err := m.ValuesForKey(key, subkeys)<br>
-   - values, err := m.ValuesForPath(path, subkeys)<br>
-   - count, err := m.UpdateValuesForPath(newVal, path, subkeys)
+or structure to a `Map` value, 'm', or cast a `map[string]interface{}` value to a `Map` value, 'm', then:
+<pre>paths := m.PathsForKey(key)
+path := m.PathForKeyShortest(key)
+values, err := m.ValuesForKey(key, subkeys)
+values, err := m.ValuesForPath(path, subkeys)
+count, err := m.UpdateValuesForPath(newVal, path, subkeys)</pre>
 
 Get everything at once, irrespective of path depth:
-   - leafnodes := m.LeafNodes()<br>
-   - leafvalues := m.LeafValues()
+<pre>leafnodes := m.LeafNodes()
+leafvalues := m.LeafValues()</pre>
 
-A new Map with whatever keys are desired can be created from the current Map and then encoded in XML
+A new `Map` with whatever keys are desired can be created from the current `Map` and then encoded in XML
 or JSON. (Note: keys can use dot-notation.)
-   - newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")<br>
-   - newXml := newMap.Xml()   // for example<br>
-   - newJson := newMap.Json() // ditto<br>
+<pre>newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
+newXml := newMap.Xml()   // for example
+newJson := newMap.Json() // ditto</pre>
 
 <h4>Usage</h4>
 
@@ -72,17 +72,17 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
 
 <h4>XML parsing conventions</h4>
 
-   - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
-     to the attribute label. (Unless overridden by PrependAttrWithHyphen(false).)
+   - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
+     to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)`.)
    - If the element is a simple element and has attributes, the element value
-     is given the key '#text' for its map[string]interface{} representation.  (See
+     is given the key `#text` for its `map[string]interface{}` representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
 <h4>XML encoding conventions</h4>
 
-   - 'nil' Map values, which may represent 'null' JSON values, are encoded as '\<tag/\>'.
-      NOTE: the operation is not symmetric as '\<tag/\>' elements are decoded as 'tag:""' Map values,
-            which, then, encode in JSON as '"tag":""' values..
+   - 'nil' `Map` values, which may represent 'null' JSON values, are encoded as `<tag/>`.
+      NOTE: the operation is not symmetric as `<tag/>` elements are decoded as `tag:""` `Map` values,
+            which, then, encode in JSON as `"tag":""` values.
 
 <h4>Running "go test"</h4>
 
@@ -93,21 +93,21 @@ output from running "go test" as examples of calling the various functions and m
 <h4>Motivation</h4>
 
 I make extensive use of JSON for messaging and typically unmarshal the messages into
-map[string]interface{} variables.  This is easily done using json.Unmarshal from the
+`map[string]interface{}` variables.  This is easily done using `json.Unmarshal` from the
 standard Go libraries.  Unfortunately, many legacy solutions use structured
 XML messages; in those environments the applications would have to be refitted to
 interoperate with my components.
 
 The better solution is to just provide an alternative HTTP handler that receives
-XML messages and parses it into a map[string]interface{} variable and then reuse
-all the JSON-based code.  The Go xml.Unmarshal() function does not provide the same
-option of unmarshaling XML messages into map[string]interface{} variables. So I wrote
+XML messages and parses it into a `map[string]interface{}` variable and then reuse
+all the JSON-based code.  The Go `xml.Unmarshal()` function does not provide the same
+option of unmarshaling XML messages into `map[string]interface{}` variables. So I wrote
 a couple of small functions to fill this gap and released them as the x2j package.
 
 Over the next year and a half additional features were added, and the companion j2x
-package was released to address XML encoding of arbitrary JSON and map[string]interface{}
+package was released to address XML encoding of arbitrary JSON and `map[string]interface{}`
 values.  As part of a refactoring of our production system and looking at how we had been
 using the x2j and j2x packages we found that we rarely performed direct XML-to-JSON or
-JSON-to_XML conversion and that working with the XML or JSON as map[string]interface{}
+JSON-to_XML conversion and that working with the XML or JSON as `map[string]interface{}`
 values was the primary value.  Thus, everything was refactored into the mxj package.
 
