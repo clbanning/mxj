@@ -6,7 +6,7 @@ import (
 )
 
 // RenameKey renames a key in a Map.
-// TODO(mrsln): It works only for nested maps. It doesn't work for cases when it buried in a list.
+// It works only for nested maps. It doesn't work for cases when it buried in a list.
 func (mv Map) RenameKey(path string, newName string) error {
 	m := map[string]interface{}(mv)
 	return renameKey_(m, path, newName)
@@ -30,6 +30,7 @@ func renameKey_(m interface{}, path string, newName string) error {
 				}
 			}
 		}
+		// TODO(mrsln): look for the key buried in a list
 	}
 	return errors.New("RenameKey didn't find the path: " + path)
 }
