@@ -410,3 +410,37 @@ func x_main(t *testing.T) {
 	}
 	fmt.Println("doc.stuff[1].data[1].F:", v)
 }
+
+func TestValueForPath(t *testing.T) {
+	m := map[string]interface{}{
+		"Div": map[string]interface{}{
+			"Colour": "blue",
+		},
+	}
+	mv := Map(m)
+
+	v, err := mv.ValueForPath("Div.Colour")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if str, ok := v.(string); !ok || str != "blue" {
+		t.Fatal("wrong value")
+	}
+}
+
+func TestValueForPathString(t *testing.T) {
+	m := map[string]interface{}{
+		"Div": map[string]interface{}{
+			"Colour": "blue",
+		},
+	}
+	mv := Map(m)
+
+	str, err := mv.ValueForPathString("Div.Colour")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if str != "blue" {
+		t.Fatal("wrong value")
+	}
+}
