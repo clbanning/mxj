@@ -14,29 +14,30 @@ func TestSetValueForPath(t *testing.T) {
 		},
 	}
 	mv := Map(m)
-	err := mv.SetValueForPath("Big", "Div.Font.Size")
 
+	// testing setting a new key
+	err := mv.SetValueForPath("big", "Div.Font.Size")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	values, err := mv.ValuesForPath("Div.Font.Size")
-	if len(values) == 0 {
-		t.Fatal("err: didn't add the new key")
+	val, err := mv.ValueForPathString("Div.Font.Size")
+	if err != nil {
+		t.Fatal(err)
 	}
-	if values[0] != "Big" {
-		t.Fatal("err: value is different")
+	if val != "big" {
+		t.Fatal("key's value hasn't changed")
 	}
 
+	// testing setting a new value to en existing key
 	err = mv.SetValueForPath("red", "Div.Colour")
 	if err != nil {
 		t.Fatal(err)
 	}
-	values, err = mv.ValuesForPath("Div.Colour")
-	if len(values) == 0 {
-		t.Fatal("err: existing key is deleted")
+	val, err = mv.ValueForPathString("Div.Colour")
+	if err != nil {
+		t.Fatal(err)
 	}
-	if values[0] != "red" {
-		t.Fatal("err: existig key value is different")
+	if val != "red" {
+		t.Fatal("existig key's value hasn't changed")
 	}
 }
