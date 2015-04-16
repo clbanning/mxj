@@ -9,10 +9,26 @@ import (
 // It works only for nested maps. It doesn't work for cases when it buried in a list.
 func (mv Map) RenameKey(path string, newName string) error {
 	m := map[string]interface{}(mv)
-	return renameKey_(m, path, newName)
+	return renameKey(m, path, newName)
 }
 
-func renameKey_(m interface{}, path string, newName string) error {
+func renameKey(m interface{}, path string, newName string) error {
+	val, err := prevValueByPath(m, path)
+	if err != nil {
+		return err
+	}
+
+	keys := strings.Split(path, ".")
+	oldName := keys[len(keys)-1]
+
+	val[newName] = val[oldName]
+	delete(val, oldName)
+	return nil
+}
+
+// returns a value which contains a last key in the path
+// For example: prevValueByPath("a.b.c", {a{b{c: 3}}}) returns {c: 3}
+func prevValueByPath(m interface{}, path string) (map[string]interface{}, error) {
 	keys := strings.Split(path, ".")
 
 	switch mValue := m.(type) {
@@ -20,17 +36,13 @@ func renameKey_(m interface{}, path string, newName string) error {
 		for key, value := range mValue {
 			if key == keys[0] {
 				if len(keys) == 1 {
-					// renaming
-					mValue[newName] = value
-					delete(mValue, key)
-					return nil
+					return mValue, nil
 				} else {
 					// keep looking for the full path to the key
-					return renameKey_(value, strings.Join(keys[1:], "."), newName)
+					return prevValueByPath(value, strings.Join(keys[1:], "."))
 				}
 			}
 		}
-		// TODO(mrsln): look for the key buried in a list
 	}
-	return errors.New("RenameKey didn't find the path: " + path)
+	return nil, errors.New("prevValueByPath: didn't find the path – " + path)
 }
