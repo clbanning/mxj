@@ -627,7 +627,7 @@ func (mv Map) ValueForPath(path string) (interface{}, error) {
 		return nil, err
 	}
 	if len(vals) == 0 {
-		return nil, errors.New("ValueForPath: value not found")
+		return nil, errors.New("ValueForPath: path not found")
 	}
 	return vals[0], nil
 }
@@ -639,7 +639,7 @@ func (mv Map) ValueForPathString(path string) (string, error) {
 		return "", err
 	}
 	if len(vals) == 0 {
-		return "", errors.New("ValueForPath: value not found")
+		return "", errors.New("ValueForPath: path not found")
 	}
 	val := vals[0]
 	switch str := val.(type) {
@@ -648,4 +648,11 @@ func (mv Map) ValueForPathString(path string) (string, error) {
 	default:
 		return "", fmt.Errorf("ValueForPath: unsupported type: %T", str)
 	}
+}
+
+// Returns the first found value for the path as a string.
+// If the path is not found then it returns an empty string.
+func (mv Map) ValueOrEmptyForPathString(path string) string {
+	str, _ := mv.ValueForPathString(path)
+	return str
 }
