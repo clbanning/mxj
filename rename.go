@@ -11,6 +11,9 @@ func (mv Map) RenameKey(path string, newName string) error {
 	if !mv.Exists(path) {
 		return errors.New("RenameKey: the path not found: " + path)
 	}
+	if mv.Exists(parentPath(path) + "." + newName) {
+		return errors.New("RenameKey: the key already exists: " + newName)
+	}
 
 	m := map[string]interface{}(mv)
 	return renameKey(m, path, newName)
@@ -22,11 +25,10 @@ func renameKey(m interface{}, path string, newName string) error {
 		return err
 	}
 
-	keys := strings.Split(path, ".")
-	oldName := keys[len(keys)-1]
-
+	oldName := lastKey(path)
 	val[newName] = val[oldName]
 	delete(val, oldName)
+
 	return nil
 }
 
