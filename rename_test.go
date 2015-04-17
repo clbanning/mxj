@@ -26,4 +26,9 @@ func TestRenameKey(t *testing.T) {
 	if len(values) > 0 {
 		t.Fatal("didn't removed the old key")
 	}
+
+	err = mv.RenameKey("not.existing.path", "newname")
+	if err == nil {
+		t.Fatal("should raise an error on a non existing path")
+	}
 }
