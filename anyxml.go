@@ -21,7 +21,7 @@ const (
 	import (
 		"encoding/json"
 		"fmt"
-		"github/clbanning/mxj"
+		"github.com/clbanning/mxj"
 	)
 
 	func main() {
@@ -36,7 +36,7 @@ const (
 		if err != nil {
 			// do something
 		}
-		x, err := anyxml.XmlIndent(i, "", "  ", "mydoc")
+		x, err := mxj.AnyXmlIndent(i, "", "  ", "mydoc")
 		if err != nil {
 			// do something else
 		}
