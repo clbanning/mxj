@@ -55,6 +55,7 @@ func (mv Map) StringIndent(offset ...int) string {
 	return writeMap(map[string]interface{}(mv), offset...)
 }
 
+// Pretty print a Map without the value type information - just key:value entries.
 func (mv Map) StringIndentNoTypeInfo(offset ...int) string {
 	return writeMapNoTypes(map[string]interface{}(mv), offset...)
 }

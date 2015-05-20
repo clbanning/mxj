@@ -430,6 +430,8 @@ func XmlDefaultEmptyElemSyntax() {
 //    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag, possible.
 //      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
 //    - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
+// The attributes tag=value pairs are alphabetized by "tag".  Also, when encoding map[string]interface{} values - 
+// complex elements, etc. - the key:value pairs are alphabetized by key so the resulting tags will appear sorted.
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 	var err error
