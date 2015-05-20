@@ -4,8 +4,9 @@ Marshal/Unmarshal XML to/from JSON and `map[string]interface{}` values, and extr
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
 <h4>Notices</h4>
-	2015-05-20: Map.StringIndentNoTypeInfo() method.
-	            Also, alphabetically sort map keys to prettify output.
+	2015-05-20: New: mv.StringIndentNoTypeInfo().
+	            Also, alphabetically sort map[string]interface{} values by key to prettify output for mv.Xml(),
+	            mv.XmlIndent(), mv.StringIndent(), mv.StringIndentNoTypeInfo().
 	2014-11-09: IncludeTagSeqNum() adds "_seq" key with XML doc positional information.
 	            (NOTE: PreserveXmlList() is similar and will be here soon.)
 	2014-09-18: inspired by NYTimes fork, added PrependAttrWithHyphen() to allow stripping hyphen from attribute tag.

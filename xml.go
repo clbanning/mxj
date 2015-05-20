@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -710,20 +711,32 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		lenvv := len(vv)
 		// scan out attributes - keys have prepended hyphen, '-'
 		var cntAttr int
+		attrlist := make([][2]string, len(vv))
+		var n int
 		for k, v := range vv {
 			if k[:1] == "-" {
+				cntAttr++
 				switch v.(type) {
 				case string, float64, bool, int, int32, int64, float32:
-					*s += ` ` + k[1:] + `="` + fmt.Sprintf("%v", v) + `"`
-					cntAttr++
-				case []byte: // allow standard xml pkg []byte transform, as below
-					*s += ` ` + k[1:] + `="` + fmt.Sprintf("%v", string(v.([]byte))) + `"`
-					cntAttr++
+					attrlist[n][0] = k[1:]
+					attrlist[n][1] = fmt.Sprintf("%v", v)
+					n++
+				case []byte:
+					attrlist[n][0] = k[1:]
+					attrlist[n][1] = fmt.Sprintf("%v", string(v.([]byte)))
 				default:
 					return fmt.Errorf("invalid attribute value for: %s", k)
 				}
 			}
 		}
+		if cntAttr > 0 {
+			attrlist = attrlist[:n]
+			sort.Sort(attrList(attrlist))
+			for _, v := range attrlist {
+				*s += ` ` + v[0] + `="` + v[1] + `"`
+			}
+		}
+
 		// only attributes?
 		if cntAttr == lenvv {
 			break
@@ -744,12 +757,25 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		}
 		// something more complex
 		p.mapDepth++
-		var i int
+		// extract the map k:v pairs and sort on key
+		elemlist := make([][2]interface{}, len(vv))
+		n = 0
 		for k, v := range vv {
 			if k[:1] == "-" {
 				continue
 			}
-			switch v.(type) {
+			elemlist[n][0] = k
+			elemlist[n][1] = v
+			n++
+		}
+		elemlist = elemlist[:n]
+		sort.Sort(elemList(elemlist))
+		var i int
+		for _, v := range elemlist {
+			// if k[:1] == "-" {
+			// 	continue
+			// }
+			switch v[1].(type) {
 			case []interface{}:
 			default:
 				if i == 0 && doIndent {
@@ -757,8 +783,8 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 				}
 			}
 			i++
-			mapToXmlIndent(doIndent, s, k, v, p)
-			switch v.(type) {
+			mapToXmlIndent(doIndent, s, v[0].(string), v[1], p)
+			switch v[1].(type) {
 			case []interface{}: // handled in []interface{} case
 			default:
 				if doIndent {
@@ -836,3 +862,40 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 
 	return nil
 }
+
+// ============================ sort interface implementation =================
+
+type attrList [][2]string
+
+func (a attrList) Len() int {
+	return len(a)
+}
+
+func (a attrList) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a attrList) Less(i, j int) bool {
+	if a[i][0] > a[j][0] {
+		return false
+	}
+	return true
+}
+
+type elemList [][2]interface{}
+
+func (e elemList) Len() int {
+	return len(e)
+}
+
+func (e elemList) Swap(i, j int) {
+	e[i], e[j] = e[j], e[i]
+}
+
+func (e elemList) Less(i, j int) bool {
+	if e[i][0].(string) > e[j][0].(string) {
+		return false
+	}
+	return true
+}
+
