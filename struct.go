@@ -26,15 +26,16 @@ func NewMapStruct(structVal interface{}) (Map, error) {
 // if argument is not a pointer or if json.Unmarshal returns an error.
 //	json.Unmarshal structure encoding rules are followed to encode public structure fields.
 func (mv Map) Struct(structPtr interface{}) error {
+	// should check that we're getting a pointer.
+	if reflect.ValueOf(structPtr).Kind() != reflect.Ptr {
+		return errors.New("mv.Struct() error: argument is not type Ptr")
+	}
+
 	m := map[string]interface{}(mv)
 	j, err := json.Marshal(m)
 	if err != nil {
 		return err
 	}
 
-	// should check that we're getting a pointer.
-	if reflect.ValueOf(structPtr).Kind() != reflect.Ptr {
-		return errors.New("mv.Struct() error: argument is not type Ptr")
-	}
 	return json.Unmarshal(j, structPtr)
 }
