@@ -14,6 +14,9 @@ func (mv Map) SetValueForPath(value interface{}, path string) error {
 	if err != nil {
 		return err
 	}
+	if val == nil {
+		return nil // we just ignore the request if there's no val
+	}
 
 	key := pathAry[len(pathAry)-1]
 	cVal := val.(map[string]interface{})
