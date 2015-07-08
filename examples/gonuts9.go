@@ -4,7 +4,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/clbanning/mxj"
+	// "github.com/clbanning/mxj"
+	"tamgroup/mxj"
 )
 
 var data = []byte(`<root>
@@ -47,13 +48,20 @@ func main() {
 	}
 	fmt.Println(m.StringIndentNoTypeInfo())
 
+	doc, err := m.XmlIndent("", "  ")
+	if err != nil {
+		fmt.Println("err:", err)
+	}
+	fmt.Println(string(doc))
+
 	val, err := m.ValuesForKey("child1")
 	if err != nil {
 		fmt.Println("err:", err)
 	}
 	fmt.Println("val:", val)
 
-	doc, err := mxj.AnyXmlIndent(val, "", "  ", "child1")
+	mxj.XmlGoEmptyElemSyntax()
+	doc, err = mxj.AnyXmlIndent(val, "", "  ", "child1")
 	if err != nil {
 		fmt.Println("err:", err)
 	}

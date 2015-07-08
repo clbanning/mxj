@@ -430,7 +430,7 @@ func XmlDefaultEmptyElemSyntax() {
 //    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag, possible.
 //      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
 //    - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
-// The attributes tag=value pairs are alphabetized by "tag".  Also, when encoding map[string]interface{} values - 
+// The attributes tag=value pairs are alphabetized by "tag".  Also, when encoding map[string]interface{} values -
 // complex elements, etc. - the key:value pairs are alphabetized by key so the resulting tags will appear sorted.
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
@@ -698,6 +698,7 @@ func (p *pretty) Outdent() {
 func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
+	var elen int
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
 
 	switch value.(type) {
@@ -797,6 +798,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		}
 		p.mapDepth--
 		endTag = true
+		elen = 1 // we do have some content ...
 	case []interface{}:
 		for _, v := range value.([]interface{}) {
 			if doIndent {
@@ -813,12 +815,21 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		*s += "<" + key
 		break
 	default: // handle anything - even goofy stuff
+		elen = 0
 		switch value.(type) {
 		case string, float64, bool, int, int32, int64, float32:
-			*s += ">" + fmt.Sprintf("%v", value)
+			v := fmt.Sprintf("%v", value)
+			elen = len(v)
+			if elen > 0 {
+				*s += ">" + v
+			}
 		case []byte: // NOTE: byte is just an alias for uint8
 			// similar to how xml.Marshal handles []byte structure members
-			*s += ">" + string(value.([]byte))
+			v := string(value.([]byte))
+			elen = len(v)
+			if elen > 0 {
+				*s += ">" + v
+			}
 		default:
 			var v []byte
 			var err error
@@ -830,7 +841,10 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			if err != nil {
 				*s += ">UNKNOWN"
 			} else {
-				*s += string(v)
+				elen = len(v)
+				if elen > 0 {
+					*s += string(v)
+				}
 			}
 		}
 		isSimple = true
@@ -848,7 +862,14 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		}
 		switch value.(type) {
 		case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
-			*s += `</` + key + ">"
+			if elen > 0  || useGoXmlEmptyElemSyntax {
+				if elen == 0 {
+					*s += ">"
+				}
+				*s += `</` + key + ">"
+			} else {
+				*s += `/>`
+			}
 		}
 	} else if useGoXmlEmptyElemSyntax {
 		*s += "></" + key + ">"
@@ -900,4 +921,3 @@ func (e elemList) Less(i, j int) bool {
 	}
 	return true
 }
-
