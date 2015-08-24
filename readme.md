@@ -98,7 +98,7 @@ output from running "go test" as examples of calling the various functions and m
 I make extensive use of JSON for messaging and typically unmarshal the messages into
 `map[string]interface{}` variables.  This is easily done using `json.Unmarshal` from the
 standard Go libraries.  Unfortunately, many legacy solutions use structured
-XML messages; in those environments the applications would have to be refitted to
+XML messages; in those environments the applications would have to be refactored to
 interoperate with my components.
 
 The better solution is to just provide an alternative HTTP handler that receives
