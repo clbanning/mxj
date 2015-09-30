@@ -96,15 +96,15 @@ output from running "go test" as examples of calling the various functions and m
 <h4>Motivation</h4>
 
 I make extensive use of JSON for messaging and typically unmarshal the messages into
-`map[string]interface{}` variables.  This is easily done using `json.Unmarshal` from the
+`map[string]interface{}` values.  This is easily done using `json.Unmarshal` from the
 standard Go libraries.  Unfortunately, many legacy solutions use structured
 XML messages; in those environments the applications would have to be refactored to
 interoperate with my components.
 
 The better solution is to just provide an alternative HTTP handler that receives
-XML messages and parses it into a `map[string]interface{}` variable and then reuse
+XML messages and parses it into a `map[string]interface{}` value and then reuse
 all the JSON-based code.  The Go `xml.Unmarshal()` function does not provide the same
-option of unmarshaling XML messages into `map[string]interface{}` variables. So I wrote
+option of unmarshaling XML messages into `map[string]interface{}` values. So I wrote
 a couple of small functions to fill this gap and released them as the x2j package.
 
 Over the next year and a half additional features were added, and the companion j2x
