@@ -93,7 +93,7 @@ var XmlWriterBufSize int = 256
 //	          See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
 //	          data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
 //	          you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
-//	       2. The 'raw' return value may be larger than the XML text value.  To log it, cast it to a string.
+//	       2. The 'raw' return value may be larger than the XML text value. 
 func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
