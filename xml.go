@@ -215,10 +215,10 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			tt := t.(xml.StartElement)
 
 			// First call to xmlToMapParser() doesn't pass xml.StartElement - the map key.
-			// So when the loop is first entered, the first token is the root tag along 
-			// with any attributes, which we process here. 
-			// 
-			// Subsequent calls to xmlToMapParser() will pass in tag+attributes for 
+			// So when the loop is first entered, the first token is the root tag along
+			// with any attributes, which we process here.
+			//
+			// Subsequent calls to xmlToMapParser() will pass in tag+attributes for
 			// processing before getting the next token which is the element value,
 			// which is done above.
 			if skey == "" {
@@ -298,7 +298,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			tt = strings.Trim(tt, "\t\r\b\n ")
 			if len(tt) > 0 {
 				if len(na) > 0 {
-					na["#text"] = tt
+					na["#text"] = cast(tt, r)
 				} else {
 					n[skey] = cast(tt, r)
 				}
