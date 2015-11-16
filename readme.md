@@ -1,5 +1,5 @@
 <h2>mxj - to/from maps, XML and JSON</h2>
-Marshal/Unmarshal XML to/from JSON and `map[string]interface{}` values, and extract/modify values from maps by key or key-path, including wildcards.  
+Decode/encode XML to/from map[string]interface{} (or JSON) values, and extract/modify values from maps by key or key-path, including wildcards.
 
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
