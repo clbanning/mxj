@@ -16,6 +16,9 @@ to:
 </author>
 
 NOTE: sequence of elements NOT guaranteed due to use of map[string]interface{}.
+
+Here we build the "full-name" element value from other values in the doc by selecting the
+"first-name" value with the latest dates.
 */
 
 package main
@@ -40,8 +43,8 @@ func main() {
 		fmt.Println("NewMapXml err:", err)
 		return
 	}
-	// vals, err := m.ValuesForKey("first-name") // alternatively
-	vals, err := m.ValuesForPath("author.first-name")
+	// vals, err := m.ValuesForPath("author.first-name") // path option
+	vals, err := m.ValuesForKey("first-name") // key-only alternatively
 	if err != nil {
 		fmt.Println("ValuesForPath err:", err)
 		return
@@ -71,13 +74,15 @@ func main() {
 			fname = fn
 		}
 	}
-	/* alternatively:
-	vals, err := m.ValuesForKey("first-name", "-effect_range:2012-")
-	if len(vals) == 0 {
-		fmt.Println("no #text vals")
-		return
-	}
-	fname := vals[0].(map[string]interface{})["#text"].(string)
+	/*
+		// alternatively:
+		//(however, this requires knowing what latest "effect_range" attribute value is)
+		vals, err := m.ValuesForKey("first-name", "-effect_range:2012-")
+		if len(vals) == 0 {
+			fmt.Println("no #text vals")
+			return
+		}
+		fname := vals[0].(map[string]interface{})["#text"].(string)
 	*/
 
 	vals, err = m.ValuesForPath("author.last-name")
