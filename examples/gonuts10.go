@@ -43,7 +43,7 @@ func main() {
 		fmt.Println("NewMapXml err:", err)
 		return
 	}
-	// vals, err := m.ValuesForPath("author.first-name") // path option
+	// vals, err := m.ValuesForPath("author.first-name") // full-path option
 	vals, err := m.ValuesForKey("first-name") // key-only alternatively
 	if err != nil {
 		fmt.Println("ValuesForPath err:", err)
@@ -85,7 +85,8 @@ func main() {
 		fname := vals[0].(map[string]interface{})["#text"].(string)
 	*/
 
-	vals, err = m.ValuesForPath("author.last-name")
+	// vals, err = m.ValuesForKey("last-name") // key-only option
+	vals, err = m.ValuesForPath("author.last-name") // full-path option
 	if err != nil {
 		fmt.Println("ValuesForPath err:", err)
 		return
