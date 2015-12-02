@@ -79,18 +79,7 @@ func main() {
 			fname = fn
 		}
 	}
-	/*
-		// alternatively:
-		//(however, this requires knowing what latest "effect_range" attribute value is)
-		vals, err := m.ValuesForKey("first-name", "-effect_range:2012-")
-		if len(vals) == 0 {
-			fmt.Println("no #text vals")
-			return
-		}
-		fname := vals[0].(map[string]interface{})["#text"].(string)
-	*/
 
-	// vals, err = m.ValuesForKey("last-name") // key-only option
 	vals, err = m.ValuesForPath("author.last-name.#text") // full-path option
 	if err != nil {
 		fmt.Println("ValuesForPath err:", err)
