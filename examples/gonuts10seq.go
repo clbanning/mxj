@@ -64,6 +64,7 @@ func main() {
 			fmt.Println("no #text tag")
 			return
 		}
+		// dt, ok := vm["#attr"].([]interface{})[0].(map[string]interface{})["effect_range"].(string)
 		attri, ok := vm["#attr"].([]interface{})
 		if !ok {
 			fmt.Println("no #attr")
