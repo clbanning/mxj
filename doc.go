@@ -1,5 +1,5 @@
 // mxj - A collection of map[string]interface{} and associated XML and JSON utilities.
-// Copyright 2012-2014 Charles Banning. All rights reserved.
+// Copyright 2012-2015 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
@@ -11,6 +11,7 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
 Note:
+	2015-12-02: NewMapXmlSeq() with mv.XmlSeq() & co. will try to preserve structure of XML doc when re-encoding.
 	2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
 
 SUMMARY
@@ -77,8 +78,13 @@ XML PARSING CONVENTIONS
 XML ENCODING CONVENTIONS
 
    - 'nil' Map values, which may represent 'null' JSON values, are encoded as "<tag/>".
-      NOTE: the operation is not symmetric as "<tag/>" elements are decoded as 'tag:""' Map values,
-            which, then, encode in JSON as '"tag":""' values..
+     NOTE: the operation is not symmetric as "<tag/>" elements are decoded as 'tag:""' Map values,
+           which, then, encode in JSON as '"tag":""' values..
+   - ALSO: there is no guarantee that the encoded XML doc will be the same as the decoded one.  (Go
+           randomizes the walk through map[string]interface{} values.) If you plan to re-encode the
+           Map value to XML and want the same sequencing of elements look at NewMapXmlSeq() and
+           m.XmlSeq() - these try to preserve the element sequencing but with added complexity when
+           working with the Map representation.
 
 */
 package mxj
