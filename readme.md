@@ -27,7 +27,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
 	2014-04-28: ValuesForPath() and NewMap() now accept path with indexed array references.
 
-<h4>Basic Unmarshal XML / JSON / struct</h4>
+<h4>Basic Unmarshal XML to map[string]interface{}</h4>
 <pre>type Map map[string]interface{}</pre>
 
 Create a `Map` value, 'm', from any `map[string]interface{}` value, 'v':
@@ -100,6 +100,11 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
    - 'nil' `Map` values, which may represent 'null' JSON values, are encoded as `<tag/>`.
       NOTE: the operation is not symmetric as `<tag/>` elements are decoded as `tag:""` `Map` values,
             which, then, encode in JSON as `"tag":""` values.
+      ALSO: there is no guarantee that the encoded XML doc will be the same as the decoded one.  (Go
+            randomizes the walk through map[string]interface{} values.) If you plan to re-encode the
+            Map value to XML and want the same sequencing of elements look at NewMapXmlSeq() and
+            m.XmlSeq() - these try to preserve the element sequencing but will added complexity when
+            working with the Map representation.
 
 <h4>Running "go test"</h4>
 
