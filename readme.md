@@ -103,7 +103,7 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
    - ALSO: there is no guarantee that the encoded XML doc will be the same as the decoded one.  (Go
            randomizes the walk through map[string]interface{} values.) If you plan to re-encode the
            Map value to XML and want the same sequencing of elements look at NewMapXmlSeq() and
-           m.XmlSeq() - these try to preserve the element sequencing but will added complexity when
+           m.XmlSeq() - these try to preserve the element sequencing but with added complexity when
            working with the Map representation.
 
 <h4>Running "go test"</h4>
