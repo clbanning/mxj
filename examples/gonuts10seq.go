@@ -70,6 +70,19 @@ func main() {
 			fmt.Println("no #attr")
 			return
 		}
+		/* <!-- the general case where there might be more than one attribute -->
+			var dt string
+			var ok bool
+			for _, v := range attri {
+				if dt, ok = v.(map[string]interface{})["effect_range"].(string); ok {
+					break
+				}
+			}
+			if dt == "" {
+				fmt.Println("no effect_range attr k:v pair")
+				return
+			}
+		*/
 		dt, ok := attri[0].(map[string]interface{})["effect_range"].(string)
 		if !ok {
 			fmt.Println("no effect_range attr")
