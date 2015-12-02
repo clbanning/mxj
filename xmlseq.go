@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file
 
 // xmlseq.go - version of xml.go with sequence # injection on Decoding and sorting on Encoding.
-// TODO(clb): Also handle Comment, Direction and ProcInst xml.Token values.
+// Also, handles comments, directives and process instructions.
 
 package mxj
 
