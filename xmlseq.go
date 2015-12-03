@@ -280,7 +280,11 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 // The following rules apply.
 //    - The key label "#text" is treated as the value for a simple element with attributes.
 //    - The "#seq" key is used to seqence the subelements but is ignored for writing.
-//    - Map "#attr" key identifies the array of attribute map[string]interface{} values.
+//    - The "#attr" map key identifies the array of attribute map[string]interface{} values.
+//    - The "#comment" map key identifies a comment in the value "#text" map entry - <!--comment-->.
+//    - The "#directive" map key identifies a directive in the value "#text" map entry - <!directive>.
+//    - The "#procinst" map key identifies a process instruction in the value "#target" and "#inst"
+//      map entries - <?target inst?>.
 //    - Value type encoding:
 //          > string, bool, float64, int, int32, int64, float32: per "%v" formating
 //          > []bool, []uint8: by casting to string
@@ -289,8 +293,6 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 //    - Elements with only attribute values or are null are terminated using "/>" unless XmlGoEmptyElemSystax() called.
 //    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag, possible.
 //      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
-// YET TO COME - 2015.12.02
-//    - handle comment, directive and process instruction k:v pairs
 func (mv Map) XmlSeq(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 	var err error
