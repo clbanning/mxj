@@ -458,7 +458,7 @@ func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, roo
 
 // Default poll delay to keep Handler from spinning on an open stream
 // like sitting on os.Stdin waiting for imput.
-var xhandlerPollInterval = time.Duration(1e6)
+var xhandlerPollInterval = time.Millisecond
 
 // Bulk process XML using handlers that process a Map value.
 //	'rdr' is an io.Reader for XML (stream)
@@ -489,7 +489,7 @@ func HandleXmlReader(xmlReader io.Reader, mapHandler func(Map) bool, errHandler 
 				break
 			}
 		} else if merr != io.EOF {
-			<-time.After(xhandlerPollInterval)
+			time.Sleep(xhandlerPollInterval)
 		}
 
 		if merr == io.EOF {
@@ -529,7 +529,7 @@ func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, []byte) bool, 
 				break
 			}
 		} else if merr != io.EOF {
-			<-time.After(xhandlerPollInterval)
+			time.Sleep(xhandlerPollInterval)
 		}
 
 		if merr == io.EOF {
