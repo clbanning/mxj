@@ -256,7 +256,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			seq++
 			na["#directive"] = dm
 		case xml.ProcInst:
-			pm := make(map[string]interface{}, 2)
+			pm := make(map[string]interface{}, 3)
 			pm["#target"] = t.(xml.ProcInst).Target
 			pm["#inst"] = string(t.(xml.ProcInst).Inst)
 			pm["#seq"] = seq
