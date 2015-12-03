@@ -74,7 +74,9 @@ func writeMap(m interface{}, offset ...int) string {
 		return "[nil] nil"
 	case string:
 		return "[string] " + m.(string)
-	case float64:
+	case int, int32, int64:
+		return "[int] " + strconv.Itoa(m.(int))
+	case float64, float32:
 		return "[float64] " + strconv.FormatFloat(m.(float64), 'e', 2, 64)
 	case bool:
 		return "[bool] " + strconv.FormatBool(m.(bool))
