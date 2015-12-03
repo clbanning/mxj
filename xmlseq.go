@@ -205,7 +205,6 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// 'na' holding sub-elements of n.
 			// See if 'key' already exists.
 			// If 'key' exists, then this is a list, if not just add key:val to na.
-			// Note: individual list members decode in sequence; thus, no "#seq" k:v pair required.
 			if v, ok := na[key]; ok {
 				var a []interface{}
 				switch v.(type) {
@@ -224,8 +223,8 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			if len(n) == 0 {
 				// If len(na)==0 we have an empty element == "";
 				// it has no xml.Attr nor xml.CharData.
-				// Note: in original node-tree parser, val defaulted to "";
-				// so we always had the default if len(node.nodes) == 0.
+				// Empty element content will be  map["etag"]map["#text"]""
+				// after #seq injection - map["etag"]map["#seq"]seq - after return.
 				if len(na) > 0 {
 					n[skey] = na
 				} else {
@@ -467,7 +466,8 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		}
 
 		haveAttrs := false
-		// process attributes first
+		// process attributes first 
+		// They are in sequence in the array.
 		if v, ok := val["#attr"].([]interface{}); ok {
 			for _, vv := range v {
 				for k, av := range vv.(map[string]interface{}) {
@@ -504,8 +504,8 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		kv := make([]keyval, 0)
 		var kvv keyval
 		for k, v := range val {
-			if k == "#attr" {
-				continue // already processed
+			if k == "#attr" { // already processed
+				continue
 			}
 			if k == "#seq" { // ignore - just for sorting
 				continue
