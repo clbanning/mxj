@@ -128,9 +128,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 	// Allocate maps and load attributes, if any.
 	if skey != "" {
 		// 'n' only needs one slot - save call to runtime•hashGrow()
-		// 'na' we don't know but minimally alloc slots for attrs + a CharData value
-		//      - subsequent slots will be alloc'd by runtime•hasGrow() as 2x existing
-		//        so, at least we've giveen it a start, even jus saving 1 alloc.
+		// 'na' we don't know
 		n = make(map[string]interface{}, 1)
 		na = make(map[string]interface{})
 		if len(a) > 0 {
@@ -193,7 +191,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// where all the "list" subelements are decoded into an array.
 			switch val.(type) {
 			case map[string]interface{}:
-				val.(map[string]interface{})["#seq"] = seq // will overwrite an "_seq" XML tag
+				val.(map[string]interface{})["#seq"] = seq
 				seq++
 			case interface{}: // a non-nil simple element: string, float64, bool
 				v := map[string]interface{}{"#text": val}
