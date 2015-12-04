@@ -139,7 +139,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				am[v.Name.Local] = cast(v.Value, r)
 				aa[n] = interface{}(am)
 			}
-			na["#attr"] = aa // note: a will encode in sequence of decoding
+			na["#attr"] = aa // note: array will encode in sequence of decoding
 		}
 	}
 	for {
