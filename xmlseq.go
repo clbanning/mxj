@@ -99,7 +99,7 @@ func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, erro
 	return m, b, nil
 }
 
-// xmlReaderToTree() - parse a XML io.Reader to a map[string]interface{} value
+// xmlSeqReaderToMap() - parse a XML io.Reader to a map[string]interface{} value
 func xmlSeqReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader
 	p := xml.NewDecoder(rdr)
