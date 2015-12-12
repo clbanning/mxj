@@ -241,18 +241,27 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				seq++
 			}
 		case xml.Comment:
+			if na == nil { // ignore stuff outside of a root tag
+				break
+			}
 			cm := make(map[string]interface{}, 2)
 			cm["#text"] = string(t.(xml.Comment))
 			cm["#seq"] = seq
 			seq++
 			na["#comment"] = cm
 		case xml.Directive:
+			if na == nil {
+				break
+			}
 			dm := make(map[string]interface{}, 2)
 			dm["#text"] = string(t.(xml.Directive))
 			dm["#seq"] = seq
 			seq++
 			na["#directive"] = dm
 		case xml.ProcInst:
+			if na == nil {
+				break
+			}
 			pm := make(map[string]interface{}, 3)
 			pm["#target"] = t.(xml.ProcInst).Target
 			pm["#inst"] = string(t.(xml.ProcInst).Inst)
