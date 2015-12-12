@@ -17,6 +17,8 @@ import (
 	"strings"
 )
 
+var NO_ROOT = errors.New("no root key")
+
 // ------------------- NewMapXmlSeq & NewMapXmlSeqReader ... -------------------------
 
 // THIS IS EXPERIMENTAL!
@@ -38,6 +40,8 @@ import (
 //	• directives - "<!text>" - are decoded as map["#directive"]map[#text"]"directive_text" with a "#seq" k:v pair.
 //	• process instructions  - "<?instr?>" - are decoded as map["#procinst"]interface{} where the #procinst value
 //	  is of map[string]interface{} type with the following keys: #target, #inst, and #seq.
+//	• comments, directives, and procinsts that are NOT part of a document with a root key will be returned as
+//	  map[string]interface{} and the error value NO_ROOT.
 //	• note: "<![CDATA[" syntax is lost in xml.Decode parser - and is not handled here, either.
 //	   and: "\r\n" is converted to "\n"
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
@@ -241,8 +245,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				seq++
 			}
 		case xml.Comment:
-			if na == nil { // ignore stuff outside of a root tag
-				break
+			if n == nil { // no root 'key'
+				n = map[string]interface{}{"#comment": string(t.(xml.Comment))}
+				return n, NO_ROOT
 			}
 			cm := make(map[string]interface{}, 2)
 			cm["#text"] = string(t.(xml.Comment))
@@ -250,8 +255,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			seq++
 			na["#comment"] = cm
 		case xml.Directive:
-			if na == nil {
-				break
+			if n == nil { // no root 'key'
+				n = map[string]interface{}{"#directive": string(t.(xml.Directive))}
+				return n, NO_ROOT
 			}
 			dm := make(map[string]interface{}, 2)
 			dm["#text"] = string(t.(xml.Directive))
@@ -259,8 +265,10 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			seq++
 			na["#directive"] = dm
 		case xml.ProcInst:
-			if na == nil {
-				break
+			if n == nil {
+				na = map[string]interface{}{"#target": t.(xml.ProcInst).Target, "#inst": string(t.(xml.ProcInst).Inst)}
+				n  = map[string]interface{}{"#procinst": na}
+				return n, NO_ROOT
 			}
 			pm := make(map[string]interface{}, 3)
 			pm["#target"] = t.(xml.ProcInst).Target
@@ -473,7 +481,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		}
 
 		haveAttrs := false
-		// process attributes first 
+		// process attributes first
 		// They are in sequence in the array.
 		if v, ok := val["#attr"].([]interface{}); ok {
 			for _, vv := range v {
@@ -496,12 +504,17 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			break
 		}
 
-		// simple element? Note: '#text" is an invalid XML tag.
-		// a simple elment
+		// simple element?
+		// every map value has, at least, "#seq" and, perhaps, "#text" and/or "#attr"
 		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs) || (len(val) == 2 && !haveAttrs)) {
 			*s += ">" + fmt.Sprintf("%v", v)
 			endTag = true
 			elen = 1
+			isSimple = true
+			break
+		} else if !ok && ((len(val) == 2 && haveAttrs) || (len(val) == 1 && !haveAttrs)) {
+			endTag = false // no #text value & isSimple
+			elen = 0
 			isSimple = true
 			break
 		}
@@ -562,7 +575,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		}
 		p.mapDepth--
 		endTag = true
-		elen = 1 // we do have some content ...
+		elen = 1 // we do have some content other than attrs
 	case []interface{}:
 		for _, v := range value.([]interface{}) {
 			if doIndent {
@@ -631,7 +644,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 				*s += `/>`
 			}
 		}
-	} else if key != "#comment"  && key != "#directive" && key != "#procinst" {
+	} else if key != "#comment" && key != "#directive" && key != "#procinst" {
 		if useGoXmlEmptyElemSyntax {
 			*s += "></" + key + ">"
 		} else {
