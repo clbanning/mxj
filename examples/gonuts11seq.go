@@ -22,8 +22,7 @@ func main() {
 	var m mxj.Map
 	var err error
 	// We read processing docs sequentially.
-	// Un-rooted ProcInst or Comments are processed but not reencoded ...
-	// you can grab the source XML for them using mxj.NewMapXmlReaderRaw() if you want to reprint them.
+	// Un-rooted ProcInst or Comments are processed AND just reencoded. (XmlSeqIndent() knows how, now.)
 	for m, err = mxj.NewMapXmlSeqReader(rdr); m != nil || err != io.EOF; m, err = mxj.NewMapXmlSeqReader(rdr) {
 		if err != nil {
 			if err != mxj.NO_ROOT {
