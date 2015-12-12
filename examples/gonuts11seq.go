@@ -1,10 +1,10 @@
 /* gonuts10seqB.go - https://groups.google.com/forum/?fromgroups#!topic/golang-nuts/tf4aDQ1Hn_c
 
+Objective:  assign Comment.CommentText attribute value to Request.ReportingName attribute that immediately follows Comment.
+
 NOTE: use NewMapXmlSeq() and mv.XmlSeqIndent() to preserve structure.
 
 See data value at EOF - from: https://gist.github.com/suntong/e4dcdc6c85dcf769eec4
-
-Objective:  into Comment.CommentText attribute value into Request.ReportingName attribute that immediately follows Comment.
 */
 
 package main
