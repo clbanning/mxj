@@ -143,12 +143,11 @@ func main() {
 				}
 				// fmt.Println(r)
 
-				// loop through attributes to find the ReportingName entry
 				// get Reporting tame entry from #attr - we assume it exists
 				// note: this is NOT SAFE - we assume all Items.Request entries always have ReportingName attr.
 				rn := r["#attr"].(map[string]interface{})["ReportingName"].(map[string]interface{})
 				// set #text to: tname, acmt
-				// if you just want first 10 chars: rn["ReportingName"] = tname + ", " + acmt[:10]
+				// if you just want first 10 chars: rn["#text"] = tname + ", " + acmt[:10]
 				rn["#text"] = tname + ", " + acmt
 				// fmt.Println(r)
 			}
