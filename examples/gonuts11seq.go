@@ -12,8 +12,8 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"github.com/clbanning/mxj"
+	"io"
 )
 
 func main() {
@@ -100,15 +100,10 @@ func copyCmts(m mxj.Map, path string) error {
 		// For each Comment(n) extract the CommentText attribute value and use it to
 		// set the ReportingName attribute value in Request(n+1).
 		for _, v := range cmt {
-			seq := v.(map[string]interface{})["#seq"].(int) // type is int
-			var acmt string
-			var ok bool
-			// extract CommentText attr from array of "#attr"
-			for _, vv := range v.(map[string]interface{})["#attr"].([]interface{}) {
-				if acmt, ok = vv.(map[string]interface{})["CommentText"].(string); ok {
-					break
-				}
-			}
+			vmap := v.(map[string]interface{})
+			seq := vmap["#seq"].(int) // type is int
+			// extract CommentText attr from "#attr"
+			acmt, _ := mxj.Map(vmap).ValueForPath("#attr.CommentText.#text")
 			if acmt == "" {
 				fmt.Println("no CommentText value in Comment attributes")
 			}
@@ -126,24 +121,12 @@ func copyCmts(m mxj.Map, path string) error {
 				continue
 			}
 			// fmt.Println(r)
-			// loop through attributes to find the ReportingName entry
-			var rn map[string]interface{}
-			for _, vv := range r["#attr"].([]interface{}) {
-				rnt := vv.(map[string]interface{})
-				for key, _ := range rnt { // check if map key is ReportingName
-					if key == "ReportingName" {
-						rn = rnt
-						goto gotRptName
-					}
-				}
-			}
-		gotRptName:
-			if rn == nil { // shouldn't happen, but be safe
-				continue
-			}
-			// set it to acmt
+			// get Reporting tame entry from #attr - we assume it exists
+			// note: this is NOT SAFE - we assume all Items.Request entries always have ReportingName attr.
+			rn := r["#attr"].(map[string]interface{})["ReportingName"].(map[string]interface{})
+			// set #text to acmt
 			// if you just want first 10 chars: rn["ReportingName"] = acmt[:10]
-			rn["ReportingName"] = acmt
+			rn["#text"] = acmt
 			// fmt.Println(r)
 		}
 	}

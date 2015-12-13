@@ -78,15 +78,19 @@ func main() {
 		}
 		// process each TransactionTimer element ...
 		for _, t := range vals {
-			tmap := t.(map[string]interface{})
 			// get Name from attrs
-			// note: this is NOT SAFE in general - assumes that all keys are present
-			//       and of correct type
-			tname, _  := mxj.Map(tmap).ValueForPathString("#attr.Name.#text")
+			var tname string
+			for _, vv := range t.(map[string]interface{})["#attr"].([]interface{}) {
+				if ttname, ok := vv.(map[string]interface{})["Name"]; ok {
+					tname = ttname.(string)
+					break
+				}
+			}
+			// fmt.Println(mxj.Map(t.(map[string]interface{})).StringIndent())
 
 			// now process TransactionTimer.Items value ... is a map[string]interface{} value
 			// with Comment and Request keys with array values
-			vm, ok := tmap["Items"].(map[string]interface{})
+			vm, ok := t.(map[string]interface{})["Items"].(map[string]interface{})
 			if !ok {
 				fmt.Println("assertion failed")
 				return
@@ -123,12 +127,15 @@ func main() {
 			// For each Comment(n) extract the CommentText attribute value and use it to
 			// set the ReportingName attribute value in Request(n+1).
 			for _, v := range cmt {
-				vmap := v.(map[string]interface{})
-				seq := vmap["#seq"].(int) // type is int
+				seq := v.(map[string]interface{})["#seq"].(int) // type is int
+				var acmt string
+				var ok bool
 				// extract CommentText attr from array of "#attr"
-				acmt, _ := mxj.Map(vmap).ValueForPathString("#attr.CommentText.#text")
-				// a := v.(map[string]interface{})["#attr"].(map[string]interface{})
-				// acmt := a["CommentText"].(map[string]interface{})["#text"].(string)
+				for _, vv := range v.(map[string]interface{})["#attr"].([]interface{}) {
+					if acmt, ok = vv.(map[string]interface{})["CommentText"].(string); ok {
+						break
+					}
+				}
 				if acmt == "" {
 					fmt.Println("no CommentText value in Comment attributes")
 				}
@@ -146,14 +153,24 @@ func main() {
 					continue
 				}
 				// fmt.Println(r)
-
 				// loop through attributes to find the ReportingName entry
-				// get Reporting tame entry from #attr - we assume it exists
-				// note: this is NOT SAFE - we assume all Items.Request entries always have ReportingName attr.
-				rn := r["#attr"].(map[string]interface{})["ReportingName"].(map[string]interface{})
-				// set #text to: tname, acmt
+				var rn map[string]interface{}
+				for _, vv := range r["#attr"].([]interface{}) {
+					rnt := vv.(map[string]interface{})
+					for key, _ := range rnt { // check if map key is ReportingName
+						if key == "ReportingName" {
+							rn = rnt
+							goto gotRptName
+						}
+					}
+				}
+			gotRptName:
+				if rn == nil { // shouldn't happen, but be safe
+					continue
+				}
+				// set it to acmt
 				// if you just want first 10 chars: rn["ReportingName"] = tname + ", " + acmt[:10]
-				rn["#text"] = tname + ", " + acmt
+				rn["ReportingName"] = tname + ", " + acmt
 				// fmt.Println(r)
 			}
 		}

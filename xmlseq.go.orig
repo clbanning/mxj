@@ -28,7 +28,7 @@ var NO_ROOT = errors.New("no root key")
 // NewMapXmlSeq - convert a XML doc into a Map with elements id'd with decoding sequence int - #seq.
 // If the optional argument 'cast' is 'true', then values will be converted to boolean or float64 if possible.
 // NOTE: "#seq" key/value pairs are removed on encoding with mv.XmlSeq() / mv.XmlSeqIndent().
-//	• attributes are a map - map["#attr"]map["attr_key"]map[string]interface{}{"#text":<aval>, "#seq":<num>}
+//	• attributes are an array - map["#attr"][]map["attr_key"]interface{}
 //	• all simple elements are decoded as map["#text"]interface{} with a "#seq" k:v pair, as well.
 //	• lists always decode as map["list_tag"][]map[string]interface{} where the array elements include
 //	  a "#seq" k:v pair based on sequence they are decoded.  Thus, XML like:
@@ -136,11 +136,12 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 		n = make(map[string]interface{}, 1)
 		na = make(map[string]interface{})
 		if len(a) > 0 {
-			// xml.Attr is decoded into: map["#attr"]map[<attr_label>]interface{}
-			// where interface{} is map[string]interface{}{"#text":<attr_val>, "#seq":<attr_seq>}
-			aa := make(map[string]interface{}, len(a))
+			// xml.Attr is decoded into: map["#attr"][]map[string]interface{}
+			aa := make([]interface{}, len(a))
 			for n, v := range a {
-				aa[v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": n}
+				am := make(map[string]interface{}, 1)
+				am[v.Name.Local] = cast(v.Value, r)
+				aa[n] = interface{}(am)
 			}
 			na["#attr"] = aa // note: array will encode in sequence of decoding
 		}
@@ -448,9 +449,10 @@ func (mv Map) XmlSeqIndent(prefix, indent string, rootTag ...string) ([]byte, er
 func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, pp *pretty) error {
 	var endTag bool
 	var isSimple bool
-	var noEndTag bool
 	var elen int
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
+
+	// fmt.Println(key, ":", value)
 
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
@@ -467,46 +469,33 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 
 		if key == "#comment" {
 			*s += `<!--` + val["#text"].(string) + `-->`
-			noEndTag = true
 			break
 		}
 
 		if key == "#directive" {
 			*s += `<!` + val["#text"].(string) + `>`
-			noEndTag = true
 			break
 		}
 
 		if key == "#procinst" {
 			*s += `<?` + val["#target"].(string) + ` ` + val["#inst"].(string) + `?>`
-			noEndTag = true
 			break
 		}
 
 		haveAttrs := false
 		// process attributes first
-		if v, ok := val["#attr"].(map[string]interface{}); ok {
-			// First, unroll the map[string]interface{} into a []keyval array.
-			// Then sequence it.
-			kv := make([]keyval, len(v))
-			var kvv keyval
-			n := 0
-			for ak, av := range v {
-				kvv = keyval{ak, av}
-				kv[n] = kvv
-				n++
-			}
-			sort.Sort(elemListSeq(kv))
-			// Now encode the attributes in original decoding sequence, using keyval array.
-			for _, a := range kv {
-				vv := a.v.(map[string]interface{})
-				switch vv["#text"].(type) {
-				case string, float64, bool, int, int32, int64, float32:
-					*s += ` ` + a.k + `="` + fmt.Sprintf("%v", vv["#text"]) + `"`
-				case []byte:
-					*s += ` ` + a.k + `="` + fmt.Sprintf("%v", string(vv["#text"].([]byte))) + `"`
-				default:
-					return fmt.Errorf("invalid attribute value for: %s", a.k)
+		// They are in sequence in the array.
+		if v, ok := val["#attr"].([]interface{}); ok {
+			for _, vv := range v {
+				for k, av := range vv.(map[string]interface{}) {
+					switch av.(type) {
+					case string, float64, bool, int, int32, int64, float32:
+						*s += ` ` + k + `="` + fmt.Sprintf("%v", av) + `"`
+					case []byte:
+						*s += ` ` + k + `="` + fmt.Sprintf("%v", string(av.([]byte))) + `"`
+					default:
+						return fmt.Errorf("invalid attribute value for: %s", k)
+					}
 				}
 			}
 			haveAttrs = true
@@ -519,8 +508,8 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 
 		// simple element?
 		// every map value has, at least, "#seq" and, perhaps, "#text" and/or "#attr"
-		_, seqOK := val["#seq"] // have key
-		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs && seqOK) || (len(val) == 2 && !haveAttrs && seqOK)) {
+		_, seqOK := val["#seq"]
+		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs && seqOK) || (len(val) == 2 && !haveAttrs) && seqOK) {
 			*s += ">" + fmt.Sprintf("%v", v)
 			endTag = true
 			elen = 1
@@ -640,7 +629,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		isSimple = true
 		endTag = true
 	}
-	if endTag && !noEndTag {
+	if endTag {
 		if doIndent {
 			if !isSimple {
 				*s += p.padding
@@ -657,7 +646,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 				*s += `/>`
 			}
 		}
-	} else if !noEndTag {
+	} else if key != "#comment" && key != "#directive" && key != "#procinst" {
 		if useGoXmlEmptyElemSyntax {
 			*s += "></" + key + ">"
 		} else {

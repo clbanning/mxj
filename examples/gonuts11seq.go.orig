@@ -1,39 +1,8 @@
 /* gonuts10seqB.go - https://groups.google.com/forum/?fromgroups#!topic/golang-nuts/tf4aDQ1Hn_c
 
-Objective:  to quote from email
-
-================================ BEGIN QUOTE
-I'm actually dealing with Microsoft webtest files. An example can be find at,
-
-https://gist.github.com/suntong/e4dcdc6c85dcf769eec4
-
-It is the same as our case -- we have comments before each "<Request", and the requests and comments are grouped into transactions. For *each* request, I need to change one of its sub-node with the content from its leading comments, and from the content of the grouping transaction as well.
-
-Using the above example to explain in details, the first Request is,
-
-    <Request Method="GET" Version="1.1" Url="{{Config.TestParameters.ServerURL}}/Default.aspx" ...
-
-The comments immediately before it, its leading comments, is,
-
-    <Comment CommentText="Visit Homepage ...
-
-The fist Transaction is,
-
-    <TransactionTimer Name="Show Hide Widget List">
-
-Under it, the requests and comments are grouped into this transaction.
-
-
-Now the challenge is, for *each* request with a comment immediately before it, change it attribute "ReportingName="""''s value with the content from its leading comments, and from the content of the grouping transaction as well. Let's say, first 10 chars or first three words or each. So for the first Request under "<TransactionTimer Name="Show Hide Widget List">", which is "<Request Method="GET" Version="1.1" Url="{{Config.TestParameters.ServerURL}}/Default.aspx" ...", it's attribute "ReportingName=""" should be changed to,
-
-   ReportingName="Show Hide Widget, Show Widget List"
-
-Everything else should remain exactly the same.
-========================== END OF QUOTE
+Objective:  assign Comment.CommentText attribute value to Request.ReportingName attribute that immediately follows Comment.
 
 NOTE: use NewMapXmlSeq() and mv.XmlSeqIndent() to preserve structure.
-
-ALSO: we will ignore Comment/Request entiries in WebTest.Items list.
 
 See data value at EOF - from: https://gist.github.com/suntong/e4dcdc6c85dcf769eec4
 */
@@ -43,8 +12,8 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/clbanning/mxj"
 	"io"
+	"github.com/clbanning/mxj"
 )
 
 func main() {
@@ -53,7 +22,7 @@ func main() {
 	var m mxj.Map
 	var err error
 	// We read processing docs sequentially.
-	// Un-rooted ProcInst or Comments are processed AND just re-encoded. (XmlSeqIndent() knows how, now.)
+	// Un-rooted ProcInst or Comments are processed AND just reencoded. (XmlSeqIndent() knows how, now.)
 	for m, err = mxj.NewMapXmlSeqReader(rdr); m != nil || err != io.EOF; m, err = mxj.NewMapXmlSeqReader(rdr) {
 		if err != nil {
 			if err != mxj.NO_ROOT {
@@ -67,97 +36,13 @@ func main() {
 		}
 		// fmt.Println(m.StringIndent())
 
-		// get the array of TransactionTimer  entries for the 'path'
-		vals, err := m.ValuesForPath("WebTest.Items.TransactionTimer")
-		if err != nil {
-			fmt.Printf("ValuesForPath err: %s", err.Error())
-			return
-		} else if len(vals) == 0 {
-			fmt.Printf("no vals for WebTest.Items.TransactionTime")
-			return
+		// We have Two different arrays of Items in the XML doc, one nested in the other.
+		if err = copyCmts(m, "WebTest.Items"); err != nil {
+			fmt.Println("err:", err)
 		}
-		// process each TransactionTimer element ...
-		for _, t := range vals {
-			tmap := t.(map[string]interface{})
-			// get Name from attrs
-			// note: this is NOT SAFE in general - assumes that all keys are present
-			//       and of correct type
-			tname, _  := mxj.Map(tmap).ValueForPathString("#attr.Name.#text")
-
-			// now process TransactionTimer.Items value ... is a map[string]interface{} value
-			// with Comment and Request keys with array values
-			vm, ok := tmap["Items"].(map[string]interface{})
-			if !ok {
-				fmt.Println("assertion failed")
-				return
-			}
-			// get the Comment list
-			c, ok := vm["Comment"]
-			if !ok { // --> no Items.Comment elements
-				continue
-			}
-			// Don't assume that Comment is an array.
-			// There may be just one value, in which case it will decode as map[string]interface{}.
-			switch c.(type) {
-			case map[string]interface{}:
-				c = []interface{}{c}
-			}
-			cmt := c.([]interface{})
-			// get the Request list
-			r, ok := vm["Request"]
-			if !ok { // --> no Items.Request elements
-				continue
-			}
-			// Don't assume the Request is an array.
-			// There may be just one value, in which case it will decode as map[string]interface{}.
-			switch r.(type) {
-			case map[string]interface{}:
-				r = []interface{}{r}
-			}
-			req := r.([]interface{})
-
-			// fmt.Println("Comment:", cmt)
-			// fmt.Println("Request:", req)
-
-			// Comment elements with #seq==n are followed by Request element with #seq==n+1.
-			// For each Comment(n) extract the CommentText attribute value and use it to
-			// set the ReportingName attribute value in Request(n+1).
-			for _, v := range cmt {
-				vmap := v.(map[string]interface{})
-				seq := vmap["#seq"].(int) // type is int
-				// extract CommentText attr from array of "#attr"
-				acmt, _ := mxj.Map(vmap).ValueForPathString("#attr.CommentText.#text")
-				// a := v.(map[string]interface{})["#attr"].(map[string]interface{})
-				// acmt := a["CommentText"].(map[string]interface{})["#text"].(string)
-				if acmt == "" {
-					fmt.Println("no CommentText value in Comment attributes")
-				}
-				// fmt.Println(seq, acmt)
-				// find the request with the #seq==seq+1 value
-				var r map[string]interface{}
-				for _, vv := range req {
-					rt := vv.(map[string]interface{})
-					if rt["#seq"].(int) == seq+1 {
-						r = rt
-						break
-					}
-				}
-				if r == nil { // no Request with #seq==seq+1
-					continue
-				}
-				// fmt.Println(r)
-
-				// loop through attributes to find the ReportingName entry
-				// get Reporting tame entry from #attr - we assume it exists
-				// note: this is NOT SAFE - we assume all Items.Request entries always have ReportingName attr.
-				rn := r["#attr"].(map[string]interface{})["ReportingName"].(map[string]interface{})
-				// set #text to: tname, acmt
-				// if you just want first 10 chars: rn["ReportingName"] = tname + ", " + acmt[:10]
-				rn["#text"] = tname + ", " + acmt
-				// fmt.Println(r)
-			}
+		if err = copyCmts(m, "WebTest.Items.TransactionTimer.Items"); err != nil {
+			fmt.Println("err:", err)
 		}
-
 		// re-encode the map with the comment attribute values copied to the request elements.
 		b, err := m.XmlSeqIndent("", "  ")
 		if err != nil {
@@ -166,6 +51,103 @@ func main() {
 		}
 		fmt.Println(string(b))
 	}
+}
+
+// Uncomment the print statements to details of the process here.
+func copyCmts(m mxj.Map, path string) error {
+	// get the array of Items entries for the 'path'
+	vals, err := m.ValuesForPath(path)
+	if err != nil {
+		return fmt.Errorf("ValuesForPath err: %s", err.Error())
+	} else if len(vals) == 0 {
+		return fmt.Errorf("no vals for path: %s", path)
+	}
+	// process each Items entry
+	for _, v := range vals {
+		vm, ok := v.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("assertion failed")
+		}
+		// get the Comment list
+		c, ok := vm["Comment"]
+		if !ok { // --> no Items.Comment elements
+			continue
+		}
+		// Don't assume that Comment is an array.
+		// There may be just one value, in which case it will decode as map[string]interface{}.
+		switch c.(type) {
+		case map[string]interface{}:
+			c = []interface{}{c}
+		}
+		cmt := c.([]interface{})
+		// get the Request list
+		r, ok := vm["Request"]
+		if !ok { // --> no Items.Request elements
+			continue
+		}
+		// Don't assume the Request is an array.
+		// There may be just one value, in which case it will decode as map[string]interface{}.
+		switch r.(type) {
+		case map[string]interface{}:
+			r = []interface{}{r}
+		}
+		req := r.([]interface{})
+
+		// fmt.Println("Comment:", cmt)
+		// fmt.Println("Request:", req)
+
+		// Comment elements with #seq==n are followed by Request element with #seq==n+1.
+		// For each Comment(n) extract the CommentText attribute value and use it to
+		// set the ReportingName attribute value in Request(n+1).
+		for _, v := range cmt {
+			seq := v.(map[string]interface{})["#seq"].(int) // type is int
+			var acmt string
+			var ok bool
+			// extract CommentText attr from array of "#attr"
+			for _, vv := range v.(map[string]interface{})["#attr"].([]interface{}) {
+				if acmt, ok = vv.(map[string]interface{})["CommentText"].(string); ok {
+					break
+				}
+			}
+			if acmt == "" {
+				fmt.Println("no CommentText value in Comment attributes")
+			}
+			// fmt.Println(seq, acmt)
+			// find the request with the #seq==seq+1 value
+			var r map[string]interface{}
+			for _, vv := range req {
+				rt := vv.(map[string]interface{})
+				if rt["#seq"].(int) == seq+1 {
+					r = rt
+					break
+				}
+			}
+			if r == nil { // no Request with #seq==seq+1
+				continue
+			}
+			// fmt.Println(r)
+			// loop through attributes to find the ReportingName entry
+			var rn map[string]interface{}
+			for _, vv := range r["#attr"].([]interface{}) {
+				rnt := vv.(map[string]interface{})
+				for key, _ := range rnt { // check if map key is ReportingName
+					if key == "ReportingName" {
+						rn = rnt
+						goto gotRptName
+					}
+				}
+			}
+		gotRptName:
+			if rn == nil { // shouldn't happen, but be safe
+				continue
+			}
+			// set it to acmt
+			// if you just want first 10 chars: rn["ReportingName"] = acmt[:10]
+			rn["ReportingName"] = acmt
+			// fmt.Println(r)
+		}
+	}
+	return nil
 }
 
 var data = []byte(`
