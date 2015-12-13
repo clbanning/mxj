@@ -80,8 +80,6 @@ func main() {
 		for _, t := range vals {
 			tmap := t.(map[string]interface{})
 			// get Name from attrs
-			// note: this is NOT SAFE in general - assumes that all keys are present
-			//       and of correct type
 			tname, _  := mxj.Map(tmap).ValueForPathString("#attr.Name.#text")
 
 			// now process TransactionTimer.Items value ... is a map[string]interface{} value
@@ -127,8 +125,6 @@ func main() {
 				seq := vmap["#seq"].(int) // type is int
 				// extract CommentText attr from array of "#attr"
 				acmt, _ := mxj.Map(vmap).ValueForPathString("#attr.CommentText.#text")
-				// a := v.(map[string]interface{})["#attr"].(map[string]interface{})
-				// acmt := a["CommentText"].(map[string]interface{})["#text"].(string)
 				if acmt == "" {
 					fmt.Println("no CommentText value in Comment attributes")
 				}
