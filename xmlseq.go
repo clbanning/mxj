@@ -292,8 +292,8 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 // Encode a Map as XML with elements sorted on #seq.  The companion of NewMapXmlSeq().
 // The following rules apply.
 //    - The key label "#text" is treated as the value for a simple element with attributes.
-//    - The "#seq" key is used to seqence the subelements but is ignored for writing.
-//    - The "#attr" map key identifies the array of attribute map[string]interface{} values.
+//    - The "#seq" key is used to seqence the subelements or attributes but is ignored for writing.
+//    - The "#attr" map key identifies the map of attribute map[string]interface{} values with "#text" key.
 //    - The "#comment" map key identifies a comment in the value "#text" map entry - <!--comment-->.
 //    - The "#directive" map key identifies a directive in the value "#text" map entry - <!directive>.
 //    - The "#procinst" map key identifies a process instruction in the value "#target" and "#inst"
