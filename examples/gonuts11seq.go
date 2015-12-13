@@ -62,7 +62,6 @@ func copyCmts(m mxj.Map, path string) error {
 	} else if len(vals) == 0 {
 		return fmt.Errorf("no vals for path: %s", path)
 	}
-	var cmt, req []interface{}
 	// process each Items entry
 	for _, v := range vals {
 		vm, ok := v.(map[string]interface{})
@@ -70,18 +69,29 @@ func copyCmts(m mxj.Map, path string) error {
 			return fmt.Errorf("assertion failed")
 		}
 		// get the Comment list
-		cmt, ok = vm["Comment"].([]interface{})
-		if !ok {
+		c, ok := vm["Comment"]
+		if !ok { // --> no Items.Comment elements
 			continue
 		}
+		// Don't assume that Comment is an array.
+		// There may be just one value, in which case it will decode as map[string]interface{}.
+		switch c.(type) {
+		case map[string]interface{}:
+			c = []interface{}{c}
+		}
+		cmt := c.([]interface{})
 		// get the Request list
-		req, ok = vm["Request"].([]interface{})
-		if !ok {
+		r, ok := vm["Request"]
+		if !ok { // --> no Items.Request elements
 			continue
 		}
-		if cmt == nil || req == nil {
-			break
+		// Don't assume the Request is an array.
+		// There may be just one value, in which case it will decode as map[string]interface{}.
+		switch r.(type) {
+		case map[string]interface{}:
+			r = []interface{}{r}
 		}
+		req := r.([]interface{})
 
 		// fmt.Println("Comment:", cmt)
 		// fmt.Println("Request:", req)

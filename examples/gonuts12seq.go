@@ -76,7 +76,6 @@ func main() {
 			fmt.Printf("no vals for WebTest.Items.TransactionTime")
 			return
 		}
-		var cmt, req []interface{}
 		// process each TransactionTimer element ...
 		for _, t := range vals {
 			// get Name from attrs
@@ -97,19 +96,29 @@ func main() {
 				return
 			}
 			// get the Comment list
-			cmt, ok = vm["Comment"].([]interface{})
-			if !ok {
+			c, ok := vm["Comment"]
+			if !ok { // --> no Items.Comment elements
 				continue
 			}
+			// Don't assume that Comment is an array.
+			// There may be just one value, in which case it will decode as map[string]interface{}.
+			switch c.(type) {
+			case map[string]interface{}:
+				c = []interface{}{c}
+			}
+			cmt := c.([]interface{})
 			// get the Request list
-			req, ok = vm["Request"].([]interface{})
-			if !ok {
+			r, ok := vm["Request"]
+			if !ok { // --> no Items.Request elements
 				continue
 			}
-			if cmt == nil || req == nil {
-				fmt.Println("cmt or req empty")
-				break
+			// Don't assume the Request is an array.
+			// There may be just one value, in which case it will decode as map[string]interface{}.
+			switch r.(type) {
+			case map[string]interface{}:
+				r = []interface{}{r}
 			}
+			req := r.([]interface{})
 
 			// fmt.Println("Comment:", cmt)
 			// fmt.Println("Request:", req)
