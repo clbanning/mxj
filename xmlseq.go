@@ -512,21 +512,16 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			haveAttrs = true
 		}
 
-		// only attributes?
-		if len(val) == 0 {
-			break
-		}
-
 		// simple element?
 		// every map value has, at least, "#seq" and, perhaps, "#text" and/or "#attr"
 		_, seqOK := val["#seq"] // have key
-		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs && seqOK) || (len(val) == 2 && !haveAttrs && seqOK)) {
+		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs) || (len(val) == 2 && !haveAttrs)) && seqOK {
 			*s += ">" + fmt.Sprintf("%v", v)
 			endTag = true
 			elen = 1
 			isSimple = true
 			break
-		} else if !ok && ((len(val) == 2  && haveAttrs) || (len(val) == 1 && !haveAttrs)) && seqOK {
+		} else if !ok && ((len(val) == 2 && haveAttrs) || (len(val) == 1 && !haveAttrs)) && seqOK {
 			// here no #text but have #seq or #seq+#attr
 			endTag = false
 			break
