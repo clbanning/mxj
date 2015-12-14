@@ -43,7 +43,8 @@ func main() {
 		if err = copyCmts(m, "WebTest.Items.TransactionTimer.Items"); err != nil {
 			fmt.Println("err:", err)
 		}
-		// re-encode the map with the comment attribute values copied to the request elements.
+		// re-encode the map with the Items.Comment[n].#attr.CommentText
+		// values copied to the Items.Request[n+1].#attr.ReportingName elements.
 		b, err := m.XmlSeqIndent("", "  ")
 		if err != nil {
 			fmt.Println("XmlIndent err:", err)

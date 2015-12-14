@@ -73,7 +73,7 @@ func main() {
 			fmt.Printf("ValuesForPath err: %s", err.Error())
 			return
 		} else if len(vals) == 0 {
-			fmt.Printf("no vals for WebTest.Items.TransactionTime")
+			fmt.Printf("no vals for WebTest.Items.TransactionTimer")
 			return
 		}
 		// process each TransactionTimer element ...
@@ -148,7 +148,8 @@ func main() {
 			}
 		}
 
-		// re-encode the map with the comment attribute values copied to the request elements.
+		// re-encode the map with the TransactionTimer.#attr.Name & Items.Comment[n].#attr.CommentText
+		// values copied to the Items.Request[n+1].#attr.ReportingName elements.
 		b, err := m.XmlSeqIndent("", "  ")
 		if err != nil {
 			fmt.Println("XmlIndent err:", err)
