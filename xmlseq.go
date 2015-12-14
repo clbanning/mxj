@@ -489,11 +489,9 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			// First, unroll the map[string]interface{} into a []keyval array.
 			// Then sequence it.
 			kv := make([]keyval, len(v))
-			var kvv keyval
 			n := 0
 			for ak, av := range v {
-				kvv = keyval{ak, av}
-				kv[n] = kvv
+				kv[n] = keyval{ak, av}
 				n++
 			}
 			sort.Sort(elemListSeq(kv))
@@ -530,7 +528,6 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		// we now need to sequence everything except attributes
 		// 'kv' will hold everything that needs to be written
 		kv := make([]keyval, 0)
-		var kvv keyval
 		for k, v := range val {
 			if k == "#attr" { // already processed
 				continue
@@ -542,12 +539,10 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			case []interface{}:
 				// unwind the array as separate entries
 				for _, vv := range v.([]interface{}) {
-					kvv = keyval{k, vv}
-					kv = append(kv, kvv)
+					kv = append(kv, keyval{k, vv})
 				}
 			default:
-				kvv = keyval{k, v}
-				kv = append(kv, kvv)
+				kv = append(kv, keyval{k, v})
 			}
 		}
 
