@@ -118,8 +118,8 @@ func main() {
 			// fmt.Println("Request:", req)
 
 			// Comment elements with #seq==n are followed by Request element with #seq==n+1.
-			// For each Comment(n) extract the CommentText attribute value and use it to
-			// set the ReportingName attribute value in Request(n+1).
+			// For each Comment.#seq==n extract the CommentText attribute value and use it to
+			// set the ReportingName attribute value in Request.#seq==n+1.
 			for _, v := range cmt {
 				vmap := v.(map[string]interface{})
 				seq := vmap["#seq"].(int) // type is int
