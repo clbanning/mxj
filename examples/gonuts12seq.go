@@ -148,8 +148,8 @@ func main() {
 			}
 		}
 
-		// re-encode the map with the TransactionTimer.#attr.Name & Items.Comment[n].#attr.CommentText
-		// values copied to the Items.Request[n+1].#attr.ReportingName elements.
+		// re-encode the map with the TransactionTimer.#attr.Name & Items.Comment[#seq==n].#attr.CommentText
+		// values copied to the Items.Request[#seq==n+1].#attr.ReportingName elements.
 		b, err := m.XmlSeqIndent("", "  ")
 		if err != nil {
 			fmt.Println("XmlIndent err:", err)
