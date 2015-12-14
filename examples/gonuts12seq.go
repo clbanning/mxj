@@ -80,7 +80,7 @@ func main() {
 		for _, t := range vals {
 			tmap := t.(map[string]interface{})
 			// get Name from attrs
-			tname, _  := mxj.Map(tmap).ValueForPathString("#attr.Name.#text")
+			tname, _ := mxj.Map(tmap).ValueForPathString("#attr.Name.#text")
 
 			// now process TransactionTimer.Items value ... is a map[string]interface{} value
 			// with Comment and Request keys with array values
@@ -141,15 +141,10 @@ func main() {
 				if r == nil { // no Request with #seq==seq+1
 					continue
 				}
-				// fmt.Println(r)
-
-				// get ReportingName entry from #attr - we assume it exists
-				// note: this is NOT SAFE - we assume all Items.Request entries always have ReportingName attr.
-				rn := r["#attr"].(map[string]interface{})["ReportingName"].(map[string]interface{})
-				// set #text to: tname, acmt
-				// if you just want first 10 chars: rn["#text"] = tname + ", " + acmt[:10]
-				rn["#text"] = tname + ", " + acmt
-				// fmt.Println(r)
+				if err := mxj.Map(r).SetValueForPath(tname+", "+acmt, "#attr.ReportingName.#text"); err != nil {
+					fmt.Println("SetValueForPath err:", err)
+					break
+				}
 			}
 		}
 

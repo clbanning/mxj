@@ -120,14 +120,10 @@ func copyCmts(m mxj.Map, path string) error {
 			if r == nil { // no Request with #seq==seq+1
 				continue
 			}
-			// fmt.Println(r)
-			// get ReportingName entry from #attr - we assume it exists
-			// note: this is NOT SAFE - we assume all Items.Request entries always have ReportingName attr.
-			rn := r["#attr"].(map[string]interface{})["ReportingName"].(map[string]interface{})
-			// set #text to acmt
-			// if you just want first 10 chars: rn["#text"] = acmt[:10]
-			rn["#text"] = acmt
-			// fmt.Println(r)
+			if err := mxj.Map(r).SetValueForPath(acmt, "#attr.ReportingName.#text"); err != nil {
+				fmt.Println("SetValueForPath err:", err)
+				break
+			}
 		}
 	}
 	return nil
