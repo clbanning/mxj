@@ -17,7 +17,8 @@ import (
 	"strings"
 )
 
-var NO_ROOT = errors.New("no root key")
+var NoRoot = errors.New("no root key")
+var NO_ROOT = NoRoot // maintain backwards compatibility
 
 // ------------------- NewMapXmlSeq & NewMapXmlSeqReader ... -------------------------
 
@@ -41,7 +42,7 @@ var NO_ROOT = errors.New("no root key")
 //	• process instructions  - "<?instr?>" - are decoded as map["#procinst"]interface{} where the #procinst value
 //	  is of map[string]interface{} type with the following keys: #target, #inst, and #seq.
 //	• comments, directives, and procinsts that are NOT part of a document with a root key will be returned as
-//	  map[string]interface{} and the error value NO_ROOT.
+//	  map[string]interface{} and the error value 'NoRoot'.
 //	• note: "<![CDATA[" syntax is lost in xml.Decode parser - and is not handled here, either.
 //	   and: "\r\n" is converted to "\n"
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
@@ -197,8 +198,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				val.(map[string]interface{})["#seq"] = seq
 				seq++
 			case interface{}: // a non-nil simple element: string, float64, bool
-				v := map[string]interface{}{"#text": val}
-				v["#seq"] = seq
+				v := map[string]interface{}{"#text": val, "#seq": seq}
 				seq++
 				val = v
 			}
@@ -246,7 +246,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 		case xml.Comment:
 			if n == nil { // no root 'key'
 				n = map[string]interface{}{"#comment": string(t.(xml.Comment))}
-				return n, NO_ROOT
+				return n, NoRoot
 			}
 			cm := make(map[string]interface{}, 2)
 			cm["#text"] = string(t.(xml.Comment))
@@ -256,7 +256,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 		case xml.Directive:
 			if n == nil { // no root 'key'
 				n = map[string]interface{}{"#directive": string(t.(xml.Directive))}
-				return n, NO_ROOT
+				return n, NoRoot
 			}
 			dm := make(map[string]interface{}, 2)
 			dm["#text"] = string(t.(xml.Directive))
@@ -267,7 +267,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			if n == nil {
 				na = map[string]interface{}{"#target": t.(xml.ProcInst).Target, "#inst": string(t.(xml.ProcInst).Inst)}
 				n = map[string]interface{}{"#procinst": na}
-				return n, NO_ROOT
+				return n, NoRoot
 			}
 			pm := make(map[string]interface{}, 3)
 			pm["#target"] = t.(xml.ProcInst).Target
