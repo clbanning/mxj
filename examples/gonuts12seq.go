@@ -50,13 +50,11 @@ import (
 func main() {
 	// fmt.Println(string(data))
 	rdr := bytes.NewReader(data)
-	var m mxj.Map
-	var err error
 	// We read processing docs sequentially.
 	// Un-rooted ProcInst or Comments are processed AND just re-encoded. (XmlSeqIndent() knows how, now.)
-	for m, err = mxj.NewMapXmlSeqReader(rdr); m != nil || err != io.EOF; m, err = mxj.NewMapXmlSeqReader(rdr) {
+	for m, err := mxj.NewMapXmlSeqReader(rdr); m != nil || err != io.EOF; m, err = mxj.NewMapXmlSeqReader(rdr) {
 		if err != nil {
-			if err != mxj.NO_ROOT {
+			if err != mxj.NoRoot {
 				fmt.Println("NewMapXmlSeq err:", err)
 				fmt.Println("m:", m)
 			} else if m != nil {
@@ -71,10 +69,10 @@ func main() {
 		vals, err := m.ValuesForPath("WebTest.Items.TransactionTimer")
 		if err != nil {
 			fmt.Printf("ValuesForPath err: %s", err.Error())
-			return
+			continue
 		} else if len(vals) == 0 {
 			fmt.Printf("no vals for WebTest.Items.TransactionTimer")
-			return
+			continue
 		}
 		// process each TransactionTimer element ...
 		for _, t := range vals {
