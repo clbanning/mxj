@@ -126,7 +126,6 @@ func xmlSeqToMap(doc []byte, r bool) (map[string]interface{}, error) {
 // Add #seq tag value for each element decoded - to be used for Encoding later.
 func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[string]interface{}, error) {
 	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey'
-	// Unless 'skey' is a simple element w/o attributes, in which case the xml.CharData value is the value.
 	var n, na map[string]interface{}
 	var seq int // for including seq num when decoding
 

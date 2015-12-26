@@ -26,6 +26,7 @@ package main
 import (
 	"fmt"
 	"github.com/clbanning/mxj"
+	"strings"
 )
 
 var data = []byte(`
@@ -53,6 +54,7 @@ func main() {
 		return
 	}
 	var fname, date string
+	var index int
 	for _, v := range vals {
 		vm, ok := v.(map[string]interface{})
 		if !ok {
@@ -64,32 +66,20 @@ func main() {
 			fmt.Println("no #text tag")
 			return
 		}
-		// dt, ok := vm["#attr"].([]interface{})[0].(map[string]interface{})["effect_range"].(string)
-		attri, ok := vm["#attr"].([]interface{})
-		if !ok {
-			fmt.Println("no #attr")
-			return
-		}
-		/* <!-- the general case where there might be more than one attribute -->
-			var dt string
-			var ok bool
-			for _, v := range attri {
-				if dt, ok = v.(map[string]interface{})["effect_range"].(string); ok {
-					break
-				}
-			}
-			if dt == "" {
-				fmt.Println("no effect_range attr k:v pair")
-				return
-			}
-		*/
-		dt, ok := attri[0].(map[string]interface{})["effect_range"].(string)
-		if !ok {
+		// extract the associated date
+		dt, _ := mxj.Map(vm).ValueForPathString("#attr.effect_range.#text")
+		if dt == "" {
 			fmt.Println("no effect_range attr")
 			return
 		}
-		if dt > date {
-			date = dt
+		dts := strings.Split(dt, "-")
+		if len(dts) > 1 && dts[len(dts)-1] == "" {
+			index = len(dts) - 2
+		} else if len(dts) > 0 {
+			index = len(dts) - 1
+		}
+		if len(dts) > 0 && dts[index] > date {
+			date = dts[index]
 			fname = fn
 		}
 	}
