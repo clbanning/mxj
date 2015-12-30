@@ -89,11 +89,26 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
 
 <h4>XML parsing conventions</h4>
 
+Using NewXml()
+--------------
+
    - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
      to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)`.)
    - If the element is a simple element and has attributes, the element value
      is given the key `#text` for its `map[string]interface{}` representation.  (See
      the 'atomFeedString.xml' test data, below.)
+
+Using NewXmlSeq()
+-----------------
+
+   - Attributes are parsed to `map["#attr"]map["<attr_label>"]map[string]interface{}`values
+     where the <attr_label> value has "#text" and "#seq" keys - the "#text" key holds the 
+     value for <attr_label>.
+   - All elements, except for the root, are map[string]interface{} values and have a "#seq"
+     key.
+   - Comments, directives, and process instructions are unmarshalled into the Map using the
+     keys "#comment", "directive", and "procinst", respectively. (See documentation for more
+     specifics.)
 
 <h4>XML encoding conventions</h4>
 
