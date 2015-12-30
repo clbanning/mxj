@@ -90,7 +90,6 @@ Also, the subdirectory "examples" contains a wide range of examples, several tak
 <h4>XML parsing conventions</h4>
 
 Using NewXml()
---------------
 
    - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
      to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)`.)
@@ -99,7 +98,6 @@ Using NewXml()
      the 'atomFeedString.xml' test data, below.)
 
 Using NewXmlSeq()
------------------
 
    - Attributes are parsed to `map["#attr"]map["<attr_label>"]map[string]interface{}`values
      where the <attr_label> value has "#text" and "#seq" keys - the "#text" key holds the 
