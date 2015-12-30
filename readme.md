@@ -100,8 +100,8 @@ Using NewXml()
 Using NewXmlSeq()
 
    - Attributes are parsed to `map["#attr"]map["<attr_label>"]map[string]interface{}`values
-     where the <attr_label> value has "#text" and "#seq" keys - the "#text" key holds the 
-     value for <attr_label>.
+     where the "<attr_label>" value has "#text" and "#seq" keys - the "#text" key holds the 
+     value for "<attr_label>".
    - All elements, except for the root, are map[string]interface{} values and have a "#seq"
      key.
    - Comments, directives, and process instructions are unmarshalled into the Map using the
