@@ -96,6 +96,7 @@ Using NewXml()
    - If the element is a simple element and has attributes, the element value
      is given the key `#text` for its `map[string]interface{}` representation.  (See
      the 'atomFeedString.xml' test data, below.)
+   - XML comments, directives, and process instructions are ignored.
 
 Using NewXmlSeq()
 
@@ -105,7 +106,7 @@ Using NewXmlSeq()
    - All elements, except for the root, are map[string]interface{} values and have a "#seq"
      key.
    - Comments, directives, and process instructions are unmarshalled into the Map using the
-     keys "#comment", "directive", and "procinst", respectively. (See documentation for more
+     keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
      specifics.)
 
 <h4>XML encoding conventions</h4>
