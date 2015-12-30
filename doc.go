@@ -70,13 +70,28 @@ SUMMARY
 
 XML PARSING CONVENTIONS
 
-   - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
-     to the attribute label. (PrependAttrWithHyphen(false) will override this.)
+   Using NewXml()
+
+   - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
+     to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)`.)
    - If the element is a simple element and has attributes, the element value
-     is given the key '#text' for its map[string]interface{} representation.
+     is given the key `#text` for its `map[string]interface{}` representation.  (See
+     the 'atomFeedString.xml' test data, below.)
+   - XML comments, directives, and process instructions are ignored.
+
+   Using NewXmlSeq()
+
+   - Attributes are parsed to `map["#attr"]map[<attr_label>]map[string]interface{}`values
+     where the `<attr_label>` value has "#text" and "#seq" keys - the "#text" key holds the 
+     value for `<attr_label>`.
+   - All elements, except for the root, are map[string]interface{} values and have a "#seq"
+     key.
+   - Comments, directives, and process instructions are unmarshalled into the Map using the
+     keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
+     specifics.)
 
 XML ENCODING CONVENTIONS
-
+   
    - 'nil' Map values, which may represent 'null' JSON values, are encoded as "<tag/>".
      NOTE: the operation is not symmetric as "<tag/>" elements are decoded as 'tag:""' Map values,
            which, then, encode in JSON as '"tag":""' values..
