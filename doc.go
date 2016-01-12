@@ -84,8 +84,7 @@ XML PARSING CONVENTIONS
    - Attributes are parsed to `map["#attr"]map[<attr_label>]map[string]interface{}`values
      where the `<attr_label>` value has "#text" and "#seq" keys - the "#text" key holds the 
      value for `<attr_label>`.
-   - All elements, except for the root, are map[string]interface{} values and have a "#seq"
-     key.
+   - All elements, except for the root,have a "#seq" key.
    - Comments, directives, and process instructions are unmarshalled into the Map using the
      keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
      specifics.)
