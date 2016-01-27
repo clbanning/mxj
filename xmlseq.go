@@ -22,9 +22,7 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 
 // ------------------- NewMapXmlSeq & NewMapXmlSeqReader ... -------------------------
 
-// THIS IS EXPERIMENTAL!
-//
-// It is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
+// This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // NewMapXmlSeq - convert a XML doc into a Map with elements id'd with decoding sequence int - #seq.
 // If the optional argument 'cast' is 'true', then values will be converted to boolean or float64 if possible.
@@ -53,9 +51,7 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	return xmlSeqToMap(xmlVal, r)
 }
 
-// THIS IS EXPERIMENTAL!
-//
-// It is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
+// This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
 // See NewMapXmlSeq for "#seq" key insertion.
@@ -69,9 +65,7 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	return xmlSeqReaderToMap(xmlReader, r)
 }
 
-// THIS IS EXPERIMENTAL!
-//
-// It is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
+// This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
 //	NOTES: 1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
@@ -284,9 +278,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 
 // ------------------ mv.Xml & mv.XmlWriter - from j2x ------------------------
 
-// THIS IS EXPERIMENTAL!
-//
-// It should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
+// This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Encode a Map as XML with elements sorted on #seq.  The companion of NewMapXmlSeq().
 // The following rules apply.
@@ -341,9 +333,7 @@ done:
 // The following implementation is provided only for symmetry with NewMapXmlReader[Raw]
 // The names will also provide a key for the number of return arguments.
 
-// THIS IS EXPERIMENTAL!
-//
-// It should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
+// This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as  XML on the Writer.
 // See Xml() for encoding rules.
@@ -357,9 +347,7 @@ func (mv Map) XmlSeqWriter(xmlWriter io.Writer, rootTag ...string) error {
 	return err
 }
 
-// THIS IS EXPERIMENTAL!
-//
-// It should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
+// This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as  XML on the Writer. []byte is the raw XML that was written.
 // See Xml() for encoding rules.
@@ -373,9 +361,7 @@ func (mv Map) XmlSeqWriterRaw(xmlWriter io.Writer, rootTag ...string) ([]byte, e
 	return x, err
 }
 
-// THIS IS EXPERIMENTAL!
-//
-// It should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
+// This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as pretty XML on the Writer.
 // See Xml() for encoding rules.
@@ -389,9 +375,7 @@ func (mv Map) XmlSeqIndentWriter(xmlWriter io.Writer, prefix, indent string, roo
 	return err
 }
 
-// THIS IS EXPERIMENTAL!
-//
-// It should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
+// This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as pretty XML on the Writer. []byte is the raw XML that was written.
 // See Xml() for encoding rules.
@@ -409,9 +393,7 @@ func (mv Map) XmlSeqIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, 
 
 // ---------------------- XmlSeqIndent ----------------------------
 
-// THIS IS EXPERIMENTAL!
-//
-// It should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
+// This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Encode a map[string]interface{} as a pretty XML string.
 // See mv.XmlSeq() for encoding rules.
