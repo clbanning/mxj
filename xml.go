@@ -279,7 +279,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				na[key] = val // save it as a singleton
 			}
 		case xml.EndElement:
-			// len(n) > 0 if this is a simple element w/o xml.Attrs.
+			// len(n) > 0 if this is a simple element w/o xml.Attrs - see xml.CharData case.
 			if len(n) == 0 {
 				// If len(na)==0 we have an empty element == "";
 				// it has no xml.Attr nor xml.CharData.
@@ -293,14 +293,18 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			}
 			return n, nil
 		case xml.CharData:
-			tt := string(t.(xml.CharData))
 			// clean up possible noise
-			tt = strings.Trim(tt, "\t\r\b\n ")
+			tt := strings.Trim(string(t.(xml.CharData)), "\t\r\b\n ")
 			if len(tt) > 0 {
 				if len(na) > 0 {
 					na["#text"] = cast(tt, r)
-				} else {
+				} else if skey != "" {
 					n[skey] = cast(tt, r)
+				} else {
+					// per Adrian (http://www.adrianlungu.com/) catch stray text
+					// in decoder stream - 
+					// https://github.com/clbanning/mxj/pull/14#issuecomment-182816374
+					return nil, errors.New("no tag for chardata: "+tt)
 				}
 			}
 		default:
