@@ -300,7 +300,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				if len(na) > 0 {
 					na["#text"] = cast(tt, r)
 				} else {
-					n[skey] = cast(tt, r)
+					if skey != "" {
+						n[skey] = cast(tt, r)
+					}
 				}
 			}
 		default:
