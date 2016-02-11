@@ -46,6 +46,8 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //		if jerr != nil {
 //			// handle error
 //		}
+//
+//	NOTE: if there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM".
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -55,6 +57,8 @@ func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
+// If there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM", which
+// should be handled.
 func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -176,6 +180,10 @@ var includeTagSeqNum bool
 func IncludeTagSeqNum(b bool) {
 	includeTagSeqNum = b
 }
+
+// Handle Byte-Order-Mark from reader - 
+// return nil, IsBOM.
+var IsBOM = errors.New("BOM")
 
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
 // A refactoring of xmlToTreeParser(), markDuplicate() and treeToMap() - here, all-in-one.
@@ -302,9 +310,15 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 					n[skey] = cast(tt, r)
 				} else {
 					// per Adrian (http://www.adrianlungu.com/) catch stray text
-					// in decoder stream - 
+					// in decoder stream -
 					// https://github.com/clbanning/mxj/pull/14#issuecomment-182816374
-					return nil, errors.New("no tag for chardata: "+tt)
+					// NOTE: CharSetReader must be set to non-UTF-8 CharSet or you'll get
+					// a p.Token() decoding error when the BOM is UTF-16 or UTF-32.
+					if isBOM([]byte(tt)) {
+						return nil, IsBOM // accept and ignore BOMs
+					} else {
+						return nil, errors.New("no tag for chardata: " + tt)
+					}
 				}
 			}
 		default:
@@ -329,6 +343,33 @@ func cast(s string, r bool) interface{} {
 		}
 	}
 	return interface{}(s)
+}
+
+// Check for Byte-Order-Mark header.
+var boms = [][]byte{
+	{'\xef', '\xbb', '\xbf'},
+	{'\xfe', '\xff'},
+	{'\xff', '\xfe'},
+	{'\x00', '\x00', '\xfe', '\xff'},
+	{'\xff', '\xfe', '\x00', '\x00'},
+}
+
+func isBOM(b []byte) bool {
+	for _, bom := range boms {
+		if len(b) != len(bom) {
+			continue
+		}
+		var i int
+		for i = 0; i < len(b); i++ {
+			if b[i] != bom[i] {
+				break
+			}
+		}
+		if i == len(b) {
+			return true
+		}
+	}
+	return false
 }
 
 // ------------------ END: NewMapXml & NewMapXmlReader -------------------------

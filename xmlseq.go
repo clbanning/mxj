@@ -43,6 +43,8 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	  map[string]interface{} and the error value 'NoRoot'.
 //	• note: "<![CDATA[" syntax is lost in xml.Decode parser - and is not handled here, either.
 //	   and: "\r\n" is converted to "\n"
+//
+//	NOTE: if there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM".
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -54,6 +56,7 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 // This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
+// If there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM".
 // See NewMapXmlSeq for "#seq" key insertion.
 func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
@@ -231,9 +234,15 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			tt := strings.Trim(string(t.(xml.CharData)), "\t\r\b\n ")
 			if skey == "" {
 				// per Adrian (http://www.adrianlungu.com/) catch stray text
-				// in decoder stream - 
+				// in decoder stream -
 				// https://github.com/clbanning/mxj/pull/14#issuecomment-182816374
-				return nil, errors.New("no tag for chardata: " + tt)
+				// NOTE: CharSetReader must be set to non-UTF-8 CharSet or you'll get
+				// a p.Token() decoding error when the BOM is UTF-16 or UTF-32.
+				if isBOM([]byte(tt)) {
+					return nil, IsBOM
+				} else {
+					return nil, errors.New("no tag for chardata: " + tt)
+				}
 			}
 			if len(tt) > 0 {
 				// every simple element is a #text and has #seq associated with it

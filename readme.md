@@ -16,6 +16,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2016.02.11: Handle Byte-Order-Mark (BOMs): decoders return "nil, IsBom", which can be ignored.
 	2015.12.02: EXPERIMENTAL XML decoding/encoding that preserves original structure of document. See
 	            NewMapXmlSeq() and mv.XmlSeq() / mv.XmlSeqIndent().
 	2015-05-20: New: mv.StringIndentNoTypeInfo().
