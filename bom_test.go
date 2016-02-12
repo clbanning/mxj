@@ -24,11 +24,11 @@ func TestBom(t *testing.T) {
 
 	// use just UTF-8 BOM ... no alternative CharSetReader
 	if _, err := NewMapXml(boms[0]); err != io.EOF {
-		t.Fatalf("NewMapXml err;", err)
+		t.Fatalf("NewMapXml err; %v\n", err)
 	}
 
 	if _, err := NewMapXmlSeq(boms[0]); err != io.EOF {
-		t.Fatalf("NewMapXmlSeq err:", err)
+		t.Fatalf("NewMapXmlSeq err: %v\n", err)
 	}
 }
 
