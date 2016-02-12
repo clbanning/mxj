@@ -47,7 +47,8 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //			// handle error
 //		}
 //
-//	NOTE: if there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM".
+//	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
+//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -57,8 +58,8 @@ func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
-// If there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM", which
-// should be handled.
+//	NOTE: the 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
+//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -71,6 +72,8 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 
 // XmlWriterBufSize - set the size of io.Writer for the TeeReader used by NewMapXmlReaderRaw()
 // and HandleXmlReaderRaw().  This reduces repeated memory allocations and copy() calls in most cases.
+//	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
+//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 var XmlWriterBufSize int = 256
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
@@ -80,6 +83,8 @@ var XmlWriterBufSize int = 256
 //	          data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
 //	          you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
 //	       2. The 'raw' return value may be larger than the XML text value.
+//	       3. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
+//	          extraneous xml.CharData will be ignored unless io.EOF is reached first.
 func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -109,7 +114,22 @@ func xmlReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader
 	p := xml.NewDecoder(rdr)
 	p.CharsetReader = XmlCharsetReader
-	return xmlToMapParser("", nil, p, r)
+	m, err := xmlToMapParser("", nil, p, r)
+	// if a map was created, return it
+	if m != nil || (err != nil && err != StrayData && err != IsBOM) {
+		return m, err
+	}
+	// let's keep looking for an xml.StartElement
+	// If we get a non-StrayData/IsBOM err returned, including nil, 
+	// return the map and error value. (Including io.EOF.)
+	var rerr error
+	for {
+		m, rerr = xmlToMapParser("", nil, p, r)
+		if rerr != StrayData && rerr != IsBOM {
+			return m, rerr
+		}
+	}
+	return m, err // shouldn't happen
 }
 
 // xmlToMap - convert a XML doc into map[string]interface{} value
@@ -117,7 +137,22 @@ func xmlToMap(doc []byte, r bool) (map[string]interface{}, error) {
 	b := bytes.NewReader(doc)
 	p := xml.NewDecoder(b)
 	p.CharsetReader = XmlCharsetReader
-	return xmlToMapParser("", nil, p, r)
+	m, err := xmlToMapParser("", nil, p, r)
+	// if a map was created, return it or if there is a Decoding error.
+	if m != nil || (err != nil && err != StrayData && err != IsBOM) {
+		return m, err
+	}
+	// let's keep looking for an xml.StartElement
+	// If we get a non-StrayData/IsBOM err returned, including nil, 
+	// return the map and error value. (Including io.EOF.)
+	var rerr error
+	for {
+		m, rerr = xmlToMapParser("", nil, p, r)
+		if rerr != StrayData && rerr != IsBOM {
+			return m, rerr
+		}
+	}
+	return m, err // shouldn't happen
 }
 
 // ===================================== where the work happens =============================
@@ -181,9 +216,11 @@ func IncludeTagSeqNum(b bool) {
 	includeTagSeqNum = b
 }
 
-// Handle Byte-Order-Mark from reader - 
-// return nil, IsBOM.
-var IsBOM = errors.New("BOM")
+// Handle Byte-Order-Mark from reader or stray CharData error.
+var (
+	IsBOM     = errors.New("BOM")
+	StrayData = errors.New("stray CharData")
+)
 
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
 // A refactoring of xmlToTreeParser(), markDuplicate() and treeToMap() - here, all-in-one.
@@ -317,7 +354,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 					if isBOM([]byte(tt)) {
 						return nil, IsBOM // accept and ignore BOMs
 					} else {
-						return nil, errors.New("no tag for chardata: " + tt)
+						return nil, StrayData
 					}
 				}
 			}
@@ -585,6 +622,7 @@ func HandleXmlReaderRaw(xmlReader io.Reader, mapHandler func(Map, []byte) bool, 
 }
 
 // ----------------- END: Handle XML stream by processing Map value --------------
+
 
 // --------  a hack of io.TeeReader ... need one that's an io.ByteReader for xml.NewDecoder() ----------
 

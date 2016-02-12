@@ -44,7 +44,8 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	• note: "<![CDATA[" syntax is lost in xml.Decode parser - and is not handled here, either.
 //	   and: "\r\n" is converted to "\n"
 //
-//	NOTE: if there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM".
+//	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
+//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -56,8 +57,8 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 // This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
-// If there a valid byte-order-mark passed from a stream, it will return "nil, IsBOM".
-// See NewMapXmlSeq for "#seq" key insertion.
+//	NOTE: the 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
+//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -77,6 +78,8 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 //	          data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
 //	          you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
 //	       2. The 'raw' return value may be larger than the XML text value.
+//	       3. The 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
+//	          extraneous xml.CharData will be ignored unless io.EOF is reached first.
 func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -106,7 +109,22 @@ func xmlSeqReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader
 	p := xml.NewDecoder(rdr)
 	p.CharsetReader = XmlCharsetReader
-	return xmlSeqToMapParser("", nil, p, r)
+	m, err := xmlSeqToMapParser("", nil, p, r)
+	// if a map was created, return it
+	if m != nil || (err != nil && err != StrayData && err != IsBOM) {
+		return m, err
+	}
+	// let's keep looking for an xml.StartElement
+	// If we get a non-StrayData/IsBOM err returned, including nil, 
+	// return the map and error value. (Including io.EOF.)
+	var rerr error
+	for {
+		m, rerr = xmlSeqToMapParser("", nil, p, r)
+		if rerr != StrayData && rerr != IsBOM {
+			return m, rerr
+		}
+	}
+	return m, err
 }
 
 // xmlSeqToMap - convert a XML doc into map[string]interface{} value
@@ -114,7 +132,22 @@ func xmlSeqToMap(doc []byte, r bool) (map[string]interface{}, error) {
 	b := bytes.NewReader(doc)
 	p := xml.NewDecoder(b)
 	p.CharsetReader = XmlCharsetReader
-	return xmlSeqToMapParser("", nil, p, r)
+	m, err := xmlSeqToMapParser("", nil, p, r)
+	// if a map was created, return it
+	if m != nil || (err != nil && err != StrayData && err != IsBOM) {
+		return m, err
+	}
+	// let's keep looking for an xml.StartElement
+	// If we get a non-StrayData/IsBOM err returned, including nil, 
+	// return the map and error value. (Including io.EOF.)
+	var rerr error
+	for {
+		m, rerr = xmlSeqToMapParser("", nil, p, r)
+		if rerr != StrayData && rerr != IsBOM {
+			return m, rerr
+		}
+	}
+	return m, err
 }
 
 // ===================================== where the work happens =============================
@@ -241,7 +274,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				if isBOM([]byte(tt)) {
 					return nil, IsBOM
 				} else {
-					return nil, errors.New("no tag for chardata: " + tt)
+					return nil, StrayData
 				}
 			}
 			if len(tt) > 0 {
