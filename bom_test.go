@@ -9,23 +9,25 @@ import (
 	"testing"
 )
 
+// Check for Byte-Order-Mark header.
+var boms = [][]byte{
+	{'\xef', '\xbb', '\xbf'},
+	{'\xfe', '\xff'},
+	{'\xff', '\xfe'},
+	{'\x00', '\x00', '\xfe', '\xff'},
+	{'\xff', '\xfe', '\x00', '\x00'},
+}
+
 func TestBom(t *testing.T) {
 	fmt.Println("\n--------------- bom_test.go \n")
 	fmt.Println("TestBom ...")
-	x := boms // just grab the array
-
-	for _, v := range x {
-		if !isBOM(v) {
-			t.Fatalf("isBOM returned 'false'; %x", v)
-		}
-	}
 
 	// use just UTF-8 BOM ... no alternative CharSetReader
-	if _, err := NewMapXml(x[0]); err != io.EOF {
+	if _, err := NewMapXml(boms[0]); err != io.EOF {
 		t.Fatalf("NewMapXml err;", err)
 	}
 
-	if _, err := NewMapXmlSeq(x[0]); err != io.EOF {
+	if _, err := NewMapXmlSeq(boms[0]); err != io.EOF {
 		t.Fatalf("NewMapXmlSeq err:", err)
 	}
 }

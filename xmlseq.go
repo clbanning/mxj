@@ -109,22 +109,7 @@ func xmlSeqReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader
 	p := xml.NewDecoder(rdr)
 	p.CharsetReader = XmlCharsetReader
-	m, err := xmlSeqToMapParser("", nil, p, r)
-	// if a map was created, return it
-	if m != nil || (err != nil && err != StrayData && err != IsBOM) {
-		return m, err
-	}
-	// let's keep looking for an xml.StartElement
-	// If we get a non-StrayData/IsBOM err returned, including nil, 
-	// return the map and error value. (Including io.EOF.)
-	var rerr error
-	for {
-		m, rerr = xmlSeqToMapParser("", nil, p, r)
-		if rerr != StrayData && rerr != IsBOM {
-			return m, rerr
-		}
-	}
-	return m, err
+	return xmlSeqToMapParser("", nil, p, r)
 }
 
 // xmlSeqToMap - convert a XML doc into map[string]interface{} value
@@ -132,22 +117,7 @@ func xmlSeqToMap(doc []byte, r bool) (map[string]interface{}, error) {
 	b := bytes.NewReader(doc)
 	p := xml.NewDecoder(b)
 	p.CharsetReader = XmlCharsetReader
-	m, err := xmlSeqToMapParser("", nil, p, r)
-	// if a map was created, return it
-	if m != nil || (err != nil && err != StrayData && err != IsBOM) {
-		return m, err
-	}
-	// let's keep looking for an xml.StartElement
-	// If we get a non-StrayData/IsBOM err returned, including nil, 
-	// return the map and error value. (Including io.EOF.)
-	var rerr error
-	for {
-		m, rerr = xmlSeqToMapParser("", nil, p, r)
-		if rerr != StrayData && rerr != IsBOM {
-			return m, rerr
-		}
-	}
-	return m, err
+	return xmlSeqToMapParser("", nil, p, r)
 }
 
 // ===================================== where the work happens =============================
@@ -271,11 +241,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				// https://github.com/clbanning/mxj/pull/14#issuecomment-182816374
 				// NOTE: CharSetReader must be set to non-UTF-8 CharSet or you'll get
 				// a p.Token() decoding error when the BOM is UTF-16 or UTF-32.
-				if isBOM([]byte(tt)) {
-					return nil, IsBOM
-				} else {
-					return nil, StrayData
-				}
+				continue
 			}
 			if len(tt) > 0 {
 				// every simple element is a #text and has #seq associated with it
