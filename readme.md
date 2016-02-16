@@ -16,6 +16,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2016.02.16: Add CoerceKeysToLower() option to handle tags with mixed capitalization.
 	2016.02.12: Seek for first xml.StartElement token; only return error if io.EOF is reached first (handles BOM).
 	2015.12.02: EXPERIMENTAL XML decoding/encoding that preserves original structure of document. See
 	            NewMapXmlSeq() and mv.XmlSeq() / mv.XmlSeqIndent().

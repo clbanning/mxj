@@ -44,8 +44,11 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	• note: "<![CDATA[" syntax is lost in xml.Decode parser - and is not handled here, either.
 //	   and: "\r\n" is converted to "\n"
 //
-//	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
+//	NOTES:
+//	   1. The 'xmlVal' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
+//	      re-encode the message in its original structure.
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -57,8 +60,11 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 // This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
-//	NOTE: the 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
+//	NOTES:
+//	   1. The 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
+//	      re-encode the message in its original structure.
 func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -72,14 +78,17 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 // This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
 //
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
-//	NOTES: 1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
-//	          using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
-//	          See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
-//	          data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
-//	          you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
-//	       2. The 'raw' return value may be larger than the XML text value.
-//	       3. The 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
-//	          extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	NOTES:
+//	   1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
+//	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
+//	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
+//	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
+//	      you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
+//	    2. The 'raw' return value may be larger than the XML text value.
+//	    3. The 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
+//	       extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	    4. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
+//	       re-encode the message in its original structure.
 func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {

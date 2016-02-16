@@ -47,8 +47,10 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //			// handle error
 //		}
 //
-//	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
+//	NOTES:
+//	   1. The 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	   2. If CoerceKeysToLower() has been called, then all key values will be lower case.
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -58,8 +60,10 @@ func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
-//	NOTE: the 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
+//	NOTES:
+//	   1. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	   2. If CoerceKeysToLower() has been called, then all key values will be lower case.
 func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -77,14 +81,16 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 var XmlWriterBufSize int = 256
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
-//	NOTES: 1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
-//	          using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
-//	          See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
-//	          data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
-//	          you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
-//	       2. The 'raw' return value may be larger than the XML text value.
-//	       3. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
-//	          extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	NOTES:
+//	   1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
+//	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
+//	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
+//	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
+//	      you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
+//	   2. The 'raw' return value may be larger than the XML text value.
+//	   3. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
+//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
+//	   4. If CoerceKeysToLower() has been called, then all key values will be lower case.
 func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -186,10 +192,25 @@ func IncludeTagSeqNum(b bool) {
 	includeTagSeqNum = b
 }
 
+// all keys will be "lower case"
+var lowerCase bool
+
+// Coerce all tag values to keys in lower case.  This is useful if you've got sources with variable
+// tag capitalization, and you want to use m.ValuesForKeys(), etc., with the key or path spec
+// in lower case.
+//	NOTE: only recognized by NewMapXml, NewMapXmlReader, and NewMapXmlReaderRaw functions.
+func CoerceKeysToLower() {
+	lowerCase = true
+}
+
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
 // A refactoring of xmlToTreeParser(), markDuplicate() and treeToMap() - here, all-in-one.
 // We've removed the intermediate *node tree with the allocation and subsequent rescanning.
 func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[string]interface{}, error) {
+	if lowerCase {
+		skey = strings.ToLower(skey)
+	}
+
 	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey'
 	// Unless 'skey' is a simple element w/o attributes, in which case the xml.CharData value is the value.
 	var n, na map[string]interface{}
@@ -206,6 +227,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 					key = `-` + v.Name.Local
 				} else {
 					key = v.Name.Local
+				}
+				if lowerCase {
+					key = strings.ToLower(key)
 				}
 				na[key] = cast(v.Value, r)
 			}
@@ -249,6 +273,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			var val interface{}
 			for key, val = range nn {
 				break
+			}
+			if lowerCase {
+				key = strings.ToLower(key)
 			}
 
 			// IncludeTagSeqNum requests that the element be augmented with a "_seq" sub-element.
