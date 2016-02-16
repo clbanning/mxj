@@ -99,6 +99,7 @@ Using NewXml()
      is given the key `#text` for its `map[string]interface{}` representation.  (See
      the 'atomFeedString.xml' test data, below.)
    - XML comments, directives, and process instructions are ignored.
+   - If CoerceKeysToLower() has been called, then the resultant keys will be lower case.
 
 Using NewXmlSeq()
 

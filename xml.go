@@ -198,7 +198,8 @@ var lowerCase bool
 // Coerce all tag values to keys in lower case.  This is useful if you've got sources with variable
 // tag capitalization, and you want to use m.ValuesForKeys(), etc., with the key or path spec
 // in lower case.
-//	NOTE: only recognized by NewMapXml, NewMapXmlReader, and NewMapXmlReaderRaw functions.
+//	NOTE: only recognized by NewMapXml, NewMapXmlReader, and NewMapXmlReaderRaw functions as well as
+//	      the associated HandleXmlReader and HandleXmlReaderRaw.
 func CoerceKeysToLower() {
 	lowerCase = true
 }
