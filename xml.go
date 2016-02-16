@@ -269,13 +269,11 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			// We need to see if nn_key already exists - means we're parsing a list.
 			// This may require converting na[nn_key] value into []interface{} type.
 			// First, extract the key:val for the map - it's a singleton.
+			// Note: if CoerceKeysToLower() called, then key will be lower case.
 			var key string
 			var val interface{}
 			for key, val = range nn {
 				break
-			}
-			if lowerCase {
-				key = strings.ToLower(key)
 			}
 
 			// IncludeTagSeqNum requests that the element be augmented with a "_seq" sub-element.
