@@ -198,10 +198,21 @@ var lowerCase bool
 // Coerce all tag values to keys in lower case.  This is useful if you've got sources with variable
 // tag capitalization, and you want to use m.ValuesForKeys(), etc., with the key or path spec
 // in lower case.
+//	CoerceKeysToLower() will toggle the coersion flag true|false - on|off
+//	CoerceKeysToLower(true|false) will set the coersion flag on|off
+//	
 //	NOTE: only recognized by NewMapXml, NewMapXmlReader, and NewMapXmlReaderRaw functions as well as
 //	      the associated HandleXmlReader and HandleXmlReaderRaw.
-func CoerceKeysToLower() {
-	lowerCase = true
+func CoerceKeysToLower(b ...bool) {
+	if len(b) == 1 {
+		lowerCase = b[0]
+		return
+	}
+	if !lowerCase {
+		lowerCase = true
+	} else {
+		lowerCase = false
+	}
 }
 
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
