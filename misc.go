@@ -58,26 +58,26 @@ func (m Map) Elements(path string) ([]string, error) {
 // keys.  (The list is alphabeticly sorted.)  NOTE: Map keys that are not prefixed with
 // '-', a hyphen, are not treated as attributes; see m.Elements(path).
 func (m Map) Attributes(path string) ([]string, error) {
-	e, err := m.ValueForPath(path)
+	a, err := m.ValueForPath(path)
 	if err != nil {
 		return nil, err
 	}
-	switch e.(type) {
+	switch a.(type) {
 	case map[string]interface{}:
-		ee := e.(map[string]interface{})
-		elems := make([]string, len(ee))
+		aa := a.(map[string]interface{})
+		attrs := make([]string, len(aa))
 		var i int
-		for k, _ := range ee {
+		for k, _ := range aa {
 			if k[:1] != "-" {
 				continue // skip non-attributes
 			}
-			elems[i] = k[1:]
+			attrs[i] = k[1:]
 			i++
 		}
-		elems = elems[:i]
+		attrs = attrs[:i]
 		// alphabetic sort keeps things tidy
-		sort.Strings(elems)
-		return elems, nil
+		sort.Strings(attrs)
+		return attrs, nil
 	}
 	return nil, fmt.Errorf("no attributes for path: %s", path)
 }
