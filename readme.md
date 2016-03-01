@@ -80,9 +80,9 @@ leafvalues := m.LeafValues()</pre>
 
 A new `Map` with whatever keys are desired can be created from the current `Map` and then encoded in XML
 or JSON. (Note: keys can use dot-notation.)
-<pre>newMap := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
-newXml := newMap.Xml()   // for example
-newJson := newMap.Json() // ditto</pre>
+<pre>newMap, err := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
+newXml, err := newMap.Xml()   // for example
+newJson, err := newMap.Json() // ditto</pre>
 
 <h4>Usage</h4>
 
