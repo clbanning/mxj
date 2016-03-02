@@ -1,4 +1,4 @@
-// Copyright 2012-2015 Charles Banning. All rights reserved.
+// Copyright 2012-2016 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
@@ -364,6 +364,12 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 // cast - try to cast string values to bool or float64
 func cast(s string, r bool) interface{} {
 	if r {
+		// handle Nan, NAN, nan
+		// thanks: https://github.com/clbanning/mxj/issues/15
+		if strings.ToLower(s) == "nan" {
+			return interface{}(s)
+		}
+
 		// handle numeric strings ahead of boolean
 		if f, err := strconv.ParseFloat(s, 64); err == nil {
 			return interface{}(f)
