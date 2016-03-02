@@ -90,6 +90,11 @@ XML PARSING CONVENTIONS
      keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
      specifics.)
 
+   Both
+
+   - By default, "Nan", "Inf", and "-Inf" values are not cast to float64.  If you want them
+     to be cast, set a flag to cast them  using CastNanInf(true).
+
 XML ENCODING CONVENTIONS
    
    - 'nil' Map values, which may represent 'null' JSON values, are encoded as "<tag/>".

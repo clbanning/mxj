@@ -200,7 +200,7 @@ var lowerCase bool
 // in lower case.
 //	CoerceKeysToLower() will toggle the coercion flag true|false - on|off
 //	CoerceKeysToLower(true|false) will set the coercion flag on|off
-//	
+//
 //	NOTE: only recognized by NewMapXml, NewMapXmlReader, and NewMapXmlReaderRaw functions as well as
 //	      the associated HandleXmlReader and HandleXmlReaderRaw.
 func CoerceKeysToLower(b ...bool) {
@@ -361,14 +361,23 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 	}
 }
 
+var castNanInf bool
+
+// Cast "Nan", "Inf", "-Inf" XML values to 'float64'.
+// By default, these values will be decoded as 'string'.
+func CastNanInf(b bool) {
+	castNanInf = b
+}
+
 // cast - try to cast string values to bool or float64
 func cast(s string, r bool) interface{} {
 	if r {
-		// handle Nan, NAN, nan
-		// thanks: https://github.com/clbanning/mxj/issues/15
-		switch strings.ToLower(s){
-		case "nan", "inf", "-inf":
-			return interface{}(s)
+		// handle nan and inf
+		if !castNanInf {
+			switch strings.ToLower(s) {
+			case "nan", "inf", "-inf":
+				return interface{}(s)
+			}
 		}
 
 		// handle numeric strings ahead of boolean

@@ -16,6 +16,8 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2016.03.02: By default decoding XML with float64 and bool value casting will not cast "NaN", "Inf", and "-Inf".
+	            To cast them to float64, first set flag with CastNanInf(true).
 	2016.02.22: New m.Root(), m.Elements(), m.Attributes methods let you examine XML document structure.
 	2016.02.16: Add CoerceKeysToLower() option to handle tags with mixed capitalization.
 	2016.02.12: Seek for first xml.StartElement token; only return error if io.EOF is reached first (handles BOM).
@@ -111,6 +113,10 @@ Using NewXmlSeq()
    - Comments, directives, and process instructions are unmarshalled into the Map using the
      keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
      specifics.)
+
+Both
+	- By default, "Nan", "Inf", and "-Inf" values are not cast to float64.  If you want them
+	  to be cast, set a flag to cast them  using CastNanInf(true).
 
 <h4>XML encoding conventions</h4>
 
