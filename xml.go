@@ -366,7 +366,8 @@ func cast(s string, r bool) interface{} {
 	if r {
 		// handle Nan, NAN, nan
 		// thanks: https://github.com/clbanning/mxj/issues/15
-		if strings.ToLower(s) == "nan" {
+		switch strings.ToLower(s){
+		case "nan", "inf", "-inf":
 			return interface{}(s)
 		}
 

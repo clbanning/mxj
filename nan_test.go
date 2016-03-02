@@ -24,3 +24,35 @@ func TestNan(t *testing.T) {
 	}
 	fmt.Println("foo.bar:", v)
 }
+
+func TestInf(t *testing.T) {
+	data := []byte("<foo><bar>INF</bar></foo>")
+	m, err := NewMapXml(data)
+	if err != nil {
+		t.Fatal("err:", err)
+	}
+	v, err := m.ValueForPath("foo.bar")
+	if err != nil {
+		t.Fatal("err:", err)
+	}
+	if _, ok := v.(string); !ok {
+		t.Fatal("v not string")
+	}
+	fmt.Println("foo.bar:", v)
+}
+
+func TestMinusInf(t *testing.T) {
+	data := []byte("<foo><bar>-INF</bar></foo>")
+	m, err := NewMapXml(data)
+	if err != nil {
+		t.Fatal("err:", err)
+	}
+	v, err := m.ValueForPath("foo.bar")
+	if err != nil {
+		t.Fatal("err:", err)
+	}
+	if _, ok := v.(string); !ok {
+		t.Fatal("v not string")
+	}
+	fmt.Println("foo.bar:", v)
+}
