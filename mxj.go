@@ -52,17 +52,17 @@ func (mv Map) Copy() (Map, error) {
 
 // Pretty print a Map.
 func (mv Map) StringIndent(offset ...int) string {
-	return writeMap(map[string]interface{}(mv), offset...)
+	return writeMap(map[string]interface{}(mv), true, offset...)
 }
 
 // Pretty print a Map without the value type information - just key:value entries.
 func (mv Map) StringIndentNoTypeInfo(offset ...int) string {
-	return writeMapNoTypes(map[string]interface{}(mv), offset...)
+	return writeMapNoTypes(map[string]interface{}(mv), true, offset...)
 }
 
 // writeMap - dumps the map[string]interface{} for examination.
 //	'offset' is initial indentation count; typically: Write(m).
-func writeMap(m interface{}, offset ...int) string {
+func writeMap(m interface{}, root bool, offset ...int) string {
 	var indent int
 	if len(offset) == 1 {
 		indent = offset[0]
@@ -104,12 +104,14 @@ func writeMap(m interface{}, offset ...int) string {
 		var n int
 		for k, v := range m.(map[string]interface{}) {
 			list[n][0] = k
-			list[n][1] = writeMap(v, indent+1)
+			list[n][1] = writeMap(v, false, indent+1)
 			n++
 		}
 		sort.Sort(mapList(list))
 		for _, v := range list {
-			s += "\n"
+			if !root {
+				s += "\n"
+			}
 			for i := 0; i < indent; i++ {
 				s += "  "
 			}
@@ -124,7 +126,7 @@ func writeMap(m interface{}, offset ...int) string {
 
 // writeMapNoTypes - dumps the map[string]interface{} for examination.
 //	'offset' is initial indentation count; typically: Write(m).
-func writeMapNoTypes(m interface{}, offset ...int) string {
+func writeMapNoTypes(m interface{}, root bool, offset ...int) string {
 	var indent int
 	if len(offset) == 1 {
 		indent = offset[0]
@@ -157,19 +159,21 @@ func writeMapNoTypes(m interface{}, offset ...int) string {
 			for i := 0; i < indent; i++ {
 				s += "  "
 			}
-			s += writeMapNoTypes(v, indent+1)
+			s += writeMapNoTypes(v, false, indent+1)
 		}
 	case map[string]interface{}:
 		list := make([][2]string, len(m.(map[string]interface{})))
 		var n int
 		for k, v := range m.(map[string]interface{}) {
 			list[n][0] = k
-			list[n][1] = writeMapNoTypes(v, indent+1)
+			list[n][1] = writeMapNoTypes(v, false, indent+1)
 			n++
 		}
 		sort.Sort(mapList(list))
 		for _, v := range list {
-			s += "\n"
+			if !root {
+				s += "\n"
+			}
 			for i := 0; i < indent; i++ {
 				s += "  "
 			}

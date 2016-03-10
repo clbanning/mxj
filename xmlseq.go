@@ -1,4 +1,4 @@
-// Copyright 2012-2015 Charles Banning. All rights reserved.
+// Copyright 2012-2016 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
@@ -29,12 +29,26 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 // NOTE: "#seq" key/value pairs are removed on encoding with mv.XmlSeq() / mv.XmlSeqIndent().
 //	• attributes are a map - map["#attr"]map["attr_key"]map[string]interface{}{"#text":<aval>, "#seq":<num>}
 //	• all simple elements are decoded as map["#text"]interface{} with a "#seq" k:v pair, as well.
-//	• lists always decode as map["list_tag"][]map[string]interface{} where the array elements include
-//	  a "#seq" k:v pair based on sequence they are decoded.  Thus, XML like:
-//	      <ltag>value 1</ltag>
-//	      <newtag>value 2</newtag>
-//	      <ltag>value 3</ltag>
-//	  will encode in proper sequence even though the Map representation merges all "ltag" elements in an array.
+//	• lists always decode as map["list_tag"][]map[string]interface{} where the array elements are maps that
+//	  include a "#seq" k:v pair based on sequence they are decoded.  Thus, XML like:
+//	      <doc>
+//	         <ltag>value 1</ltag>
+//	         <newtag>value 2</newtag>
+//	         <ltag>value 3</ltag>
+//	      </doc>
+//	  is decoded as:
+//	    doc :
+//	      ltag :[[]interface{}]
+//	        [item: 0]        
+//	          #seq :[int] 0
+//	          #text :[string] value 1
+//	        [item: 1]        
+//	          #seq :[int] 2
+//	          #text :[string] value 3
+//	      newtag :
+//	        #seq :[int] 1
+//	        #text :[string] value 2
+//	  It will encode in proper sequence even though the Map representation merges all "ltag" elements in an array.
 //	• comments - "<!--comment-->" -  are decoded as map["#comment"]map["#text"]"cmnt_text" with a "#seq" k:v pair.
 //	• directives - "<!text>" - are decoded as map["#directive"]map[#text"]"directive_text" with a "#seq" k:v pair.
 //	• process instructions  - "<?instr?>" - are decoded as map["#procinst"]interface{} where the #procinst value
