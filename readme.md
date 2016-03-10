@@ -115,6 +115,7 @@ Using NewXmlSeq()
      specifics.)
 
 Both
+
 	- By default, "Nan", "Inf", and "-Inf" values are not cast to float64.  If you want them
 	  to be cast, set a flag to cast them  using CastNanInf(true).
 
