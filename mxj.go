@@ -97,7 +97,7 @@ func writeMap(m interface{}, root bool, offset ...int) string {
 			for i := 0; i < indent; i++ {
 				s += "  "
 			}
-			s += writeMap(v, indent+1)
+			s += writeMap(v, false, indent+1)
 		}
 	case map[string]interface{}:
 		list := make([][2]string, len(m.(map[string]interface{})))
