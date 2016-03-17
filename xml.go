@@ -717,39 +717,37 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		vv := value.(map[string]interface{})
 		lenvv := len(vv)
 		// scan out attributes - keys have prepended hyphen, '-'
-		var cntAttr int
 		attrlist := make([][2]string, len(vv))
 		var n int
 		for k, v := range vv {
 			if k[:1] == "-" {
-				cntAttr++
 				switch v.(type) {
 				case string, float64, bool, int, int32, int64, float32:
 					attrlist[n][0] = k[1:]
 					attrlist[n][1] = fmt.Sprintf("%v", v)
-					n++
 				case []byte:
 					attrlist[n][0] = k[1:]
 					attrlist[n][1] = fmt.Sprintf("%v", string(v.([]byte)))
 				default:
 					return fmt.Errorf("invalid attribute value for: %s", k)
 				}
+				n++
 			}
 		}
-		if cntAttr > 0 {
+		if n > 0 {
 			attrlist = attrlist[:n]
 			sort.Sort(attrList(attrlist))
 			for _, v := range attrlist {
 				*s += ` ` + v[0] + `="` + v[1] + `"`
 			}
 		}
-
 		// only attributes?
-		if cntAttr == lenvv {
+		if n == lenvv {
 			break
 		}
+
 		// simple element? Note: '#text" is an invalid XML tag.
-		if v, ok := vv["#text"]; ok && cntAttr+1 == lenvv {
+		if v, ok := vv["#text"]; ok && n+1 == lenvv {
 			*s += ">" + fmt.Sprintf("%v", v)
 			endTag = true
 			elen = 1
