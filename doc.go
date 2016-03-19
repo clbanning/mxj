@@ -11,6 +11,12 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
 Note:
+	2016.03.19: Escape invalid chars when encoding XML attribute and element values - XMLEscapeChars().
+	2016.03.02: By default decoding XML with float64 and bool value casting will not cast "NaN", "Inf", and "-Inf".
+	            To cast them to float64, first set flag with CastNanInf(true).
+	2016.02.22: New m.Root(), m.Elements(), m.Attributes methods let you examine XML document structure.
+	2016.02.16: Add CoerceKeysToLower() option to handle tags with mixed capitalization.
+	2016.02.12: Seek for first xml.StartElement token; only return error if io.EOF is reached first (handles BOM).
 	2015-12-02: NewMapXmlSeq() with mv.XmlSeq() & co. will try to preserve structure of XML doc when re-encoding.
 	2014-08-02: AnyXml() and AnyXmlIndent() will try to marshal arbitrary values to XML.
 

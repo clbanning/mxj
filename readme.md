@@ -16,13 +16,14 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2016.03.19: Escape invalid chars when encoding XML attribute and element values - XMLEscapeChars().
 	2016.03.02: By default decoding XML with float64 and bool value casting will not cast "NaN", "Inf", and "-Inf".
 	            To cast them to float64, first set flag with CastNanInf(true).
 	2016.02.22: New m.Root(), m.Elements(), m.Attributes methods let you examine XML document structure.
 	2016.02.16: Add CoerceKeysToLower() option to handle tags with mixed capitalization.
 	2016.02.12: Seek for first xml.StartElement token; only return error if io.EOF is reached first (handles BOM).
-	2015.12.02: EXPERIMENTAL XML decoding/encoding that preserves original structure of document. See
-	            NewMapXmlSeq() and mv.XmlSeq() / mv.XmlSeqIndent().
+	2015.12.02: XML decoding/encoding that preserves original structure of document. See NewMapXmlSeq()
+	            and mv.XmlSeq() / mv.XmlSeqIndent().
 	2015-05-20: New: mv.StringIndentNoTypeInfo().
 	            Also, alphabetically sort map[string]interface{} values by key to prettify output for mv.Xml(),
 	            mv.XmlIndent(), mv.StringIndent(), mv.StringIndentNoTypeInfo().
