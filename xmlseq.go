@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
 )
@@ -39,10 +40,10 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	  is decoded as:
 //	    doc :
 //	      ltag :[[]interface{}]
-//	        [item: 0]        
+//	        [item: 0]
 //	          #seq :[int] 0
 //	          #text :[string] value 1
-//	        [item: 1]        
+//	        [item: 1]
 //	          #seq :[int] 2
 //	          #text :[string] value 3
 //	      newtag :
@@ -85,7 +86,15 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 		r = cast[0]
 	}
 
-	// build the node tree
+	// We need to put an *os.File reader on a teeReader or the xml.NewDecoder
+	// will wrap in in a bufio.Reader and seek on the file beyond where the
+	// xml.Decoder parses!
+	if _, ok := xmlReader.(*os.File); ok {
+		wb := bytes.NewBuffer(nil)             // write to a bit-bucket
+		xmlReader = myTeeReader(xmlReader, wb) // see code at EOF
+	}
+
+	// build the map
 	return xmlSeqReaderToMap(xmlReader, r)
 }
 
@@ -119,12 +128,10 @@ func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, erro
 	// retrieve the raw XML that was decoded
 	b := make([]byte, wb.Len())
 	_, _ = wb.Read(b)
+	b = bytes.TrimSpace(b)
 
-	if err != nil {
-		return nil, b, err
-	}
-
-	return m, b, nil
+	// err may be NoRoot
+	return m, b, err
 }
 
 // xmlSeqReaderToMap() - parse a XML io.Reader to a map[string]interface{} value
