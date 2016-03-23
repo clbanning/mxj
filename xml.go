@@ -70,13 +70,11 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 		r = cast[0]
 	}
 
-	// We need to put an *os.File reader on a teeReader or the xml.NewDecoder
-	// will wrap in in a bufio.Reader and seek on the file beyond where the
+	// We need to put an *os.File reader in a ByteReader or the xml.NewDecoder
+	// will wrap it in a bufio.Reader and seek on the file beyond where the
 	// xml.Decoder parses!
 	if _, ok := xmlReader.(io.ByteReader); !ok {
-		b := make([]byte, XmlWriterBufSize)
-		wb := bytes.NewBuffer(b)               // write to a bit-bucket
-		xmlReader = myTeeReader(xmlReader, wb) // see code at EOF
+		xmlReader = myByteReader(xmlReader) // see code at EOF
 	}
 
 	// build the map
@@ -639,11 +637,11 @@ func myTeeReader(r io.Reader, w io.Writer) io.Reader {
 }
 
 // need for io.Reader - but we don't use it ...
-func (t *teeReader) Read(p []byte) (n int, err error) {
+func (t *teeReader) Read(p []byte) (int, error) {
 	return 0, nil
 }
 
-func (t *teeReader) ReadByte() (c byte, err error) {
+func (t *teeReader) ReadByte() (byte, error) {
 	n, err := t.r.Read(t.b)
 	if n > 0 {
 		if _, err := t.w.Write(t.b[:1]); err != nil {
@@ -651,6 +649,32 @@ func (t *teeReader) ReadByte() (c byte, err error) {
 		}
 	}
 	return t.b[0], err
+}
+
+// For use with NewMapXmlReader & NewMapXmlSeqReader.
+type byteReader struct {
+	r io.Reader
+	b []byte
+}
+
+func myByteReader(r io.Reader) io.Reader {
+	b := make([]byte, 1)
+	return &byteReader{r, b}
+}
+
+// need for io.Reader - but we don't use it ...
+func (b *byteReader) Read(p []byte) (int, error) {
+	return 0, nil
+}
+
+func (b *byteReader) ReadByte() (byte, error) {
+	n, err := b.r.Read(b.b)
+	if n == 1 {
+		return b.b[0], err
+	} else {
+		var c byte
+		return c, err
+	}
 }
 
 // ----------------------- END: io.TeeReader hack -----------------------------------
