@@ -14,7 +14,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -74,7 +73,7 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	// We need to put an *os.File reader on a teeReader or the xml.NewDecoder
 	// will wrap in in a bufio.Reader and seek on the file beyond where the
 	// xml.Decoder parses!
-	if _, ok := xmlReader.(*os.File); ok {
+	if _, ok := xmlReader.(io.ByteReader); !ok {
 		wb := bytes.NewBuffer(nil)             // write to a bit-bucket
 		xmlReader = myTeeReader(xmlReader, wb) // see code at EOF
 	}

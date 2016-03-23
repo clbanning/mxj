@@ -3,24 +3,21 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/clbanning/mxj"
 	"io"
-	"io/ioutil"
+	"os"
 )
 
 func main() {
-	b, err := ioutil.ReadFile("gitissue2.dat")
+	fh, err := os.Open("gitissue2.dat")
 	if err != nil {
 		fmt.Println("err:", err)
 		return
 	}
-	r := bytes.NewReader(b)
 	m := make(map[string]interface{})
 	for {
-		v, err := mxj.NewMapXmlSeqReader(r)
-		// v, raw, err := mxj.NewMapXmlSeqReaderRaw(r)
+		v, err := mxj.NewMapXmlSeqReader(fh)
 		if err != nil {
 			if err == io.EOF {
 				break
