@@ -74,7 +74,8 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	// will wrap in in a bufio.Reader and seek on the file beyond where the
 	// xml.Decoder parses!
 	if _, ok := xmlReader.(io.ByteReader); !ok {
-		wb := bytes.NewBuffer(nil)             // write to a bit-bucket
+		b := make([]byte, XmlWriterBufSize)
+		wb := bytes.NewBuffer(b)               // write to a bit-bucket
 		xmlReader = myTeeReader(xmlReader, wb) // see code at EOF
 	}
 
@@ -86,7 +87,7 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 // and HandleXmlReaderRaw().  This reduces repeated memory allocations and copy() calls in most cases.
 //	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
-var XmlWriterBufSize int = 256
+var XmlWriterBufSize int = 512
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
 //	NOTES:

@@ -89,7 +89,8 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	// will wrap in in a bufio.Reader and seek on the file beyond where the
 	// xml.Decoder parses!
 	if _, ok := xmlReader.(io.ByteReader); !ok {
-		wb := bytes.NewBuffer(nil)             // write to a bit-bucket
+		b := make([]byte, XmlWriterBufSize)
+		wb := bytes.NewBuffer(b)               // write to a bit-bucket
 		xmlReader = myTeeReader(xmlReader, wb) // see code at EOF
 	}
 
