@@ -668,8 +668,8 @@ func (b *byteReader) Read(p []byte) (int, error) {
 }
 
 func (b *byteReader) ReadByte() (byte, error) {
-	n, err := b.r.Read(b.b)
-	if n == 1 {
+	_, err := b.r.Read(b.b)
+	if len(b.b) > 0 {
 		return b.b[0], err
 	} else {
 		var c byte

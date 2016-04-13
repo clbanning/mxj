@@ -59,6 +59,7 @@ func TestNewMapXmlError(t *testing.T) {
 }
 
 func TestNewMapXmlReader(t *testing.T) {
+	fmt.Println("\n==================== TestNewMapXmlReader ...")
 	x := []byte(`<root><this>is a test</this></root><root2><newtag>something more</newtag><list><item>1</item><item>2</item></list></root2>`)
 
 	r := bytes.NewReader(x)
