@@ -671,10 +671,9 @@ func (b *byteReader) ReadByte() (byte, error) {
 	_, err := b.r.Read(b.b)
 	if len(b.b) > 0 {
 		return b.b[0], nil
-	} else {
-		var c byte
-		return c, err
 	}
+	var c byte
+	return c, err
 }
 
 // ----------------------- END: io.TeeReader hack -----------------------------------
