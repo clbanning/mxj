@@ -16,7 +16,7 @@ import (
 // is nil.  If CustomeDecoder != nil, then CharsetReader variable is
 // not recognized and must be set as part of the CustomDecoder value..
 //	Usage:
-//		CustomeDecoder = &xml.Decoder{Strict:false}
+//		CustomDecoder = &xml.Decoder{Strict:false}
 var CustomDecoder *xml.Decoder
 
 // useCustomDecoder copy over public attributes from customDecoder
