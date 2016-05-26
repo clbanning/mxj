@@ -126,7 +126,11 @@ func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) 
 func xmlReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader
 	p := xml.NewDecoder(rdr)
-	p.CharsetReader = XmlCharsetReader
+	if CustomDecoder != nil {
+		useCustomDecoder(p)
+	} else {
+		p.CharsetReader = XmlCharsetReader
+	}
 	return xmlToMapParser("", nil, p, r)
 }
 
@@ -134,7 +138,11 @@ func xmlReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 func xmlToMap(doc []byte, r bool) (map[string]interface{}, error) {
 	b := bytes.NewReader(doc)
 	p := xml.NewDecoder(b)
-	p.CharsetReader = XmlCharsetReader
+	if CustomDecoder != nil {
+		useCustomDecoder(p)
+	} else {
+		p.CharsetReader = XmlCharsetReader
+	}
 	return xmlToMapParser("", nil, p, r)
 }
 

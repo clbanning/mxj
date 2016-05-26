@@ -136,7 +136,11 @@ func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, erro
 func xmlSeqReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 	// parse the Reader
 	p := xml.NewDecoder(rdr)
-	p.CharsetReader = XmlCharsetReader
+	if CustomDecoder != nil {
+		useCustomDecoder(p)
+	} else {
+		p.CharsetReader = XmlCharsetReader
+	}
 	return xmlSeqToMapParser("", nil, p, r)
 }
 
@@ -144,7 +148,11 @@ func xmlSeqReaderToMap(rdr io.Reader, r bool) (map[string]interface{}, error) {
 func xmlSeqToMap(doc []byte, r bool) (map[string]interface{}, error) {
 	b := bytes.NewReader(doc)
 	p := xml.NewDecoder(b)
-	p.CharsetReader = XmlCharsetReader
+	if CustomDecoder != nil {
+		useCustomDecoder(p)
+	} else {
+		p.CharsetReader = XmlCharsetReader
+	}
 	return xmlSeqToMapParser("", nil, p, r)
 }
 
