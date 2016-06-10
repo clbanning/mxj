@@ -23,6 +23,8 @@ import (
 // ------------------- NewMapXml & NewMapXmlReader ... -------------------------
 
 // If XmlCharsetReader != nil, it will be used to decode the XML, if required.
+// Note: if CustomDeocder != nil, then XmlCharsetReader is ignored; 
+// set the CustomDecoder attribute instead.
 //   import (
 //	     charset "code.google.com/p/go-charset/charset"
 //	     github.com/clbanning/mxj

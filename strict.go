@@ -13,8 +13,8 @@ import (
 
 // CustomDecoder can be used to specify xml.Decoder attribute
 // values, e.g., Strict:false, to be used.  By default CustomDecoder
-// is nil.  If CustomeDecoder != nil, then CharsetReader variable is
-// not recognized and must be set as part of the CustomDecoder value..
+// is nil.  If CustomeDecoder != nil, then mxj.XmlCharsetReader variable is
+// ignored and must be set as part of the CustomDecoder value, if needed.
 //	Usage:
 //		mxj.CustomDecoder = &xml.Decoder{Strict:false}
 var CustomDecoder *xml.Decoder
