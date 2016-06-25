@@ -19,7 +19,7 @@ func TestStrictModeXml(t *testing.T) {
 }
 
 func TestStrictModeXmlSeq(t *testing.T) {
-	fmt.Println("----------------- TestStrictModeXml ...")
+	fmt.Println("----------------- TestStrictModeXmlSeq ...")
 	data := []byte(`<document> <name>Bill & Hallett</name> <salute>Duc &amp; 123xx</salute> <goes_by/> <lang>E</lang> </document>`)
 
 	CustomDecoder = &xml.Decoder{Strict:false}

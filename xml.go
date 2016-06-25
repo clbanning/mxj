@@ -150,16 +150,17 @@ func xmlToMap(doc []byte, r bool) (map[string]interface{}, error) {
 
 // ===================================== where the work happens =============================
 
-// Allow people to drop hyphen when unmarshaling the XML doc.
-var useHyphen bool = true
-
 // PrependAttrWithHyphen. Prepend attribute tags with a hyphen.
-// Default is 'true'.
+// Default is 'true'. (Not applicable to NewMapXmlSeq(), mv.XmlSeq(), etc.)
 //	Note:
 //		If 'false', unmarshaling and marshaling is not symmetric. Attributes will be
 //		marshal'd as <attr_tag>attr</attr_tag> and may be part of a list.
 func PrependAttrWithHyphen(v bool) {
-	useHyphen = v
+	if v {
+		attrPrefix = "-"
+		return
+	}
+	attrPrefix = ""
 }
 
 // Include sequence id with inner tags. - per Sean Murphy, murphysean84@gmail.com.
@@ -232,6 +233,19 @@ func CoerceKeysToLower(b ...bool) {
 	}
 }
 
+// 25jun16: Allow user to specify the "prefix" character for XML attribute key labels.
+// We do this by replacing '`' constant with attrPrefix var, replacing useHyphen with attrPrefix = "",
+// and adding a SetAttrPrefix(s string) function.
+
+var attrPrefix string = `-` // the default
+
+// SetAttrPrefix changes the default, "-", to the specified value, s.
+// SetAttrPrefix("") is the same as PrependAttrWithHyphen(false).
+// (Not applicable for NewMapXmlSeq(), mv.XmlSeq(), etc.)
+func SetAttrPrefix(s string) {
+	attrPrefix = s
+}
+
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
 // A refactoring of xmlToTreeParser(), markDuplicate() and treeToMap() - here, all-in-one.
 // We've removed the intermediate *node tree with the allocation and subsequent rescanning.
@@ -252,11 +266,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 		if len(a) > 0 {
 			for _, v := range a {
 				var key string
-				if useHyphen {
-					key = `-` + v.Name.Local
-				} else {
-					key = v.Name.Local
-				}
+				key = attrPrefix + v.Name.Local
 				if lowerCase {
 					key = strings.ToLower(key)
 				}
@@ -763,7 +773,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		var n int
 		var ss string
 		for k, v := range vv {
-			if k[:1] == "-" {
+			if k[:1] == attrPrefix {
 				switch v.(type) {
 				case string:
 					ss = v.(string)
@@ -819,7 +829,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		elemlist := make([][2]interface{}, len(vv))
 		n = 0
 		for k, v := range vv {
-			if k[:1] == "-" {
+			if k[:1] == attrPrefix {
 				continue
 			}
 			elemlist[n][0] = k

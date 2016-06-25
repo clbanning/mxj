@@ -16,6 +16,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2016.06.25: Support overriding default XML attribute prefix, "-", in Map valus - SetAttrPrefix().
 	2016.05.26: Support customization of xml.Decoder by exposing CustomDecoder variable.
 	2016.03.19: Escape invalid chars when encoding XML attribute and element values - XMLEscapeChars().
 	2016.03.02: By default decoding XML with float64 and bool value casting will not cast "NaN", "Inf", and "-Inf".
