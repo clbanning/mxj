@@ -11,6 +11,7 @@ package mxj
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // Return the root element of the Map. If there is not a single key in Map,
@@ -40,7 +41,7 @@ func (mv Map) Elements(path string) ([]string, error) {
 		elems := make([]string, len(ee))
 		var i int
 		for k, _ := range ee {
-			if k[:1] == "-" {
+			if len(attrPrefix) > 0 && strings.Index(k, attrPrefix) == 0 {
 				continue // skip attributes
 			}
 			elems[i] = k
@@ -56,7 +57,9 @@ func (mv Map) Elements(path string) ([]string, error) {
 
 // If the path is an element with attributes, return a list of the attribute
 // keys.  (The list is alphabeticly sorted.)  NOTE: Map keys that are not prefixed with
-// '-', a hyphen, are not treated as attributes; see m.Elements(path).
+// '-', a hyphen, are not treated as attributes; see m.Elements(path). Also, if the
+// attribute prefix is "" - SetAttrPrefix("") or PrependAttrWithHyphen(false) - then
+// there are no identifiable attributes.
 func (mv Map) Attributes(path string) ([]string, error) {
 	a, err := mv.ValueForPath(path)
 	if err != nil {
@@ -68,10 +71,10 @@ func (mv Map) Attributes(path string) ([]string, error) {
 		attrs := make([]string, len(aa))
 		var i int
 		for k, _ := range aa {
-			if k[:1] != "-" {
+			if len(attrPrefix) == 0 || strings.Index(k, attrPrefix) != 0 {
 				continue // skip non-attributes
 			}
-			attrs[i] = k[1:]
+			attrs[i] = k[len(attrPrefix):]
 			i++
 		}
 		attrs = attrs[:i]
