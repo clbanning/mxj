@@ -5,6 +5,7 @@ package mxj
 
 import (
 	"strconv"
+	"strings"
 )
 
 const (
@@ -23,6 +24,9 @@ type LeafNode struct {
 // LeafNodes - returns an array of all LeafNode values for the Map.
 // The option no_attr argument suppresses attribute values (keys with prepended hyphen, '-')
 // as well as the "#text" key for the associated simple element value.
+//	NOTE: if PrependAttrWithHypen(false), then #test is stripping "#text" key
+//	will result in attributes having .attr-name as terminal node in 'path' while
+//	the path for the element value, itself, will be the base path w/o "#text".
 func (mv Map) LeafNodes(no_attr ...bool) []LeafNode {
 	var a bool
 	if len(no_attr) == 1 {
@@ -45,7 +49,8 @@ func getLeafNodes(path, node string, mv interface{}, l *[]LeafNode, noattr bool)
 	switch mv.(type) {
 	case map[string]interface{}:
 		for k, v := range mv.(map[string]interface{}) {
-			if noattr && k[:1] == "-" {
+			// if noattr && k[:1] == "-" {
+			if noattr && len(attrPrefix) > 0 && strings.Index(k, attrPrefix) == 0 {
 				continue
 			}
 			getLeafNodes(path, k, v, l, noattr)

@@ -18,6 +18,7 @@ var miscdata = []byte(`
 `)
 
 func TestMisc(t *testing.T) {
+	PrependAttrWithHyphen(true) // be safe
 	fmt.Println("\n------------------ misc_test.go ...")
 }
 
@@ -170,6 +171,7 @@ func TestElementsNoAttrPrefix(t *testing.T) {
 	if len(e) != 4 {
 		t.Fatal("didn't get 4 elements:", e)
 	}
+	PrependAttrWithHyphen(true)
 }
 
 func TestAttributesNoAttrPrefix(t *testing.T) {
@@ -193,4 +195,5 @@ func TestAttributesNoAttrPrefix(t *testing.T) {
 	if len(a) > 0 {
 		t.Fatal("found attributes where there are none:", a)
 	}
+	PrependAttrWithHyphen(true)
 }

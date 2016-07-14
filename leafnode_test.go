@@ -94,4 +94,24 @@ func TestLeafNodes(t *testing.T) {
 	for _, v := range ln {
 		fmt.Printf("%#v\n", v)
 	}
+
+	// no-hyphen
+	PrependAttrWithHyphen(false)
+	m, err = NewMapXml(xmldata2)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	fmt.Println("\nno-hyphen-xml2data2-LeafValues:")
+	ln = m.LeafNodes()
+	for _, v := range ln {
+		fmt.Printf("%#v\n", v)
+	}
+	fmt.Println("\nno-hyphen-xml2data2-LeafValues(NoAttributes):")
+	ln = m.LeafNodes(NoAttributes)
+	for _, v := range ln {
+		fmt.Printf("%#v\n", v)
+	}
+
+	// restore default
+	PrependAttrWithHyphen(true)
 }
