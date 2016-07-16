@@ -11,7 +11,7 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
 Note:
-	2016.06.25: Support overriding default XML attribute prefix, "-", in Map values - SetAttrPrefix().
+	2016.06.25: Support overriding default XML attribute prefix, "-", in Map keys - SetAttrPrefix().
 	2016.05.26: Support customization of xml.Decoder by exposing CustomDecoder variable.
 	2016.03.19: Escape invalid chars when encoding XML attribute and element values - XMLEscapeChars().
 	2016.03.02: By default decoding XML with float64 and bool value casting will not cast "NaN", "Inf", and "-Inf".
