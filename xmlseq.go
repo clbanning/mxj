@@ -161,11 +161,14 @@ func xmlSeqToMap(doc []byte, r bool) (map[string]interface{}, error) {
 // xmlSeqToMapParser - load a 'clean' XML doc into a map[string]interface{} directly.
 // Add #seq tag value for each element decoded - to be used for Encoding later.
 func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[string]interface{}, error) {
-	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey'
+	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey' in 'n'.
 	var n, na map[string]interface{}
 	var seq int // for including seq num when decoding
 
 	// Allocate maps and load attributes, if any.
+	// NOTE: on entry from XmlToMap(), etc., skey=="", and we fall through
+	//       to get StartElement then recurse with skey!="" where we begin
+	//       allocating map[string]interface{} values 'n' and 'na'.
 	if skey != "" {
 		// 'n' only needs one slot - save call to runtime•hashGrow()
 		// 'na' we don't know

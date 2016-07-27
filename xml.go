@@ -254,12 +254,15 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 		skey = strings.ToLower(skey)
 	}
 
-	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey'
+	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey' in 'n'.
 	// Unless 'skey' is a simple element w/o attributes, in which case the xml.CharData value is the value.
 	var n, na map[string]interface{}
 	var seq int // for includeTagSeqNum
 
 	// Allocate maps and load attributes, if any.
+	// NOTE: on entry from XmlToMap(), etc., skey=="", and we fall through
+	//       to get StartElement then recurse with skey!="" where we begin
+	//       allocating map[string]interface{} values 'n' and 'na'.
 	if skey != "" {
 		n = make(map[string]interface{})  // old n
 		na = make(map[string]interface{}) // old n.nodes
