@@ -260,9 +260,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 	var seq int // for includeTagSeqNum
 
 	// Allocate maps and load attributes, if any.
-	// NOTE: on entry from XmlToMap(), etc., skey=="", and we fall through
-	//       to get StartElement then recurse with skey!="" where we begin
-	//       allocating map[string]interface{} values 'n' and 'na'.
+	// NOTE: on entry from NewMapXml(), etc., skey=="", and we fall through
+	//       to get StartElement then recurse with skey==xml.StartElement.Name.Local  
+	//       where we begin allocating map[string]interface{} values 'n' and 'na'.
 	if skey != "" {
 		n = make(map[string]interface{})  // old n
 		na = make(map[string]interface{}) // old n.nodes
