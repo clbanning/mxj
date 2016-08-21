@@ -14,7 +14,7 @@ var xmlEscapeChars bool
 // NOTE: this is brute force with NO interrogation of '&' being escaped already; if it is
 // then '&amp;' will be re-escaped as '&amp;amp;'.
 //  
-// This is only for m.Xml() and mv.XmlIndent(); mv.XmlSeq() and m.XmlSeqIndent() assume that
+// This is only for mv.Xml() and mv.XmlIndent(); mv.XmlSeq() and mv.XmlSeqIndent() assume that
 // values were originally decoded from valid XML.
 /*
 	The values are:
@@ -28,8 +28,8 @@ func XMLEscapeChars(b bool) {
 	xmlEscapeChars = b
 }
 
-// order is important - must scan for '&' first, since 's' may contain "&amp;" that
-// is parsed to "&amp;amp;" - or "&lt;" that is parsed to "&amp;lt;".
+// Scan for '&' first, since 's' may contain "&amp;" that is parsed to "&amp;amp;" 
+// - or "&lt;" that is parsed to "&amp;lt;".
 var escapechars = [][2][]byte{
 	{[]byte(`&`), []byte(`&amp;`)},
 	{[]byte(`<`), []byte(`&lt;`)},
