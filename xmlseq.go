@@ -167,7 +167,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 
 	// Allocate maps and load attributes, if any.
 	// NOTE: on entry from NewMapXml(), etc., skey=="", and we fall through
-	//       to get StartElement then recurse with skey==xml.StartElement.Name.Local  
+	//       to get StartElement then recurse with skey==xml.StartElement.Name.Local
 	//       where we begin allocating map[string]interface{} values 'n' and 'na'.
 	if skey != "" {
 		// 'n' only needs one slot - save call to runtime•hashGrow()
@@ -328,7 +328,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 
 // ------------------ END: NewMapXml & NewMapXmlReader -------------------------
 
-// ------------------ mv.Xml & mv.XmlWriter - from j2x ------------------------
+// --------------------- mv.XmlSeq & mv.XmlSeqWriter -------------------------
 
 // This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
@@ -388,7 +388,7 @@ done:
 // This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as  XML on the Writer.
-// See Xml() for encoding rules.
+// See XmlSeq() for encoding rules.
 func (mv Map) XmlSeqWriter(xmlWriter io.Writer, rootTag ...string) error {
 	x, err := mv.XmlSeq(rootTag...)
 	if err != nil {
@@ -402,7 +402,7 @@ func (mv Map) XmlSeqWriter(xmlWriter io.Writer, rootTag ...string) error {
 // This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as  XML on the Writer. []byte is the raw XML that was written.
-// See Xml() for encoding rules.
+// See XmlSeq() for encoding rules.
 func (mv Map) XmlSeqWriterRaw(xmlWriter io.Writer, rootTag ...string) ([]byte, error) {
 	x, err := mv.XmlSeq(rootTag...)
 	if err != nil {
@@ -430,7 +430,7 @@ func (mv Map) XmlSeqIndentWriter(xmlWriter io.Writer, prefix, indent string, roo
 // This should ONLY be used on Map values that were decoded using NewMapXmlSeq() & co.
 //
 // Writes the Map as pretty XML on the Writer. []byte is the raw XML that was written.
-// See Xml() for encoding rules.
+// See XmlSeq() for encoding rules.
 func (mv Map) XmlSeqIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, rootTag ...string) ([]byte, error) {
 	x, err := mv.XmlSeqIndent(prefix, indent, rootTag...)
 	if err != nil {
@@ -483,6 +483,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 	var isSimple bool
 	var noEndTag bool
 	var elen int
+	var ss string
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
 
 	switch value.(type) {
@@ -532,10 +533,22 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			for _, a := range kv {
 				vv := a.v.(map[string]interface{})
 				switch vv["#text"].(type) {
-				case string, float64, bool, int, int32, int64, float32:
+				case string:
+					if xmlEscapeChars {
+						ss = escapeChars(vv["#text"].(string))
+					} else {
+						ss = vv["#text"].(string)
+					}
+					*s += ` ` + a.k + `="` + ss + `"`
+				case float64, bool, int, int32, int64, float32:
 					*s += ` ` + a.k + `="` + fmt.Sprintf("%v", vv["#text"]) + `"`
 				case []byte:
-					*s += ` ` + a.k + `="` + fmt.Sprintf("%v", string(vv["#text"].([]byte))) + `"`
+					if xmlEscapeChars {
+						ss = escapeChars(string(vv["#text"].([]byte)))
+					} else {
+						ss = string(vv["#text"].([]byte))
+					}
+					*s += ` ` + a.k + `="` + ss + `"`
 				default:
 					return fmt.Errorf("invalid attribute value for: %s", a.k)
 				}
@@ -548,7 +561,10 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		_, seqOK := val["#seq"] // have key
 		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs) || (len(val) == 2 && !haveAttrs)) && seqOK {
 			if stmp, ok := v.(string); ok && stmp != "" {
-				*s += ">" + fmt.Sprintf("%v", v)
+				if xmlEscapeChars {
+					stmp = escapeChars(stmp)
+				}
+				*s += ">" + stmp
 				endTag = true
 				elen = 1
 			}
@@ -632,18 +648,31 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 	default: // handle anything - even goofy stuff
 		elen = 0
 		switch value.(type) {
-		case string, float64, bool, int, int32, int64, float32:
+		case string:
+			if xmlEscapeChars {
+				ss = escapeChars(value.(string))
+			} else {
+				ss = value.(string)
+			}
+			println("xmlEscapeChars:", xmlEscapeChars, "ss:", ss)
+			if len(ss) > 0 {
+				*s += ">" + ss
+			}
+		case float64, bool, int, int32, int64, float32:
 			v := fmt.Sprintf("%v", value)
-			elen = len(v)
-			if elen > 0 {
+			if len(v) > 0 {
 				*s += ">" + v
 			}
 		case []byte: // NOTE: byte is just an alias for uint8
 			// similar to how xml.Marshal handles []byte structure members
-			v := string(value.([]byte))
-			elen = len(v)
-			if elen > 0 {
-				*s += ">" + v
+			if xmlEscapeChars {
+				ss = escapeChars(string(value.([]byte)))
+			} else {
+				ss = string(value.([]byte))
+			}
+			println("xmlEscapeChars:", xmlEscapeChars, "ss:", ss)
+			if len(ss) > 0 {
+				*s += ">" + ss
 			}
 		default:
 			var v []byte

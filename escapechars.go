@@ -14,8 +14,6 @@ var xmlEscapeChars bool
 // NOTE: this is brute force with NO interrogation of '&' being escaped already; if it is
 // then '&amp;' will be re-escaped as '&amp;amp;'.
 //  
-// This is only for mv.Xml() and mv.XmlIndent(); mv.XmlSeq() and mv.XmlSeqIndent() assume that
-// values were originally decoded from valid XML.
 /*
 	The values are:
 	"   &quot;
