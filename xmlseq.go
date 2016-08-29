@@ -654,13 +654,14 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			} else {
 				ss = value.(string)
 			}
-			println("xmlEscapeChars:", xmlEscapeChars, "ss:", ss)
-			if len(ss) > 0 {
+			elen = len(ss)
+			if elen > 0 {
 				*s += ">" + ss
 			}
 		case float64, bool, int, int32, int64, float32:
 			v := fmt.Sprintf("%v", value)
-			if len(v) > 0 {
+			elen = len(v)
+			if elen > 0 {
 				*s += ">" + v
 			}
 		case []byte: // NOTE: byte is just an alias for uint8
@@ -670,8 +671,8 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			} else {
 				ss = string(value.([]byte))
 			}
-			println("xmlEscapeChars:", xmlEscapeChars, "ss:", ss)
-			if len(ss) > 0 {
+			elen = len(ss)
+			if elen > 0 {
 				*s += ">" + ss
 			}
 		default:
