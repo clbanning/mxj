@@ -6,8 +6,6 @@
 //          NewMapXml, NewMapXmlReader, mv.Xml, mv.XmlWriter
 // see x2j and j2x for wrappers to provide end-to-end transformation of XML and JSON messages.
 
-// dummy
-
 package mxj
 
 import (
