@@ -777,7 +777,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	case map[string]interface{}:
 		vv := value.(map[string]interface{})
 		lenvv := len(vv)
-		// scan out attributes - keys have prepended hyphen, '-'
+		// scan out attributes - attribute keys have prepended attrPrefix
 		attrlist := make([][2]string, len(vv))
 		var n int
 		var ss string
