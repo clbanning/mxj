@@ -10,6 +10,7 @@ package mxj
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -23,7 +24,7 @@ import (
 // ------------------- NewMapXml & NewMapXmlReader ... -------------------------
 
 // If XmlCharsetReader != nil, it will be used to decode the XML, if required.
-// Note: if CustomDeocder != nil, then XmlCharsetReader is ignored; 
+// Note: if CustomDeocder != nil, then XmlCharsetReader is ignored;
 // set the CustomDecoder attribute instead.
 //   import (
 //	     charset "code.google.com/p/go-charset/charset"
@@ -261,7 +262,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 
 	// Allocate maps and load attributes, if any.
 	// NOTE: on entry from NewMapXml(), etc., skey=="", and we fall through
-	//       to get StartElement then recurse with skey==xml.StartElement.Name.Local  
+	//       to get StartElement then recurse with skey==xml.StartElement.Name.Local
 	//       where we begin allocating map[string]interface{} values 'n' and 'na'.
 	if skey != "" {
 		n = make(map[string]interface{})  // old n
@@ -761,7 +762,8 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
 
 	switch value.(type) {
-	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
+	// special handling of []interface{} values when len(value) == 0
+	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32, json.Number:
 		if doIndent {
 			*s += p.padding
 		}
@@ -779,9 +781,10 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			if k[:1] == attrPrefix {
 				switch v.(type) {
 				case string:
-					ss = v.(string)
 					if xmlEscapeChars {
-						ss = escapeChars(ss)
+						ss = escapeChars(v.(string))
+					} else {
+						ss = v.(string)
 					}
 					attrlist[n][0] = k[1:]
 					attrlist[n][1] = ss
@@ -789,9 +792,10 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 					attrlist[n][0] = k[1:]
 					attrlist[n][1] = fmt.Sprintf("%v", v)
 				case []byte:
-					ss = string(v.([]byte))
 					if xmlEscapeChars {
-						ss = escapeChars(ss)
+						ss = escapeChars(string(v.([]byte)))
+					} else {
+						ss = string(v.([]byte))
 					}
 					attrlist[n][0] = k[1:]
 					attrlist[n][1] = ss
@@ -865,6 +869,16 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		endTag = true
 		elen = 1 // we do have some content ...
 	case []interface{}:
+		// special case - found during implementing Issue #23
+		if len(value.([]interface{})) == 0 {
+			if doIndent {
+				*s += p.padding + p.indent
+			}
+			*s += "<" + key
+			elen = 0
+			endTag = true
+			break
+		}
 		for _, v := range value.([]interface{}) {
 			if doIndent {
 				p.Indent()
@@ -891,7 +905,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			if elen > 0 {
 				*s += ">" + v
 			}
-		case float64, bool, int, int32, int64, float32:
+		case float64, bool, int, int32, int64, float32, json.Number:
 			v := fmt.Sprintf("%v", value)
 			elen = len(v) // always > 0
 			*s += ">" + v
@@ -931,21 +945,14 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 				*s += p.padding
 			}
 		}
-		switch value.(type) {
-		case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
-			if elen > 0 || useGoXmlEmptyElemSyntax {
-				if elen == 0 {
-					*s += ">"
-				}
-				*s += `</` + key + ">"
-			} else {
-				*s += `/>`
+		if elen > 0 || useGoXmlEmptyElemSyntax {
+			if elen == 0 {
+				*s += ">"
 			}
+			*s += `</` + key + ">"
+		} else {
+			*s += `/>`
 		}
-	} else if useGoXmlEmptyElemSyntax {
-		*s += "></" + key + ">"
-	} else {
-		*s += "/>"
 	}
 	if doIndent {
 		if p.cnt > p.start {
