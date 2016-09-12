@@ -159,9 +159,11 @@ func xmlToMap(doc []byte, r bool) (map[string]interface{}, error) {
 func PrependAttrWithHyphen(v bool) {
 	if v {
 		attrPrefix = "-"
+		lenAttrPrefix = len(attrPrefix)
 		return
 	}
 	attrPrefix = ""
+	lenAttrPrefix = len(attrPrefix)
 }
 
 // Include sequence id with inner tags. - per Sean Murphy, murphysean84@gmail.com.
@@ -239,12 +241,14 @@ func CoerceKeysToLower(b ...bool) {
 // and adding a SetAttrPrefix(s string) function.
 
 var attrPrefix string = `-` // the default
+var lenAttrPrefix int = 1   // the default
 
 // SetAttrPrefix changes the default, "-", to the specified value, s.
 // SetAttrPrefix("") is the same as PrependAttrWithHyphen(false).
 // (Not applicable for NewMapXmlSeq(), mv.XmlSeq(), etc.)
 func SetAttrPrefix(s string) {
 	attrPrefix = s
+	lenAttrPrefix = len(attrPrefix)
 }
 
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
@@ -778,7 +782,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		var n int
 		var ss string
 		for k, v := range vv {
-			if k[:1] == attrPrefix {
+			if k[:lenAttrPrefix] == attrPrefix {
 				switch v.(type) {
 				case string:
 					if xmlEscapeChars {
@@ -786,10 +790,10 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 					} else {
 						ss = v.(string)
 					}
-					attrlist[n][0] = k[1:]
+					attrlist[n][0] = k[lenAttrPrefix:]
 					attrlist[n][1] = ss
-				case float64, bool, int, int32, int64, float32:
-					attrlist[n][0] = k[1:]
+				case float64, bool, int, int32, int64, float32, json.Number:
+					attrlist[n][0] = k[lenAttrPrefix:]
 					attrlist[n][1] = fmt.Sprintf("%v", v)
 				case []byte:
 					if xmlEscapeChars {
@@ -797,10 +801,10 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 					} else {
 						ss = string(v.([]byte))
 					}
-					attrlist[n][0] = k[1:]
+					attrlist[n][0] = k[lenAttrPrefix:]
 					attrlist[n][1] = ss
 				default:
-					return fmt.Errorf("invalid attribute value for: %s", k)
+					return fmt.Errorf("invalid attribute value for: %s:<%T>", k, v)
 				}
 				n++
 			}
@@ -836,7 +840,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		elemlist := make([][2]interface{}, len(vv))
 		n = 0
 		for k, v := range vv {
-			if k[:1] == attrPrefix {
+			if k[:lenAttrPrefix] == attrPrefix {
 				continue
 			}
 			elemlist[n][0] = k
