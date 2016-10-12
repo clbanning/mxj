@@ -21,7 +21,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	2016.03.19: Escape invalid chars when encoding XML attribute and element values - XMLEscapeChars().
 	2016.03.02: By default decoding XML with float64 and bool value casting will not cast "NaN", "Inf", and "-Inf".
 	            To cast them to float64, first set flag with CastNanInf(true).
-	2016.02.22: New m.Root(), m.Elements(), m.Attributes methods let you examine XML document structure.
+	2016.02.22: New mv.Root(), mv.Elements(), mv.Attributes methods let you examine XML document structure.
 	2016.02.16: Add CoerceKeysToLower() option to handle tags with mixed capitalization.
 	2016.02.12: Seek for first xml.StartElement token; only return error if io.EOF is reached first (handles BOM).
 	2015.12.02: XML decoding/encoding that preserves original structure of document. See NewMapXmlSeq()
@@ -39,24 +39,24 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 <pre>type Map map[string]interface{}</pre>
 
 Create a `Map` value, 'm', from any `map[string]interface{}` value, 'v':
-<pre>m := Map(v)</pre>
+<pre>mv := Map(v)</pre>
 
 Unmarshal / marshal XML as a `Map` value, 'm':
-<pre>m, err := NewMapXml(xmlValue) // unmarshal
-xmlValue, err := m.Xml()      // marshal</pre>
+<pre>mv, err := NewMapXml(xmlValue) // unmarshal
+xmlValue, err := mv.Xml()      // marshal</pre>
 
 Unmarshal XML from an `io.Reader` as a `Map` value, 'm':
-<pre>m, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
-m, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded</pre>
+<pre>mv, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
+mv, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded</pre>
 
-Marshal `Map` value, 'm', to an XML Writer (`io.Writer`):
-<pre>err := m.XmlWriter(xmlWriter)
-raw, err := m.XmlWriterRaw(xmlWriter) // 'raw' is the raw XML that was written on xmlWriter</pre>
+Marshal `Map` value, 'mv', to an XML Writer (`io.Writer`):
+<pre>err := mv.XmlWriter(xmlWriter)
+raw, err := mv.XmlWriterRaw(xmlWriter) // 'raw' is the raw XML that was written on xmlWriter</pre>
    
 Also, for prettified output:
-<pre>xmlValue, err := m.XmlIndent(prefix, indent, ...)
-err := m.XmlIndentWriter(xmlWriter, prefix, indent, ...)
-raw, err := m.XmlIndentWriterRaw(xmlWriter, prefix, indent, ...)</pre>
+<pre>xmlValue, err := mv.XmlIndent(prefix, indent, ...)
+err := mv.XmlIndentWriter(xmlWriter, prefix, indent, ...)
+raw, err := mv.XmlIndentWriterRaw(xmlWriter, prefix, indent, ...)</pre>
 
 Bulk process XML with error handling (note: handlers must return a boolean value):
 <pre>err := HandleXmlReader(xmlReader, mapHandler(Map), errHandler(error))
@@ -67,25 +67,25 @@ Converting XML to JSON: see Examples for `NewMapXml` and `HandleXmlReader`.
 There are comparable functions and methods for JSON processing.
 
 Arbitrary structure values can be decoded to / encoded from `Map` values:
-<pre>m, err := NewMapStruct(structVal)
-err := m.Struct(structPointer)</pre>
+<pre>mv, err := NewMapStruct(structVal)
+err := mv.Struct(structPointer)</pre>
 
 <h4>Extract / modify Map values</h4>
 To work with XML tag values, JSON or Map key values or structure field values, decode the XML, JSON
 or structure to a `Map` value, 'm', or cast a `map[string]interface{}` value to a `Map` value, 'm', then:
 <pre>paths := m.PathsForKey(key)
-path := m.PathForKeyShortest(key)
-values, err := m.ValuesForKey(key, subkeys)
-values, err := m.ValuesForPath(path, subkeys)
-count, err := m.UpdateValuesForPath(newVal, path, subkeys)</pre>
+path := mv.PathForKeyShortest(key)
+values, err := mv.ValuesForKey(key, subkeys)
+values, err := mv.ValuesForPath(path, subkeys)
+count, err := mv.UpdateValuesForPath(newVal, path, subkeys)</pre>
 
 Get everything at once, irrespective of path depth:
-<pre>leafnodes := m.LeafNodes()
-leafvalues := m.LeafValues()</pre>
+<pre>leafnodes := mv.LeafNodes()
+leafvalues := mv.LeafValues()</pre>
 
 A new `Map` with whatever keys are desired can be created from the current `Map` and then encoded in XML
 or JSON. (Note: keys can use dot-notation.)
-<pre>newMap, err := m.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
+<pre>newMap, err := mv.NewMap("oldKey_1:newKey_1", "oldKey_2:newKey_2", ..., "oldKey_N:newKey_N")
 newXml, err := newMap.Xml()   // for example
 newJson, err := newMap.Json() // ditto</pre>
 
