@@ -17,6 +17,7 @@ func TestOnlyAttributes(t *testing.T) {
 	dom, err := NewMapXml([]byte(`
 		<memballoon model="virtio">
 			<address type="pci" domain="0x0000" bus="0x00" slot="0x05" function="0x0"/>
+			<empty/>
 		</memballoon>)`))
 	if err != nil {
 		t.Fatal(err)
@@ -33,6 +34,7 @@ func TestOnlyAttributesSeq(t *testing.T) {
 	dom, err := NewMapXmlSeq([]byte(`
 		<memballoon model="virtio">
 			<address type="pci" domain="0x0000" bus="0x00" slot="0x05" function="0x0"/>
+			<empty/>
 		</memballoon>)`))
 	if err != nil {
 		t.Fatal(err)
