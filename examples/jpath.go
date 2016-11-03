@@ -192,7 +192,7 @@ func main() {
 	fmt.Println("list of leaf values:", list)
 
 	// $..*                     all Elements in XML document. All members of JSON structure.
-	// 2nd every value - even complex values
+	// 2nd every value - even complex elements
 	path := "*"
 	list = make([]interface{},0)
 	for {
