@@ -179,7 +179,7 @@ func main() {
 		n++
 	}
 	list = list[:n]
-	fmt.Println("books with isbn:", list)
+	fmt.Println("books with price < $10:", list)
 
 	// $..*                     all Elements in XML document. All members of JSON structure.
 	// 1st where values are not complex elements
