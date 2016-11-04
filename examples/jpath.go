@@ -1,4 +1,4 @@
-// gitissue #28 
+// gitissue #28
 
 /*
 (reference: http://goessner.net/articles/JsonPath/)
@@ -183,12 +183,13 @@ func main() {
 
 	// $..*                     all Elements in XML document. All members of JSON structure.
 	// 1st where values are not complex elements
-	fmt.Println("list of leaf values:", m.LeafValues())
+	list = m.LeafValues()
+	fmt.Println("list of leaf values:", list)
 
 	// $..*                     all Elements in XML document. All members of JSON structure.
 	// 2nd every value - even complex elements
 	path := "*"
-	list = make([]interface{},0)
+	list = make([]interface{}, 0)
 	for {
 		v, _ := m.ValuesForPath(path)
 		if len(v) == 0 {
