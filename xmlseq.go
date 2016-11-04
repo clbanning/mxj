@@ -767,3 +767,13 @@ func PrintElemListSeq(e elemListSeq) {
 		fmt.Printf("%d: %v\n", n, v)
 	}
 }
+
+// =============== https://groups.google.com/forum/#!topic/golang-nuts/lHPOHD-8qio
+
+func BeautifyXml(b []byte, prefix, indent string) ([]byte, error) {
+	x, err := NewMapXmlSeq(b)
+	if err != nil {
+		return nil, err
+	}
+	return x.XmlSeqIndent(prefix, indent)
+}

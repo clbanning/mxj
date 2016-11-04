@@ -16,9 +16,9 @@ func TestNewMapXmlSeq(t *testing.T) {
    <books>
       <book seq="1">
          <author>William T. Gaddis</author>
-         <review>Gaddis is one of the most influential but little know authors in America.</review>
+			<review>Gaddis is one of the most influential but little know authors in America.</review>
          <title>The Recognitions</title>
-         <!-- here's the rest of the review -->
+			<!-- here's the rest of the review -->
          <review>One of the great seminal American novels of the 20th century.</review>
          <review>Without it Thomas Pynchon probably wouldn't have written Gravity's Rainbow.</review>
       </book>
@@ -30,12 +30,12 @@ func TestNewMapXmlSeq(t *testing.T) {
       <book>
          <author>John Hawkes</author>
          <title>The Beetle Leg</title>
-         <!throw in a directive here>
+			<!throw in a directive here>
          <review>A lyrical novel about the construction of Ft. Peck Dam in Montana.</review>
       </book>
       <book> 
          <author>
-            <?cat first_name last_name?>
+				<?cat first_name last_name?>
             <first_name>T.E.</first_name>
             <last_name>Porter</last_name>
          </author>
@@ -64,4 +64,15 @@ func TestNewMapXmlSeq(t *testing.T) {
 		t.Fatal("err:", err)
 	}
 	fmt.Println("NewMapXmlSeq, mv.XmlSeqIndent():\n", string(b))
+}
+
+
+func TestBeautifyXml(t *testing.T) {
+	fmt.Println("\n----------------  TestBeautifyXml ...")
+	data := []byte(`<doc><tag1 attr="test">something</tag1><tag2>something else</tag2></doc>`)
+	v, err := BeautifyXml(data,"","  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(string(v))
 }
