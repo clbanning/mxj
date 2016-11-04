@@ -183,13 +183,7 @@ func main() {
 
 	// $..*                     all Elements in XML document. All members of JSON structure.
 	// 1st where values are not complex elements
-	paths := m.LeafPaths()
-	list = make([]interface{},0)
-	for  _, path := range paths {
-		v, _ := m.ValueForPath(path)
-		list = append(list, v)
-	}
-	fmt.Println("list of leaf values:", list)
+	fmt.Println("list of leaf values:", m.LeafValues())
 
 	// $..*                     all Elements in XML document. All members of JSON structure.
 	// 2nd every value - even complex elements
