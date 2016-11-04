@@ -771,7 +771,7 @@ func PrintElemListSeq(e elemListSeq) {
 // =============== https://groups.google.com/forum/#!topic/golang-nuts/lHPOHD-8qio
 
 // BeautifyXml formats an XML doc per the prefix and indent arguments
-// similar to mv.XmlIndent().
+// similar to Map.XmlIndent().
 func BeautifyXml(b []byte, prefix, indent string) ([]byte, error) {
 	x, err := NewMapXmlSeq(b)
 	if err != nil {
