@@ -68,7 +68,7 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //
 //	NAME SPACES:
 //	   1. Keys in the Map value that are parsed from a <name space prefix>:<local name> tag preserve the
-//		   "<prefix>:" notation rather than stripping it as with NewMapXml().
+//	      "<prefix>:" notation rather than stripping it as with NewMapXml().
 //	   2. Attribute keys for name space prefix declarations preserve "xmlns:<prefix>=" notation.
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
