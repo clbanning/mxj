@@ -186,7 +186,11 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// where interface{} is map[string]interface{}{"#text":<attr_val>, "#seq":<attr_seq>}
 			aa := make(map[string]interface{}, len(a))
 			for i, v := range a {
-				aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
+				if len(v.Name.Space) > 0 {
+					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
+				} else {
+					aa[v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
+				}
 			}
 			na["#attr"] = aa
 		}
@@ -283,7 +287,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 					name = tt.Name.Local
 				}
 				if skey != name {
-					return nil, fmt.Errorf("element %s not properly terminated, got %s at #%d", 
+					return nil, fmt.Errorf("element %s not properly terminated, got %s at #%d",
 						skey, name, p.InputOffset())
 				}
 			}
