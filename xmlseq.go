@@ -274,6 +274,19 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 				na[key] = val // save it as a singleton
 			}
 		case xml.EndElement:
+			if skey != "" {
+				tt := t.(xml.EndElement)
+				var name string
+				if len(tt.Name.Space) > 0 {
+					name = tt.Name.Space + `:` + tt.Name.Local
+				} else {
+					name = tt.Name.Local
+				}
+				if skey != name {
+					return nil, fmt.Errorf("decoding error: element %s not properly terminated, got %s at #%d", 
+						skey, name, p.InputOffset())
+				}
+			}
 			// len(n) > 0 if this is a simple element w/o xml.Attrs - see xml.CharData case.
 			if len(n) == 0 {
 				// If len(na)==0 we have an empty element == "";
@@ -730,7 +743,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		}
 	} else if !noEndTag {
 		if useGoXmlEmptyElemSyntax {
-				*s += `</` + key + ">"
+			*s += `</` + key + ">"
 			// *s += "></" + key + ">"
 		} else {
 			*s += "/>"

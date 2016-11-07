@@ -64,3 +64,24 @@ func TestNewMapXmlSeq(t *testing.T) {
 	}
 	fmt.Println("NewMapXmlSeq, mv.XmlSeqIndent():\n", string(b))
 }
+
+func TestXmlSeqDecodeError(t *testing.T) {
+	fmt.Println("------------ TestXmlSeqDecodeError ...")
+	x := []byte(`<doc> 
+   <books>
+      <book seq="1">
+         <author>William T. Gaddis</author>
+			<review>Gaddis is one of the most influential but little know authors in America.</review>
+         <title>The Recognitions</title>
+			<!-- here's the rest of the review -->
+         <review>One of the great seminal American novels of the 20th century.</review>
+         <review>Without it Thomas Pynchon probably wouldn't have written Gravity's Rainbow.</review>
+   </books>
+</doc>`)
+
+	_, err := NewMapXmlSeq(x)
+	if err == nil {
+		t.Fatal("didn't catch EndElement error")
+	}
+	fmt.Println("err ok:", err)
+}
