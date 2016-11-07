@@ -283,7 +283,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 					name = tt.Name.Local
 				}
 				if skey != name {
-					return nil, fmt.Errorf("decoding error: element %s not properly terminated, got %s at #%d", 
+					return nil, fmt.Errorf("element %s not properly terminated, got %s at #%d", 
 						skey, name, p.InputOffset())
 				}
 			}
