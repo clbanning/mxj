@@ -1,4 +1,3 @@
-
 package mxj
 
 import (
@@ -64,15 +63,4 @@ func TestNewMapXmlSeq(t *testing.T) {
 		t.Fatal("err:", err)
 	}
 	fmt.Println("NewMapXmlSeq, mv.XmlSeqIndent():\n", string(b))
-}
-
-
-func TestBeautifyXml(t *testing.T) {
-	fmt.Println("\n----------------  TestBeautifyXml ...")
-	data := []byte(`<doc><tag1 attr="test">something</tag1><tag2>something else</tag2></doc>`)
-	v, err := BeautifyXml(data,"","  ")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(string(v))
 }

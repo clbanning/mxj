@@ -23,6 +23,8 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 // ------------------- NewMapXmlSeq & NewMapXmlSeqReader ... -------------------------
 
 // This is only useful if you want to re-encode the Map as XML using mv.XmlSeq(), etc., to preserve the original structure.
+// The xml.Decoder.RawToken method is used to parse the XML, so there is no checking for appropriate xml.EndElement values;
+// thus, it is assumed that the XML is valid.
 //
 // NewMapXmlSeq - convert a XML doc into a Map with elements id'd with decoding sequence int - #seq.
 // If the optional argument 'cast' is 'true', then values will be converted to boolean or float64 if possible.
@@ -63,6 +65,11 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	      re-encode the message in its original structure.
+//
+//	NAME SPACES:
+//		1. Keys in the Map value that are parsed from a <name space prefix>:<local name> tag preserve the
+//		   "<prefix>:" notation rather than stripping it as with NewMapXml().
+//		2. Attribute keys for name space prefix declarations preserve "xmlns:<prefix>=" notation.
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -179,13 +186,13 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// where interface{} is map[string]interface{}{"#text":<attr_val>, "#seq":<attr_seq>}
 			aa := make(map[string]interface{}, len(a))
 			for i, v := range a {
-				aa[v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
+				aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
 			}
 			na["#attr"] = aa
 		}
 	}
 	for {
-		t, err := p.Token()
+		t, err := p.RawToken()
 		if err != nil {
 			if err != io.EOF {
 				return nil, errors.New("xml.Decoder.Token() - " + err.Error())
@@ -204,12 +211,21 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// processing before getting the next token which is the element value,
 			// which is done above.
 			if skey == "" {
-				return xmlSeqToMapParser(tt.Name.Local, tt.Attr, p, r)
+				if len(tt.Name.Space) > 0 {
+					return xmlSeqToMapParser(tt.Name.Space+`:`+tt.Name.Local, tt.Attr, p, r)
+				} else {
+					return xmlSeqToMapParser(tt.Name.Local, tt.Attr, p, r)
+				}
 			}
 
 			// If not initializing the map, parse the element.
 			// len(nn) == 1, necessarily - it is just an 'n'.
-			nn, err := xmlSeqToMapParser(tt.Name.Local, tt.Attr, p, r)
+			var nn map[string]interface{}
+			if len(tt.Name.Space) > 0 {
+				nn, err = xmlSeqToMapParser(tt.Name.Space+`:`+tt.Name.Local, tt.Attr, p, r)
+			} else {
+				nn, err = xmlSeqToMapParser(tt.Name.Local, tt.Attr, p, r)
+			}
 			if err != nil {
 				return nil, err
 			}
@@ -357,7 +373,7 @@ func (mv Map) XmlSeq(rootTag ...string) ([]byte, error) {
 
 	if len(m) == 1 && len(rootTag) == 0 {
 		for key, value := range m {
-			// if it an array, see if all values are map[string]interface{}
+			// if it's an array, see if all values are map[string]interface{}
 			// we force a new root tag if we'll end up with no key:value in the list
 			// so: key:[string_val, bool:true] --> <doc><key>string_val</key><bool>true</bool></doc>
 			switch value.(type) {
@@ -714,7 +730,8 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		}
 	} else if !noEndTag {
 		if useGoXmlEmptyElemSyntax {
-			*s += "></" + key + ">"
+				*s += `</` + key + ">"
+			// *s += "></" + key + ">"
 		} else {
 			*s += "/>"
 		}
