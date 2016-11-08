@@ -100,7 +100,7 @@ XML PARSING CONVENTIONS
      specifics.)
    - Name space syntax is preserved: 
       - <ns:key>something</ns.key> parses to map["ns:key"]interface{}("something")
-      - xmlns:ns="https://myns.com/ns" parses to map["xmlns:ns"]interface{}("https://myns.com/ns"
+      - xmlns:ns="https://myns.com/ns" parses to map["xmlns:ns"]interface{}("https://myns.com/ns")
 
    Both
 
