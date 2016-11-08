@@ -79,7 +79,7 @@ SUMMARY
 
 XML PARSING CONVENTIONS
 
-   Using NewXml()
+   Using NewMapXml()
 
    - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
      to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)`.)
@@ -89,7 +89,7 @@ XML PARSING CONVENTIONS
    - XML comments, directives, and process instructions are ignored.
    - If CoerceKeysToLower() has been called, then the resultant keys will be lower case.
 
-   Using NewXmlSeq()
+   Using NewMapXmlSeq()
 
    - Attributes are parsed to `map["#attr"]map[<attr_label>]map[string]interface{}`values
      where the `<attr_label>` value has "#text" and "#seq" keys - the "#text" key holds the 
@@ -98,6 +98,9 @@ XML PARSING CONVENTIONS
    - Comments, directives, and process instructions are unmarshalled into the Map using the
      keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
      specifics.)
+   - Name space syntax is preserved: 
+      - <ns:key>something</ns.key> parses to map["ns:key"]interface{}("something")
+      - xmlns:ns="https://myns.com/ns" parses to map["xmlns:ns"]interface{}("https://myns.com/ns"
 
    Both
 
