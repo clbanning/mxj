@@ -125,11 +125,11 @@ func TestMarshalPrefixNoHyphen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	x, err := m.XmlIndent("", "  ")
-	if err != nil {
-		t.Fatal(err)
+	_, err = m.XmlIndent("", "  ")
+	if err == nil {
+		t.Fatal("error not reported for invalid key label")
 	}
-	fmt.Println(string(x))
+	fmt.Println("err ok:", err)
 }
 
 func TestMarshalPrefixUnderscore(t *testing.T) {

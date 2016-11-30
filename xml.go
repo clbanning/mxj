@@ -782,7 +782,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		var n int
 		var ss string
 		for k, v := range vv {
-			if k[:lenAttrPrefix] == attrPrefix {
+			if lenAttrPrefix > 0 && lenAttrPrefix < len(k) && k[:lenAttrPrefix] == attrPrefix {
 				switch v.(type) {
 				case string:
 					if xmlEscapeChars {
@@ -833,7 +833,14 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			elen = 1
 			isSimple = true
 			break
+		} else if ok {
+			// Handle edge case where simple element with attributes
+			// is unmarshal'd using NewMapXml() where attribute prefix
+			// has been set to "".
+			// TODO(clb): should probably scan all keys for invalid chars.
+			return fmt.Errorf("invalid attribute key label: #text - due to attributes not being prefixed")
 		}
+
 		// close tag with possible attributes
 		*s += ">"
 		if doIndent {
@@ -845,7 +852,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		elemlist := make([][2]interface{}, len(vv))
 		n = 0
 		for k, v := range vv {
-			if k[:lenAttrPrefix] == attrPrefix {
+			if lenAttrPrefix > 0 && lenAttrPrefix < len(k) && k[:lenAttrPrefix] == attrPrefix {
 				continue
 			}
 			elemlist[n][0] = k
@@ -864,7 +871,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 				}
 			}
 			i++
-			mapToXmlIndent(doIndent, s, v[0].(string), v[1], p)
+			if err := mapToXmlIndent(doIndent, s, v[0].(string), v[1], p); err != nil {
+				return err
+			}
 			switch v[1].(type) {
 			case []interface{}: // handled in []interface{} case
 			default:
@@ -892,7 +901,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			if doIndent {
 				p.Indent()
 			}
-			mapToXmlIndent(doIndent, s, key, v, p)
+			if err := mapToXmlIndent(doIndent, s, key, v, p); err != nil {
+				return err
+			}
 			if doIndent {
 				p.Outdent()
 			}
