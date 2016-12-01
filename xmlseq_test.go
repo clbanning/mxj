@@ -53,10 +53,11 @@ func TestNewMapXmlSeq(t *testing.T) {
 	fmt.Println("NewMapXmlSeq, s:\n", m.StringIndent())
 
 	b, err := m.XmlIndent("", "  ")
-	if err != nil {
-		t.Fatal("err:", err)
+	if err == nil {
+		fmt.Println("NewMapXmlSeq, mv.XmlIndent():\n", string(b))
+		t.Fatal("didn't catch invalid key: #text")
 	}
-	fmt.Println("NewMapXmlSeq, mv.XmlIndent():\n", string(b))
+	fmt.Println("err ok:", err)
 
 	b, err = m.XmlSeqIndent("", "  ")
 	if err != nil {

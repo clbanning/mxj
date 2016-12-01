@@ -650,7 +650,9 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 				}
 			}
 			i++
-			mapToXmlSeqIndent(doIndent, s, v.k, v.v, p)
+			if err := mapToXmlSeqIndent(doIndent, s, v.k, v.v, p); err != nil {
+				return err
+			}
 			switch v.v.(type) {
 			case []interface{}: // handled in []interface{} case
 			default:
@@ -668,7 +670,9 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			if doIndent {
 				p.Indent()
 			}
-			mapToXmlSeqIndent(doIndent, s, key, v, p)
+			if err := mapToXmlSeqIndent(doIndent, s, key, v, p); err != nil {
+				return err
+			}
 			if doIndent {
 				p.Outdent()
 			}
