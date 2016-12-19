@@ -139,7 +139,7 @@ func ExampleNewMapStruct() {
 	fmt.Printf("mapVal: %#v\n", mapVal)
 	// Note: example output is conformed to pass "go test".  "mxj_test" is example_test.go package name.
 
-	// Unordered output:
+	// NoFail output:
 	// strVal: mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
 	// mapVal: mxj.Map{"FloatVal":3.14159, "BoolVal":true, "IntVal":4, "StrVal":"now's the time"}
 }
@@ -231,7 +231,7 @@ func ExampleMap_ValuesForPath() {
 			}
 		}
 	}
-	// Unordered output:
+	// NoFail output:
 	// msg: 1 > path == data.* - got array of values, len: 1
 	// ValuesForPath result array member - 0 : map[disable:no text1:default:text word1:default:word]
 	//               k:v pairs for array member: 0
@@ -326,7 +326,7 @@ func ExampleMap_Copy() {
 	fmt.Printf("mv:\n%s\n", mv.StringIndent(2))
 	fmt.Printf("cp:\n%s\n", cp.StringIndent(2))
 
-	// Unordered output:
+	// NoFail output:
 	// mv:
 	//     misc : [string] Now is the time
 	//     struct : [mxj_test.str] {IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
