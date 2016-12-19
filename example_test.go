@@ -139,9 +139,9 @@ func ExampleNewMapStruct() {
 	fmt.Printf("mapVal: %#v\n", mapVal)
 	// Note: example output is conformed to pass "go test".  "mxj_test" is example_test.go package name.
 
-	// Output:
+	// Unordered output:
 	// strVal: mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
-	// mapVal: mxj.Map{"int":4, "str":"now's the time", "float":3.14159, "bool":true}
+	// mapVal: mxj.Map{"FloatVal":3.14159, "BoolVal":true, "IntVal":4, "StrVal":"now's the time"}
 }
 
 func ExampleMap_Struct() {
@@ -165,12 +165,12 @@ func ExampleMap_Struct() {
 	fmt.Printf("strVal: %#v\n", strVal)
 	// Note: example output is conformed to pass "go test".  "mxj_test" is example_test.go package name.
 
-	// Output:
+	// Unordered output:
 	// mapVal: mxj.Map{"int":4, "str":"now's the time", "float":3.14159, "bool":true, "private":"Somewhere over the rainbow"}
 	// strVal: mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:""}
 }
 
-func ExampleMap_ValuesForKeyPath() {
+func ExampleMap_ValuesForPath() {
 	// a snippet from examples/gonuts1.go
 	// How to compensate for irregular tag labels in data.
 	// Need to extract from an XML stream the values for "netid" and "idnet".
@@ -231,7 +231,7 @@ func ExampleMap_ValuesForKeyPath() {
 			}
 		}
 	}
-	// Output:
+	// Unordered output:
 	// msg: 1 > path == data.* - got array of values, len: 1
 	// ValuesForPath result array member - 0 : map[disable:no text1:default:text word1:default:word]
 	//               k:v pairs for array member: 0
@@ -323,24 +323,25 @@ func ExampleMap_Copy() {
 	mv := mxj.Map(m)
 	cp, _ := mv.Copy()
 
-	fmt.Printf("mv:%s\n", mv.StringIndent(2))
-	fmt.Printf("cp:%s\n", cp.StringIndent(2))
+	fmt.Printf("mv:\n%s\n", mv.StringIndent(2))
+	fmt.Printf("cp:\n%s\n", cp.StringIndent(2))
 
-	// Output:
+	// Unordered output:
 	// mv:
-	//     struct :[unknown] mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
-	//     struct_ptr :[unknown] &mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
-	//     misc :[string] Now is the time
+	//     misc : [string] Now is the time
+	//     struct : [mxj_test.str] {IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
+	//     struct_ptr : [*mxj_test.str] &{IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
 	// cp:
-	//     misc :[string] Now is the time
-	//     struct :
-	//       int :[float64] 4.00e+00
-	//       str :[string] now's the time
-	//       float :[float64] 3.14e+00
-	//       bool :[bool] true
-	//     struct_ptr :
-	//       int :[float64] 4.00e+00
-	//       str :[string] now's the time
-	//       float :[float64] 3.14e+00
-	//       bool :[bool] true
+	//    misc : [string] Now is the time
+	//    struct : 
+	//      bool : [bool] true
+	//      float : [float64] 3.14159
+	//      int : [float64] 4
+	//      str : [string] now's the time
+	//    struct_ptr : 
+	//      bool : [bool] true
+	//      float : [float64] 3.14159
+	//      int : [float64] 4
+	//      str : [string] now's the time
+	//
 }
