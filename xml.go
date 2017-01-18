@@ -54,6 +54,7 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //	   1. The 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   2. If CoerceKeysToLower() has been called, then all key values will be lower case.
+//	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -67,6 +68,7 @@ func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 //	   1. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   2. If CoerceKeysToLower() has been called, then all key values will be lower case.
+//	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -101,6 +103,7 @@ var XmlWriterBufSize int = 512
 //	   3. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   4. If CoerceKeysToLower() has been called, then all key values will be lower case.
+//	   5. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -251,12 +254,31 @@ func SetAttrPrefix(s string) {
 	lenAttrPrefix = len(attrPrefix)
 }
 
+// 18jan17: Allows user to specify if the map keys should be in snake case instead of the default hyphenated notation.
+var snakeCaseKeys bool
+
+// CoerceKeysToSnakeCase changes the default, false, to the specified value, b.
+func CoerceKeysToSnakeCase(b ...bool) {
+	if len(b) == 1 {
+		snakeCaseKeys = b[0]
+		return
+	}
+	if !snakeCaseKeys {
+		snakeCaseKeys = true
+	} else {
+		snakeCaseKeys = false
+	}
+}
+
 // xmlToMapParser (2015.11.12) - load a 'clean' XML doc into a map[string]interface{} directly.
 // A refactoring of xmlToTreeParser(), markDuplicate() and treeToMap() - here, all-in-one.
 // We've removed the intermediate *node tree with the allocation and subsequent rescanning.
 func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[string]interface{}, error) {
 	if lowerCase {
 		skey = strings.ToLower(skey)
+	}
+	if snakeCaseKeys {
+		skey = strings.Replace(skey, "-", "_", -1)
 	}
 
 	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey' in 'n'.
@@ -273,6 +295,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 		na = make(map[string]interface{}) // old n.nodes
 		if len(a) > 0 {
 			for _, v := range a {
+				if snakeCaseKeys {
+					v.Name.Local = strings.Replace(v.Name.Local, "-", "_", -1)
+				}
 				var key string
 				key = attrPrefix + v.Name.Local
 				if lowerCase {
@@ -316,7 +341,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			// We need to see if nn_key already exists - means we're parsing a list.
 			// This may require converting na[nn_key] value into []interface{} type.
 			// First, extract the key:val for the map - it's a singleton.
-			// Note: if CoerceKeysToLower() called, then key will be lower case.
+			// Note:
+			// * if CoerceKeysToLower() called, then key will be lower case.
+			// * if CoerceKeysToSnakeCase() called, then key will be converted to snake case.
 			var key string
 			var val interface{}
 			for key, val = range nn {
