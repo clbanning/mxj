@@ -65,6 +65,7 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	      re-encode the message in its original structure.
+//	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 //
 //	NAME SPACES:
 //	   1. Keys in the Map value that are parsed from a <name space prefix>:<local name> tag preserve the
@@ -86,6 +87,7 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	      re-encode the message in its original structure.
+//	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -117,6 +119,7 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 //	       extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	    4. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	       re-encode the message in its original structure.
+//	    5. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -168,6 +171,10 @@ func xmlSeqToMap(doc []byte, r bool) (map[string]interface{}, error) {
 // xmlSeqToMapParser - load a 'clean' XML doc into a map[string]interface{} directly.
 // Add #seq tag value for each element decoded - to be used for Encoding later.
 func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[string]interface{}, error) {
+	if snakeCaseKeys {
+		skey = strings.Replace(skey, "-", "_", -1)
+	}
+
 	// NOTE: all attributes and sub-elements parsed into 'na', 'na' is returned as value for 'skey' in 'n'.
 	var n, na map[string]interface{}
 	var seq int // for including seq num when decoding
@@ -186,6 +193,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// where interface{} is map[string]interface{}{"#text":<attr_val>, "#seq":<attr_seq>}
 			aa := make(map[string]interface{}, len(a))
 			for i, v := range a {
+				if snakeCaseKeys {
+					v.Name.Local = strings.Replace(v.Name.Local, "-", "_", -1)
+				}
 				if len(v.Name.Space) > 0 {
 					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
 				} else {
@@ -280,6 +290,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 		case xml.EndElement:
 			if skey != "" {
 				tt := t.(xml.EndElement)
+				if snakeCaseKeys {
+					tt.Name.Local = strings.Replace(tt.Name.Local, "-", "_", -1)
+				}
 				var name string
 				if len(tt.Name.Space) > 0 {
 					name = tt.Name.Space + `:` + tt.Name.Local
