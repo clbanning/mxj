@@ -32,15 +32,18 @@ func main() {
 		return
 	}
 
-	// create the new value for 'b' as a map
-	// and update 'm'
+	// Create the new value for 'b' as a map
+	// and update 'm'.
+	// We should probably have an UpdateValueForPath
+	// method just as there is ValueForPath/ValuesForPath
+	// methods.
 	val := map[string]interface{}{"b": b}
 	n, err := m.UpdateValuesForPath(val, "a.b")
 	if err != nil {
 		fmt.Println("update err:", err)
 		return
 	}
-	if n != 1 {
+	if n == 0 {
 		fmt.Println("err: a.b not updated, n =", n)
 		return
 	}
