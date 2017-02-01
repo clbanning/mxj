@@ -254,10 +254,13 @@ func SetAttrPrefix(s string) {
 	lenAttrPrefix = len(attrPrefix)
 }
 
-// 18jan17: Allows user to specify if the map keys should be in snake case instead of the default hyphenated notation.
+// 18jan17: Allows user to specify if the map keys should be in snake case instead 
+// of the default hyphenated notation.
 var snakeCaseKeys bool
 
 // CoerceKeysToSnakeCase changes the default, false, to the specified value, b.
+// Note: the attribute prefix will be a hyphen, '-', or what ever string value has
+// been specified using SetAttrPrefix.
 func CoerceKeysToSnakeCase(b ...bool) {
 	if len(b) == 1 {
 		snakeCaseKeys = b[0]
@@ -938,7 +941,11 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		return nil
 	case nil:
 		// terminate the tag
+		if doIndent {
+			*s += p.padding
+		}
 		*s += "<" + key
+		endTag, isSimple = true, true
 		break
 	default: // handle anything - even goofy stuff
 		elen = 0

@@ -693,7 +693,11 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		return nil
 	case nil:
 		// terminate the tag
+		if doIndent {
+			*s += p.padding
+		}
 		*s += "<" + key
+		endTag, isSimple = true, true
 		break
 	default: // handle anything - even goofy stuff
 		elen = 0
