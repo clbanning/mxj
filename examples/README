@@ -1,6 +1,6 @@
 Recent additions from gonuts issues:
 
-- append.go illustrates turning a sub-element into a list
+- append.go illustrates turning a sub-element into a list (or appending to a list)
 - order.go illustrates working with a list of mixed tags and preserving their sequence
 
 
