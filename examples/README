@@ -1,4 +1,11 @@
-Examples of using ValuesFromTagPath().
+<h4>Recent additions</h4>
+
+From gonuts issues:
+
+- append.go illustrates turning a sub-element into a list
+- order.go illustrates working with a list of mixed tags and preserving their sequence
+
+<h4>Examples of using ValuesFromTagPath().</h4>
 
 A number of interesting examples have shown up in the gonuts discussion group
 that could be handled - after a fashion - using the ValuesFromTagPath() function.
