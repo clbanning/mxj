@@ -254,7 +254,7 @@ func SetAttrPrefix(s string) {
 	lenAttrPrefix = len(attrPrefix)
 }
 
-// 18jan17: Allows user to specify if the map keys should be in snake case instead 
+// 18jan17: Allows user to specify if the map keys should be in snake case instead
 // of the default hyphenated notation.
 var snakeCaseKeys bool
 
@@ -270,6 +270,21 @@ func CoerceKeysToSnakeCase(b ...bool) {
 		snakeCaseKeys = true
 	} else {
 		snakeCaseKeys = false
+	}
+}
+
+// 05feb17: support processing XMPP streams (issue #36)
+var handleXMPPStreamTag bool
+
+// HandleXMPPStreamTag causes decoder to parse XMPP <stream:stream> elements.
+// The returned Map will be: map["stream"]interface{}{map[<attrs>]interface{}}.
+// If called with no argument, XMPP stream element handling is toggled on/off.
+// (See xmppStream_test.go for example.)
+func HandleXMPPSteamTag(b ...bool) {
+	if len(b) == 0 {
+		handleXMPPStreamTag = !handleXMPPStreamTag
+	} else if len(b) == 1 {
+		handleXMPPStreamTag = b[0]
 	}
 }
 
@@ -310,6 +325,12 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			}
 		}
 	}
+	// Return XMPP <stream:stream> message.
+	if handleXMPPStreamTag && skey == "stream" {
+		n[skey] = na
+		return n, nil
+	}
+
 	for {
 		t, err := p.Token()
 		if err != nil {
