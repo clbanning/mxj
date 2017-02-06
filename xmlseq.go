@@ -130,7 +130,6 @@ func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, erro
 	wb := bytes.NewBuffer(buf)
 	trdr := myTeeReader(xmlReader, wb)
 
-	// build the node tree
 	m, err := xmlSeqReaderToMap(trdr, r)
 
 	// retrieve the raw XML that was decoded
@@ -205,6 +204,13 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			na["#attr"] = aa
 		}
 	}
+
+	// Return XMPP <stream:stream> message.
+	if handleXMPPStreamTag && skey == "stream:stream" {
+		n[skey] = na
+		return n, nil
+	}
+
 	for {
 		t, err := p.RawToken()
 		if err != nil {

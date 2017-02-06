@@ -114,7 +114,6 @@ func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) 
 	wb := bytes.NewBuffer(buf)
 	trdr := myTeeReader(xmlReader, wb) // see code at EOF
 
-	// build the node tree
 	m, err := xmlReaderToMap(trdr, r)
 
 	// retrieve the raw XML that was decoded
@@ -277,10 +276,13 @@ func CoerceKeysToSnakeCase(b ...bool) {
 var handleXMPPStreamTag bool
 
 // HandleXMPPStreamTag causes decoder to parse XMPP <stream:stream> elements.
-// The returned Map will be: map["stream"]interface{}{map[<attrs>]interface{}}.
+// If called with NewMapXml, NewMapXmlReader, New MapXmlReaderRaw the "stream"
+// element will be  returned as map["stream"]interface{}{map[<attrs>]interface{}}.
+// If called with NewMapSeq, NewMapSeqReader, NewMapSeqReaderRaw the "stream"
+// element will be returned as map["stream:stream"]interface{}{map["#attr"]interface{}{...}}.
 // If called with no argument, XMPP stream element handling is toggled on/off.
 // (See xmppStream_test.go for example.)
-func HandleXMPPSteamTag(b ...bool) {
+func HandleXMPPStreamTag(b ...bool) {
 	if len(b) == 0 {
 		handleXMPPStreamTag = !handleXMPPStreamTag
 	} else if len(b) == 1 {
