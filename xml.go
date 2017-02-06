@@ -276,12 +276,15 @@ func CoerceKeysToSnakeCase(b ...bool) {
 var handleXMPPStreamTag bool
 
 // HandleXMPPStreamTag causes decoder to parse XMPP <stream:stream> elements.
-// If called with NewMapXml, NewMapXmlReader, New MapXmlReaderRaw the "stream"
-// element will be  returned as map["stream"]interface{}{map[<attrs>]interface{}}.
-// If called with NewMapSeq, NewMapSeqReader, NewMapSeqReaderRaw the "stream"
-// element will be returned as map["stream:stream"]interface{}{map["#attr"]interface{}{...}}.
 // If called with no argument, XMPP stream element handling is toggled on/off.
 // (See xmppStream_test.go for example.)
+//	If called with NewMapXml, NewMapXmlReader, New MapXmlReaderRaw the "stream"
+//	element will be  returned as:
+//		map["stream"]interface{}{map[-<attrs>]interface{}}.
+//	If called with NewMapSeq, NewMapSeqReader, NewMapSeqReaderRaw the "stream"
+//	element will be returned as:
+//		map["stream:stream"]interface{}{map["#attr"]interface{}{map[string]interface{}}}
+//		where the "#attr" values have "#text" and "#seq" keys. (See NewMapXmlSeq.)
 func HandleXMPPStreamTag(b ...bool) {
 	if len(b) == 0 {
 		handleXMPPStreamTag = !handleXMPPStreamTag
