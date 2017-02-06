@@ -24,6 +24,7 @@ func TestToLower(t *testing.T) {
 	fmt.Println("\nTestToLower ...")
 
 	CoerceKeysToLower()
+	defer CoerceKeysToLower()
 
 	m1, err := NewMapXml(tolowerdata1)
 	if err != nil {

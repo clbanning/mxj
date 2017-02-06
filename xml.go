@@ -227,14 +227,10 @@ var lowerCase bool
 //	NOTE: only recognized by NewMapXml, NewMapXmlReader, and NewMapXmlReaderRaw functions as well as
 //	      the associated HandleXmlReader and HandleXmlReaderRaw.
 func CoerceKeysToLower(b ...bool) {
-	if len(b) == 1 {
+	if len(b) == 0 {
+		lowerCase = !lowerCase
+	} else if len(b) == 1 {
 		lowerCase = b[0]
-		return
-	}
-	if !lowerCase {
-		lowerCase = true
-	} else {
-		lowerCase = false
 	}
 }
 
@@ -261,14 +257,10 @@ var snakeCaseKeys bool
 // Note: the attribute prefix will be a hyphen, '-', or what ever string value has
 // been specified using SetAttrPrefix.
 func CoerceKeysToSnakeCase(b ...bool) {
-	if len(b) == 1 {
+	if len(b) == 0 {
+		snakeCaseKeys = !snakeCaseKeys
+	} else if len(b) == 1 {
 		snakeCaseKeys = b[0]
-		return
-	}
-	if !snakeCaseKeys {
-		snakeCaseKeys = true
-	} else {
-		snakeCaseKeys = false
 	}
 }
 
