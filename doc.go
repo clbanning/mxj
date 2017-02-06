@@ -11,6 +11,7 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
 Note:
+	2017.02.06: Support XMPP stream processing - HandleXMPPStreamTag().
 	2016.11.07: Preserve name space prefix syntax in XmlSeq parser - NewMapXmlSeq(), etc.
 	2016.06.25: Support overriding default XML attribute prefix, "-", in Map keys - SetAttrPrefix().
 	2016.05.26: Support customization of xml.Decoder by exposing CustomDecoder variable.
