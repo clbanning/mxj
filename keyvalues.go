@@ -490,6 +490,20 @@ func hasSubKeys(v interface{}, subkeys map[string]interface{}) bool {
 	return false
 }
 
+// Per: https://github.com/clbanning/mxj/issues/37#issuecomment-278651862
+var subkeySep string = ":"
+
+func SetSubkeyFieldSeparator(s ...string) {
+	switch {
+	case len(s) == 0:
+		subkeySep = ":" // the default
+	case s[0] == "":
+		subkeySep = ":" // the default
+	default:
+		subkeySep = s[0]
+	}
+}
+
 // Generate map of key:value entries as map[string]string.
 //	'kv' arguments are "name:value" pairs: attribute keys are designated with prepended hyphen, '-'.
 //	If len(kv) == 0, the return is (nil, nil).
@@ -499,12 +513,12 @@ func getSubKeyMap(kv ...string) (map[string]interface{}, error) {
 	}
 	m := make(map[string]interface{}, 0)
 	for _, v := range kv {
-		vv := strings.Split(v, ":")
+		vv := strings.Split(v, subkeySep)
 		switch len(vv) {
 		case 2:
 			m[vv[0]] = interface{}(vv[1])
 		case 3:
-			switch vv[3] {
+			switch vv[2] {
 			case "string", "char", "text":
 				m[vv[0]] = interface{}(vv[1])
 			case "bool", "boolean":
