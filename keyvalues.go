@@ -42,6 +42,7 @@ func SetArraySize(size int) int {
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
+//             - If val contains ":" symbol, use SetSubkeyFieldSeparator to a unused symbol, perhaps "|".
 func (mv Map) ValuesForKey(key string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
@@ -151,6 +152,7 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, cnt *int, subkeys ma
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
+//             - If val contains ":" symbol, use SetSubkeyFieldSeparator to a unused symbol, perhaps "|".
 func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
 	// If there are no array indexes in path, use legacy ValuesForPath() logic.
 	if strings.Index(path, "[") < 0 {

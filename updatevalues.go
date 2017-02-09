@@ -26,8 +26,10 @@ import (
 //	            exclusion critera - e.g., "!author:William T. Gaddis".
 //	 
 //	NOTES:
-//	  1. Simple elements with attributes need a path terminated as ".#text" to modify the actual value.
-//	  2. Values in Maps created using NewMapXmlSeq are map[string]interface{} values with a "#text" key.
+//		1. Simple elements with attributes need a path terminated as ".#text" to modify the actual value.
+//		2. Values in Maps created using NewMapXmlSeq are map[string]interface{} values with a "#text" key.
+//		3. If values in 'newVal' or 'subkeys' args contain ":", use SetNewvalFieldSeparator or
+//		   SetSubkeyFieldSeparator to a unused symbol, perhaps "|".
 func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...string) (int, error) {
 	m := map[string]interface{}(mv)
 
