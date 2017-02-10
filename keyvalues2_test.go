@@ -31,8 +31,8 @@ func TestSetSubkeyFieldSeparator(t *testing.T) {
 		t.Fatal(":expecting: value 2; got:", vals[0].(map[string]interface{})["#text"])
 	}
 
-	SetSubkeyFieldSeparator("|")
-	defer SetSubkeyFieldSeparator()
+	SetFieldSeparator("|")
+	defer SetFieldSeparator()
 	vals, err = m.ValuesForKey("elem", "-attr|2|text")
 	if err != nil {
 		t.Fatal(err)

@@ -28,8 +28,8 @@ import (
 //	NOTES:
 //		1. Simple elements with attributes need a path terminated as ".#text" to modify the actual value.
 //		2. Values in Maps created using NewMapXmlSeq are map[string]interface{} values with a "#text" key.
-//		3. If values in 'newVal' or 'subkeys' args contain ":", use SetNewvalFieldSeparator or
-//		   SetSubkeyFieldSeparator to a unused symbol, perhaps "|".
+//		3. If values in 'newVal' or 'subkeys' args contain ":", use SetFieldSeparator to an unused symbol, 
+//	      perhaps "|".
 func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...string) (int, error) {
 	m := map[string]interface{}(mv)
 
@@ -58,7 +58,7 @@ func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...st
 		for key, val = range newVal.(map[string]interface{}) {
 		}
 	case string: // split it as a key:value pair
-		ss := strings.Split(newVal.(string), newvalSep)
+		ss := strings.Split(newVal.(string), fieldSep)
 		n := len(ss)
 		if n < 2 || n > 3 {
 			return 0, fmt.Errorf("unknown newVal spec - %+v", newVal)
@@ -95,26 +95,6 @@ func (mv Map) UpdateValuesForPath(newVal interface{}, path string, subkeys ...st
 	updateValuesForKeyPath(key, val, m, keys, subKeyMap, &count)
 
 	return count, nil
-}
-
-// Per: https://github.com/clbanning/mxj/issues/37#issuecomment-278651862
-var newvalSep string = ":"
-
-// SetNewvalFieldSeparator changes the default field separator, ":", for the
-// newVal argument in mv.UpdateValuesForPath. E.g., if the newVal
-// value is "http://blah/blah", setting the field separator to "|" will allow
-// the newVal specification, "<key>|http://blah/blah" to parse properly. 
-// If called with no argument or an empty string value, the field separator is
-// set to the default, ":".
-func SetNewvalFieldSeparator(s ...string) {
-	switch {
-	case len(s) == 0:
-		newvalSep = ":" // the default
-	case s[0] == "":
-		newvalSep = ":" // the default
-	default:
-		newvalSep = s[0]
-	}
 }
 
 // navigate the path

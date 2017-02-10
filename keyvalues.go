@@ -42,7 +42,7 @@ func SetArraySize(size int) int {
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
-//             - If val contains ":" symbol, use SetSubkeyFieldSeparator to a unused symbol, perhaps "|".
+//             - If val contains ":" symbol, use SetFieldSeparator to a unused symbol, perhaps "|".
 func (mv Map) ValuesForKey(key string, subkeys ...string) ([]interface{}, error) {
 	m := map[string]interface{}(mv)
 	var subKeyMap map[string]interface{}
@@ -152,7 +152,7 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, cnt *int, subkeys ma
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
 //               exclusion critera - e.g., "!author:William T. Gaddis".
-//             - If val contains ":" symbol, use SetSubkeyFieldSeparator to a unused symbol, perhaps "|".
+//             - If val contains ":" symbol, use SetFieldSeparator to a unused symbol, perhaps "|".
 func (mv Map) ValuesForPath(path string, subkeys ...string) ([]interface{}, error) {
 	// If there are no array indexes in path, use legacy ValuesForPath() logic.
 	if strings.Index(path, "[") < 0 {
@@ -492,26 +492,6 @@ func hasSubKeys(v interface{}, subkeys map[string]interface{}) bool {
 	return false
 }
 
-// Per: https://github.com/clbanning/mxj/issues/37#issuecomment-278651862
-var subkeySep string = ":"
-
-// SetSubkeyFieldSeparator changes the default field separator, ":", for optional
-// subkey arguments in mv.ValuesForKey and mv.ValuesForPath. E.g., if the subkey
-// value is "http://blah/blah", setting the field separator to "|" will allow
-// the subkey specification, "<key>|http://blah/blah" to parse properly. 
-// If called with no argument or an empty string value, the field separator is
-// set to the default, ":".
-func SetSubkeyFieldSeparator(s ...string) {
-	switch {
-	case len(s) == 0:
-		subkeySep = ":" // the default
-	case s[0] == "":
-		subkeySep = ":" // the default
-	default:
-		subkeySep = s[0]
-	}
-}
-
 // Generate map of key:value entries as map[string]string.
 //	'kv' arguments are "name:value" pairs: attribute keys are designated with prepended hyphen, '-'.
 //	If len(kv) == 0, the return is (nil, nil).
@@ -521,7 +501,7 @@ func getSubKeyMap(kv ...string) (map[string]interface{}, error) {
 	}
 	m := make(map[string]interface{}, 0)
 	for _, v := range kv {
-		vv := strings.Split(v, subkeySep)
+		vv := strings.Split(v, fieldSep)
 		switch len(vv) {
 		case 2:
 			m[vv[0]] = interface{}(vv[1])
