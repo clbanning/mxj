@@ -595,13 +595,14 @@ func hasKeyPath(crumbs string, iv interface{}, key string, basket map[string]boo
 	case map[string]interface{}:
 		vv := iv.(map[string]interface{})
 		if _, ok := vv[key]; ok {
+			// create a new breadcrumb, intialized with the one we have
+			var nbc string
 			if crumbs == "" {
-				crumbs = key
+				nbc = key
 			} else {
-				crumbs += "." + key
+				nbc = crumbs + "." + key
 			}
-			// *basket = append(*basket, crumb)
-			basket[crumbs] = true
+			basket[nbc] = true
 		}
 		// walk on down the path, key could occur again at deeper node
 		for k, v := range vv {
