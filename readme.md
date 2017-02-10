@@ -16,6 +16,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2017.02.10: SetFieldSeparator changes field separator for args in UpdateValuesForPath, ValuesFor... methods.
 	2017.02.06: Support XMPP stream processing - HandleXMPPStreamTag().
 	2016.11.07: Preserve name space prefix syntax in XmlSeq parser - NewMapXmlSeq(), etc.
 	2016.06.25: Support overriding default XML attribute prefix, "-", in Map keys - SetAttrPrefix().
