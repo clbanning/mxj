@@ -740,13 +740,13 @@ func myByteReader(r io.Reader) io.Reader {
 
 // need for io.Reader - but we don't use it ...
 func (b *byteReader) Read(p []byte) (int, error) {
-	return 0, nil
+	return b.r.Read(p)
 }
 
 func (b *byteReader) ReadByte() (byte, error) {
 	_, err := b.r.Read(b.b)
 	if len(b.b) > 0 {
-		return b.b[0], nil
+		return b.b[0], err
 	}
 	var c byte
 	return c, err
