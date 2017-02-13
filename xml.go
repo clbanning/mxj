@@ -738,7 +738,8 @@ func myByteReader(r io.Reader) io.Reader {
 	return &byteReader{r, b}
 }
 
-// need for io.Reader - but we don't use it ...
+// Need for io.Reader interface ...
+// Needed if reading a malformed http.Request.Body - issue #38.
 func (b *byteReader) Read(p []byte) (int, error) {
 	return b.r.Read(p)
 }

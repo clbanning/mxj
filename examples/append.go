@@ -49,6 +49,10 @@ func main() {
 	}
 
 	x, err := m.XmlIndent("", "  ")
+	if err != nil {
+		fmt.Println("XmlIndent err:", err)
+		return
+	}
 	fmt.Println(string(x))
 }
 
