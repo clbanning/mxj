@@ -183,7 +183,7 @@ func updateValue(key string, value interface{}, m interface{}, keys0 string, sub
 				var valmodified bool
 				for _, v := range endVal.([]interface{}) {
 					// check entry subkeys
-					if ok := hasSubKeys(v, subkeys); ok {
+					if hasSubKeys(v, subkeys) {
 						// replace v with value
 						nv = append(nv, value)
 						valmodified = true
