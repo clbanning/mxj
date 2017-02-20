@@ -126,16 +126,14 @@ func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, erro
 		r = cast[0]
 	}
 	// create TeeReader so we can retrieve raw XML
-	buf := make([]byte, XmlWriterBufSize)
+	buf := make([]byte, 0)
 	wb := bytes.NewBuffer(buf)
 	trdr := myTeeReader(xmlReader, wb)
 
 	m, err := xmlSeqReaderToMap(trdr, r)
 
 	// retrieve the raw XML that was decoded
-	b := make([]byte, wb.Len())
-	_, _ = wb.Read(b)
-	b = bytes.TrimSpace(b)
+	b := wb.Bytes()
 
 	// err may be NoRoot
 	return m, b, err

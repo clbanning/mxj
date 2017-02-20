@@ -86,12 +86,6 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	return xmlReaderToMap(xmlReader, r)
 }
 
-// XmlWriterBufSize - set the size of io.Writer for the TeeReader used by NewMapXmlReaderRaw()
-// and HandleXmlReaderRaw().  This reduces repeated memory allocations and copy() calls in most cases.
-//	NOTE: the 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
-//	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
-var XmlWriterBufSize int = 512
-
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
 //	NOTES:
 //	   1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
@@ -110,15 +104,14 @@ func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) 
 		r = cast[0]
 	}
 	// create TeeReader so we can retrieve raw XML
-	buf := make([]byte, XmlWriterBufSize)
+	buf := make([]byte, 0)
 	wb := bytes.NewBuffer(buf)
 	trdr := myTeeReader(xmlReader, wb) // see code at EOF
 
 	m, err := xmlReaderToMap(trdr, r)
 
 	// retrieve the raw XML that was decoded
-	b := make([]byte, wb.Len())
-	_, _ = wb.Read(b)
+	b := wb.Bytes()
 
 	if err != nil {
 		return nil, b, err
