@@ -115,3 +115,26 @@ func TestLeafNodes(t *testing.T) {
 	// restore default
 	PrependAttrWithHyphen(true)
 }
+
+func TestLeafDotNotation(t *testing.T) {
+	xmldata2 := []byte(`
+      <doc>
+         <item num="2" color="blue">Item 2 is blue</item>
+         <item num="3" color="green">
+            <arm side="left" length="3.5"/>
+            <arm side="right" length="3.6"/>
+         </item>
+      </doc>`)
+	m, err := NewMapXml(xmldata2)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	fmt.Println("\nDotNotation-LeafValues:")
+	LeafUseDotNotation()
+	defer LeafUseDotNotation()
+	ln := m.LeafNodes()
+	for _, v := range ln {
+		fmt.Printf("%#v\n", v)
+	}
+
+}

@@ -57,7 +57,11 @@ func getLeafNodes(path, node string, mv interface{}, l *[]LeafNode, noattr bool)
 		}
 	case []interface{}:
 		for i, v := range mv.([]interface{}) {
-			getLeafNodes(path, "["+strconv.Itoa(i)+"]", v, l, noattr)
+			if useDotNotation {
+				getLeafNodes(path, strconv.Itoa(i), v, l, noattr)
+			} else {
+				getLeafNodes(path, "["+strconv.Itoa(i)+"]", v, l, noattr)
+			}
 		}
 	default:
 		// can't walk any further, so create leaf
@@ -84,4 +88,21 @@ func (mv Map) LeafValues(no_attr ...bool) []interface{} {
 		vv[i] = ln[i].Value
 	}
 	return vv
+}
+
+// ====================== utilities ======================
+
+// https://groups.google.com/forum/#!topic/golang-nuts/pj0C5IrZk4I
+var useDotNotation bool
+
+// LeafUseDotNotation sets a flag that list members in LeafNode paths
+// should be identified using ".N" syntax rather than the default "[N]"
+// syntax.  Calling LeafUseDotNotation with no arguments toggles the 
+// flag on/off; otherwise, the argument sets the flag value 'true'/'false'.
+func LeafUseDotNotation(b ...bool) {
+	if len(b) == 0 {
+		useDotNotation = !useDotNotation
+		return
+	}
+	useDotNotation = b[0]
 }
