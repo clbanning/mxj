@@ -45,7 +45,7 @@ func main() {
       fmt.Println("err:", err)
       return
    }
-	mxj.LeafUseDotNotation()
+   mxj.LeafUseDotNotation()
    l := m.LeafNodes()
    for _, v := range l {
       fmt.Println("path:", v.Path, "value:", v.Value)
