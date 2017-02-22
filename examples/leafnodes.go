@@ -4,7 +4,6 @@ package main
 
 import (
    "fmt"
-   "strings"
 
    "github.com/clbanning/mxj"
 )
@@ -46,13 +45,10 @@ func main() {
       fmt.Println("err:", err)
       return
    }
+	mxj.LeafUseDotNotation()
    l := m.LeafNodes()
-
-   // now change the [n] to .n
    for _, v := range l {
-      p := strings.Replace(v.Path, "[", ".", -1)
-      p = strings.Replace(p, "]", "", -1)
-      fmt.Println("path:", p, "value:", v.Value)
+      fmt.Println("path:", v.Path, "value:", v.Value)
    }
    /*
       Output (sequence not guaranteed):

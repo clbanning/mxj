@@ -24,9 +24,13 @@ type LeafNode struct {
 // LeafNodes - returns an array of all LeafNode values for the Map.
 // The option no_attr argument suppresses attribute values (keys with prepended hyphen, '-')
 // as well as the "#text" key for the associated simple element value.
-//	NOTE: if PrependAttrWithHypen(false), then #test is stripping "#text" key
-//	will result in attributes having .attr-name as terminal node in 'path' while
-//	the path for the element value, itself, will be the base path w/o "#text".
+//
+// PrependAttrWithHypen(false) will result in attributes having .attr-name as 
+// terminal node in 'path' while the path for the element value, itself, will be 
+// the base path w/o "#text". 
+//
+// LeafUseDotNotation(true) causes list members to be identified using ".N" syntax
+// rather than "[N]" syntax.
 func (mv Map) LeafNodes(no_attr ...bool) []LeafNode {
 	var a bool
 	if len(no_attr) == 1 {
