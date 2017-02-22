@@ -16,6 +16,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 	BenchmarkNewStructJsonBooks-4	  100000	     15309 ns/op
 
 <h4>Notices</h4>
+	2017.02.22: LeafNode paths can use ".N" syntax rather than "[N]" for list member indexing.
 	2017.02.21: github.com/clbanning/checkxml provides functions for validating XML data.
 	2017.02.10: SetFieldSeparator changes field separator for args in UpdateValuesForPath, ValuesFor... methods.
 	2017.02.06: Support XMPP stream processing - HandleXMPPStreamTag().

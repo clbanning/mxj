@@ -11,6 +11,7 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
 Notes:
+	2017.02.22: LeafNode paths can use ".N" syntax rather than "[N]" for list member indexing.
 	2017.02.21: github.com/clbanning/checkxml provides functions for validating XML data.
 	2017.02.10: SetFieldSeparator changes field separator for args in UpdateValuesForPath, ValuesFor... methods.
 	2017.02.06: Support XMPP stream processing - HandleXMPPStreamTag().
