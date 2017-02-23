@@ -654,9 +654,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		}
 		// something more complex
 		p.mapDepth++
-		// PrintElemListSeq(elemListSeq(kv))
 		sort.Sort(elemListSeq(kv))
-		// PrintElemListSeq(elemListSeq(kv))
 		i := 0
 		for _, v := range kv {
 			switch v.v.(type) {
@@ -819,12 +817,6 @@ func (e elemListSeq) Less(i, j int) bool {
 		return false
 	}
 	return true
-}
-
-func PrintElemListSeq(e elemListSeq) {
-	for n, v := range e {
-		fmt.Printf("%d: %v\n", n, v)
-	}
 }
 
 // =============== https://groups.google.com/forum/#!topic/golang-nuts/lHPOHD-8qio
