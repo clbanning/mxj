@@ -86,7 +86,8 @@ XML PARSING CONVENTIONS
    Using NewMapXml()
 
    - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
-     to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)`.)
+     to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)` or
+     SetAttrPrefix().)
    - If the element is a simple element and has attributes, the element value
      is given the key `#text` for its `map[string]interface{}` representation.  (See
      the 'atomFeedString.xml' test data, below.)
@@ -103,8 +104,8 @@ XML PARSING CONVENTIONS
      keys "#comment", "#directive", and "#procinst", respectively. (See documentation for more
      specifics.)
    - Name space syntax is preserved: 
-      - <ns:key>something</ns.key> parses to map["ns:key"]interface{}("something")
-      - xmlns:ns="http://myns.com/ns" parses to map["xmlns:ns"]interface{}("http://myns.com/ns")
+      - <ns:key>something</ns.key> parses to map["ns:key"]interface{}{"something"}
+      - xmlns:ns="http://myns.com/ns" parses to map["xmlns:ns"]interface{}{"http://myns.com/ns"}
 
    Both
 
