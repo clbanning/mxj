@@ -4,7 +4,9 @@ Decode/encode XML to/from map[string]interface{} (or JSON) values, and extract/m
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
 <h4>Related Packages</h4>
-	checkxml: [checkxml](https://github.com/clbanning/checkxml) provides functions for validating XML data.
+
+[checkxml]:[] provides functions for validating XML data.
+[checkxml]: https://github.com/clbanning/checkxml
 
 <h4>Refactor Decoder - 2015.11.15</h4>
 For over a year I've wanted to refactor the XML-to-map[string]interface{} decoder to make it more performant.  I recently took the time to do that, since we were using github.com/clbanning/mxj in a production system that could be deployed on a Raspberry Pi.  Now the decoder is comparable to the stdlib JSON-to-map[string]interface{} decoder in terms of its additional processing overhead relative to decoding to a structure value.  As shown by:
