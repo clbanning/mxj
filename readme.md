@@ -5,7 +5,7 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 
 <h4>Related Packages</h4>
 
-[checkxml]: [] provides functions for validating XML data.
+[checkxml]: provides functions for validating XML data.
 [checkxml]: https://github.com/clbanning/checkxml
 
 <h4>Refactor Decoder - 2015.11.15</h4>
