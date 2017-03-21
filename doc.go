@@ -90,7 +90,7 @@ XML PARSING CONVENTIONS
 
    - Attributes are parsed to `map[string]interface{}` values by prefixing a hyphen, `-`,
      to the attribute label. (Unless overridden by `PrependAttrWithHyphen(false)` or
-     SetAttrPrefix().)
+     `SetAttrPrefix()`.)
    - If the element is a simple element and has attributes, the element value
      is given the key `#text` for its `map[string]interface{}` representation.  (See
      the 'atomFeedString.xml' test data, below.)
