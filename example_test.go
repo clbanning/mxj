@@ -122,10 +122,10 @@ func ExampleNewMapXmlReaderRaw() {
 
 func ExampleNewMapStruct() {
 	type str struct {
-		IntVal   int     `json:"int"`
-		StrVal   string  `json:"str"`
-		FloatVal float64 `json:"float"`
-		BoolVal  bool    `json:"bool"`
+		IntVal   int     `structs:"int"`
+		StrVal   string  `structs:"str"`
+		FloatVal float64 `structs:"float"`
+		BoolVal  bool    `structs:"bool"`
 		private  string
 	}
 	strVal := str{IntVal: 4, StrVal: "now's the time", FloatVal: 3.14159, BoolVal: true, private: "Skies are blue"}
@@ -141,7 +141,7 @@ func ExampleNewMapStruct() {
 
 	// NoFail output:
 	// strVal: mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:"Skies are blue"}
-	// mapVal: mxj.Map{"FloatVal":3.14159, "BoolVal":true, "IntVal":4, "StrVal":"now's the time"}
+	// mapVal: mxj.Map{"float":3.14159, "bool":true, "int":4, "str":"now's the time"}
 }
 
 func ExampleMap_Struct() {

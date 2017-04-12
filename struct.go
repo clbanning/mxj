@@ -11,10 +11,9 @@ import (
 	"reflect"
 )
 
-// Create a new Map value from a structure.  Error returned if argument is not a structure
-// or if there is a json.Marshal or json.Unmarshal error.
-//	Only public structure fields are decoded in the Map value. Also, json.Marshal structure encoding rules
-//	are followed for decoding the structure fields.
+// Create a new Map value from a structure.  Error returned if argument is not a structure.
+// Only public structure fields are decoded in the Map value. See github.com/fatih/structs#Map
+// for handling of "structs" tags.
 func NewMapStruct(structVal interface{}) (Map, error) {
 	if !structs.IsStruct(structVal) {
 		return nil, errors.New("NewMapStruct() error: argument is not type Struct")
