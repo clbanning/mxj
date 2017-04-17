@@ -9,6 +9,7 @@ func TestStructHeader(t *testing.T) {
 	fmt.Println("\n----------------  struct_test.go ...\n")
 }
 
+/*
 func TestNewMapStruct(t *testing.T) {
 	type str struct {
 		IntVal   int     `json:"int"`
@@ -45,6 +46,7 @@ func TestNewMapStructError(t *testing.T) {
 
 	fmt.Println("NewMapStructError, merr:", merr.Error())
 }
+*/
 
 func TestStruct(t *testing.T) {
 	type str struct {
