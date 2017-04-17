@@ -16,7 +16,7 @@ import (
 // Only public structure fields are decoded in the Map value. See github.com/fatih/structs#Map
 // for handling of "structs" tags.
 
-// DEPRECATED - import github.com/fatih/struct and cast result of struct.Map to mxj.Map.
+// DEPRECATED - import github.com/fatih/structs and cast result of structs.Map to mxj.Map.
 // (Alernatively uncomment the old source and import in struct.go.)
 func NewMapStruct(structVal interface{}) (Map, error) {
 	return nil, errors.New("deprecated - see package documentation")
