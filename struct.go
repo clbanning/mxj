@@ -17,7 +17,14 @@ import (
 // for handling of "structs" tags.
 
 // DEPRECATED - import github.com/fatih/structs and cast result of structs.Map to mxj.Map.
-// (Alernatively uncomment the old source and import in struct.go.)
+//	import "github.com/fatih/structs"
+//	...
+//	   sm, err := structs.Map(<some struct>)
+//	   if err != nil {
+//	      // handle error
+//	   }
+//	   m := mxj.Map(sm)
+// Alernatively uncomment the old source and import in struct.go.
 func NewMapStruct(structVal interface{}) (Map, error) {
 	return nil, errors.New("deprecated - see package documentation")
 	/*
