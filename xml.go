@@ -951,6 +951,32 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			}
 		}
 		return nil
+	
+	case []string:
+		//quick fix for []string type 
+		//[]string should be treated exaclty as []interface{}
+		if len(value.([]string)) == 0 {
+			if doIndent {
+				*s += p.padding + p.indent
+			}
+			*s += "<" + key
+			elen = 0
+			endTag = true
+			break
+		}
+		for _, v := range value.([]string) {
+			if doIndent {
+				p.Indent()
+			}
+			if err := mapToXmlIndent(doIndent, s, key, v, p); err != nil {
+				return err
+			}
+			if doIndent {
+				p.Outdent()
+			}
+		}
+		return nil
+		
 	case nil:
 		// terminate the tag
 		if doIndent {
