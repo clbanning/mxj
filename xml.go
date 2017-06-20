@@ -951,8 +951,11 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			}
 		}
 		return nil
-	
 	case []string:
+		// This was added by https://github.com/slotix ... not a type that
+		// would be encountered if mv generated from NewMapXml, NewMapJson.
+		// Could be encountered in AnyXml(), so we'll let it stay, though
+		// it should be merged with case []interface{}, above.
 		//quick fix for []string type 
 		//[]string should be treated exaclty as []interface{}
 		if len(value.([]string)) == 0 {
@@ -976,7 +979,6 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			}
 		}
 		return nil
-		
 	case nil:
 		// terminate the tag
 		if doIndent {
