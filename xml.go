@@ -1075,10 +1075,7 @@ func (a attrList) Swap(i, j int) {
 }
 
 func (a attrList) Less(i, j int) bool {
-	if a[i][0] > a[j][0] {
-		return false
-	}
-	return true
+	return a[i][0] <= a[j][0]
 }
 
 type elemList [][2]interface{}
@@ -1092,8 +1089,5 @@ func (e elemList) Swap(i, j int) {
 }
 
 func (e elemList) Less(i, j int) bool {
-	if e[i][0].(string) > e[j][0].(string) {
-		return false
-	}
-	return true
+	return e[i][0].(string) <= e[j][0].(string)
 }
