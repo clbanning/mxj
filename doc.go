@@ -6,7 +6,7 @@
 /*
 Marshal/Unmarshal XML to/from JSON and map[string]interface{} values, and extract/modify values from maps by key or key-path, including wildcards.
 
-mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j or mxj/j2x packages.
+mxj supplants the legacy x2j and j2x packages. The subpackage x2j-wrapper is provided to facilitate migrating from the x2j package.  The x2j and j2x subpackages provide similar functionality of the old packages but are not function-name compatible with them.
 
 Note: this library was designed for processing ad hoc anonymous messages.  Bulk processing large data sets may be much more efficiently performed using the encoding/xml or encoding/json packages from Go's standard library directly.
 
