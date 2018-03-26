@@ -2,32 +2,7 @@ x2j.go - Unmarshal arbitrary XML docs to map[string]interface{} or JSON and extr
 
 NOTICE:
 
-AS OF 3-FEB-2014 THE x2j PACKAGE IS NO LONGER SUPPORTED.
-
-IT HAS BEEN DEPRECATED IN FAVOR OF mxj/x2j: https://github.com/clbanning/mxj/tree/master/x2j.
-
-ANNOUNCEMENTS
-
-22 April 2016:
-
-People keep cloning this "DEPRECATED" repo at the rate of about 100 per day, so I've pulled in the github.com/clbanning/mxj decoder that is orders of magnitude faster to speed things up. (It'd be great if everyone would just use the mxj package.)
-
-23 January 2014:
-
-Extract path(s) for a tag/key value from an anonymous XML or map[string]interface{} value.  Result can be used with ValuesForKeyPath() / ValuesAtKeyPath().  Similar to ValuesFor...() functions but PathsFor...() and PathFor...Shortest() expose the tree navigation information.
-
-20 December 2013:
-
-Non-UTF8 character sets supported via the X2jCharsetReader variable.
-
-12 December 2013:
-
-For symmetry, the package j2x has functions that marshal JSON strings and
-map[string]interface{} values to XML encoded strings: http://godoc.org/github.com/clbanning/j2x.
-
-Also, ToTree(), ToMap(), ToJson(), ToJsonIndent(), ReaderValuesFromTagPath() and ReaderValuesForTag() use io.Reader instead of string or []byte.
-
-If you want to process a stream of XML messages check out XmlMsgsFromReader().
+26mar18: This is provided to aid transitioning applications using the "x2j" package to the "mxj" package.
 
 USAGE
 
