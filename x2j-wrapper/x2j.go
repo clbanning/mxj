@@ -2,6 +2,7 @@
 // Copyright 2012-2018 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
+
 /*
    Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
    THIS IS ONLY PROVIDED TO FACILIATE MIGRATING TO "mxj" PACKAGE FROM "x2j" PACKAGE.
