@@ -14,6 +14,7 @@ Related Packages:
 	checkxml: github.com/clbanning/checkxml provides functions for validating XML data.
 
 Notes:
+	2018.03.26: Added mxj/x2j-wrapper sub-package for migrating from legacy x2j package.
 	2017.02.22: LeafNode paths can use ".N" syntax rather than "[N]" for list member indexing.
 	2017.02.21: github.com/clbanning/checkxml provides functions for validating XML data.
 	2017.02.10: SetFieldSeparator changes field separator for args in UpdateValuesForPath, ValuesFor... methods.
