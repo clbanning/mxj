@@ -817,8 +817,8 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	if reflect.ValueOf(value).Kind() == reflect.Map {
 		if _, ok := value.(map[string]interface{}); !ok {
 			val := make(map[string]interface{})
-			keys := reflect.ValueOf(value).MapKeys()
 			vv := reflect.ValueOf(value)
+			keys := vv.MapKeys()
 			for _, k := range keys {
 				val[fmt.Sprint(k)] = vv.MapIndex(k).Interface()
 			}
