@@ -815,7 +815,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	// per issue #48, 18apr18 - try and coerce maps to map[string]interface{}
 	// Don't need for mapToXmlSeqIndent, since maps there are decoded by NewMapXmlSeq().
 	if reflect.ValueOf(value).Kind() == reflect.Map {
-		if _, ok := value.(map[string]interface{}); !ok {
+		switch value.(type) {
+		case map[string]interface{}:
+		default:
 			val := make(map[string]interface{})
 			vv := reflect.ValueOf(value)
 			keys := vv.MapKeys()
