@@ -58,8 +58,8 @@ Unmarshal / marshal XML as a `Map` value, 'mv':
 xmlValue, err := mv.Xml()      // marshal</pre>
 
 Unmarshal XML from an `io.Reader` as a `Map` value, 'mv':
-<pre>mv, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
-mv, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded</pre>
+<pre>mv, err := NewMapXmlReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
+mv, raw, err := NewMapXmlReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded</pre>
 
 Marshal `Map` value, 'mv', to an XML Writer (`io.Writer`):
 <pre>err := mv.XmlWriter(xmlWriter)

@@ -45,8 +45,8 @@ SUMMARY
       xmlValue, err := mv.Xml()      // marshal
 
    Unmarshal XML from an io.Reader as a Map value, 'mv':
-      mv, err := NewMapReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
-      mv, raw, err := NewMapReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded
+      mv, err := NewMapXmlReader(xmlReader)         // repeated calls, as with an os.File Reader, will process stream
+      mv, raw, err := NewMapXmlReaderRaw(xmlReader) // 'raw' is the raw XML that was decoded
 
    Marshal Map value, 'mv', to an XML Writer (io.Writer):
       err := mv.XmlWriter(xmlWriter)
