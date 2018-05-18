@@ -464,7 +464,7 @@ func cast(s string, r bool) interface{} {
 		// ParseBool treats "1"==true & "0"==false, we've already scanned those
 		// values as float64. See if value has 't' or 'f' as initial screen to
 		// minimize calls to ParseBool; also, see if len(s) < 6.
-		if len(s) < 6 {
+		if len(s) > 0 && len(s) < 6 {
 			switch s[:1] {
 			case "t", "T", "f", "F":
 				if b, err := strconv.ParseBool(s); err == nil {
