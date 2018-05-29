@@ -453,13 +453,13 @@ func cast(s string, r bool) interface{} {
 		if !castNanInf {
 			switch strings.ToLower(s) {
 			case "nan", "inf", "-inf":
-				return interface{}(s)
+				return s
 			}
 		}
 
 		// handle numeric strings ahead of boolean
 		if f, err := strconv.ParseFloat(s, 64); err == nil {
-			return interface{}(f)
+			return f
 		}
 		// ParseBool treats "1"==true & "0"==false, we've already scanned those
 		// values as float64. See if value has 't' or 'f' as initial screen to
@@ -468,12 +468,12 @@ func cast(s string, r bool) interface{} {
 			switch s[:1] {
 			case "t", "T", "f", "F":
 				if b, err := strconv.ParseBool(s); err == nil {
-					return interface{}(b)
+					return b
 				}
 			}
 		}
 	}
-	return interface{}(s)
+	return s
 }
 
 // ------------------ END: NewMapXml & NewMapXmlReader -------------------------
