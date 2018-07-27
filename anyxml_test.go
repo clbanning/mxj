@@ -144,8 +144,7 @@ func TestNilMap(t *testing.T) {
 		t.Fatal()
 	}
 
-	checkval = `   <root>
-   </root>`
+	checkval = `   <root></root>`
 	xmlout, err = AnyXmlIndent(nil, "   ", "  ", "root")
 	if err != nil {
 		t.Fatal(err)
