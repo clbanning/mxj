@@ -108,3 +108,101 @@ func TestAnyXmlIndent(t *testing.T) {
 	}
 	fmt.Println("s->x:\n", string(x))
 }
+
+
+func TestNilMap(t *testing.T) {
+	XmlDefaultEmptyElemSyntax()
+	checkval := "<root/>"
+	xmlout, err := AnyXml(nil, "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	checkval = "   <root/>"
+	xmlout, err = AnyXmlIndent(nil, "   ", "  ", "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	// use Go XML marshal syntax for empty element"
+	XmlGoEmptyElemSyntax()
+	checkval = "<root></root>"
+	xmlout, err = AnyXml(nil, "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	checkval = `   <root></root>`
+	xmlout, err = AnyXmlIndent(nil, "   ", "  ", "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+	XmlDefaultEmptyElemSyntax()
+}
+
+func TestNilValue(t *testing.T) {
+	val := map[string]interface{}{"toplevel": nil}
+	checkval := "<root><toplevel/></root>"
+
+	XmlDefaultEmptyElemSyntax()
+	xmlout, err := AnyXml(val, "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	checkval = `   <root>
+     <toplevel/>
+   </root>`
+	xmlout, err = AnyXmlIndent(val, "   ", "  ", "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	XmlGoEmptyElemSyntax()
+	checkval = "<root><toplevel></toplevel></root>"
+	xmlout, err = AnyXml(val, "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	checkval = `   <root>
+     <toplevel></toplevel>
+   </root>`
+	xmlout, err = AnyXmlIndent(val, "   ", "  ", "root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+	XmlDefaultEmptyElemSyntax()
+}
