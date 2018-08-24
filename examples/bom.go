@@ -26,18 +26,33 @@ Content-Type: text/plain
 --SEPARATERUFCIFHEIR--
 {"hello": "world"}
 		`)
+
+	// don't prepend attributes with '-'
 	mxj.SetAttrPrefix("")
+
+	// parse the data as a map[string]interface{} value
 	m, err := mxj.NewMapXml(data)
 	if err != nil {
 		fmt.Println("err:", err)
 		return
 	}
-
+	// check that we got a 'tag' tagged doc
+	if _, ok := m["tag"]; !ok {
+		fmt.Println("no tag doc ...")
+		return
+	}
 	fmt.Printf("%v\n", m)
 
-	val := decodedXml{
-		XMLName:  xml.Name{"","tag"},
-		SomeAttr: m["tag"].(map[string]interface{})["someattr"].(string),
+	// extract the attribute value
+	attrval, err := m.ValueForPath("tag.someattr")
+	if err != nil {
+		fmt.Println("err:", err)
+		return
 	}
+
+	// create decodeXml value
+	val := decodedXml{
+		XMLName:  xml.Name{"", "tag"},
+		SomeAttr: attrval.(string)}
 	fmt.Printf("%v\n", val)
 }
