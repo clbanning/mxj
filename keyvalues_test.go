@@ -444,3 +444,49 @@ func TestValueForPathString(t *testing.T) {
 		t.Fatal("wrong value")
 	}
 }
+
+func TestValueForPathError(t *testing.T) {
+	m := map[string]interface{}{
+		"Div": map[string]interface{}{
+			"Colour": "blue",
+		},
+	}
+	mv := Map(m)
+
+	_, err := mv.ValueForPath("Color")
+	if err != PathNotExistError {
+		t.Fatal("no PathNotExistError returned")
+	}
+}
+
+func TestValueForKey(t *testing.T) {
+	m := map[string]interface{}{
+		"Div": map[string]interface{}{
+			"Colour": "blue",
+		},
+	}
+	mv := Map(m)
+
+	v, err := mv.ValueForKey("Colour")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if str, ok := v.(string); !ok || str != "blue" {
+		t.Fatal("wrong value")
+	}
+}
+
+func TestValueForKeyError(t *testing.T) {
+	m := map[string]interface{}{
+		"Div": map[string]interface{}{
+			"Colour": "blue",
+		},
+	}
+	mv := Map(m)
+
+	_, err := mv.ValueForKey("Color")
+	if err != KeyNotExistError {
+		t.Fatal("no KeyNotExistError returned")
+	}
+}
+
