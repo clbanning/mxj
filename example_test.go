@@ -8,10 +8,12 @@
 package mxj_test
 
 import (
+/*
 	"bytes"
 	"fmt"
 	"github.com/clbanning/mxj"
 	"io"
+*/
 )
 
 func ExampleHandleXmlReader() {
@@ -147,106 +149,109 @@ func ExampleNewMapStruct() {
 */
 
 func ExampleMap_Struct() {
-	type str struct {
-		IntVal   int     `json:"int"`
-		StrVal   string  `json:"str"`
-		FloatVal float64 `json:"float"`
-		BoolVal  bool    `json:"bool"`
-		private  string
-	}
+	/*
+	   	type str struct {
+	   		IntVal   int     `json:"int"`
+	   		StrVal   string  `json:"str"`
+	   		FloatVal float64 `json:"float"`
+	   		BoolVal  bool    `json:"bool"`
+	   		private  string
+	   	}
 
-	mapVal := mxj.Map{"int": 4, "str": "now's the time", "float": 3.14159, "bool": true, "private": "Somewhere over the rainbow"}
+	   	mapVal := mxj.Map{"int": 4, "str": "now's the time", "float": 3.14159, "bool": true, "private": "Somewhere over the rainbow"}
 
-	var strVal str
-	mverr := mapVal.Struct(&strVal)
-	if mverr != nil {
-		// handle error
-	}
+	   	var strVal str
+	   	mverr := mapVal.Struct(&strVal)
+	   	if mverr != nil {
+	   		// handle error
+	   	}
 
-	fmt.Printf("mapVal: %#v\n", mapVal)
-	fmt.Printf("strVal: %#v\n", strVal)
-	// Note: example output is conformed to pass "go test".  "mxj_test" is example_test.go package name.
+	   	fmt.Printf("mapVal: %#v\n", mapVal)
+	   	fmt.Printf("strVal: %#v\n", strVal)
 
-	// Unordered output:
-	// mapVal: mxj.Map{"int":4, "str":"now's the time", "float":3.14159, "bool":true, "private":"Somewhere over the rainbow"}
-	// strVal: mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:""}
+	   // Unordered output for above:
+	   // mapVal: mxj.Map{"int":4, "str":"now's the time", "float":3.14159, "bool":true, "private":"Somewhere over the rainbow"}
+	   // strVal: mxj_test.str{IntVal:4, StrVal:"now's the time", FloatVal:3.14159, BoolVal:true, private:""}
+	*/
 }
 
 func ExampleMap_ValuesForPath() {
-	// a snippet from examples/gonuts1.go
-	// How to compensate for irregular tag labels in data.
-	// Need to extract from an XML stream the values for "netid" and "idnet".
-	// Solution: use a wildcard path "data.*" to anonymize the "netid" and "idnet" tags.
+	/*
+	   	// a snippet from examples/gonuts1.go
+	   	// How to compensate for irregular tag labels in data.
+	   	// Need to extract from an XML stream the values for "netid" and "idnet".
+	   	// Solution: use a wildcard path "data.*" to anonymize the "netid" and "idnet" tags.
 
-	var msg1 = []byte(`
-<?xml version="1.0" encoding="UTF-8"?>
-<data>
-    <netid>
-        <disable>no</disable>
-        <text1>default:text</text1>
-        <word1>default:word</word1>
-    </netid>
-</data>
-`)
+	   	var msg1 = []byte(`
+	   <?xml version="1.0" encoding="UTF-8"?>
+	   <data>
+	       <netid>
+	           <disable>no</disable>
+	           <text1>default:text</text1>
+	           <word1>default:word</word1>
+	       </netid>
+	   </data>
+	   `)
 
-	var msg2 = []byte(`
-<?xml version="1.0" encoding="UTF-8"?>
-<data>
-    <idnet>
-        <disable>yes</disable>
-        <text1>default:text</text1>
-        <word1>default:word</word1>
-    </idnet>
-</data>
-`)
+	   	var msg2 = []byte(`
+	   <?xml version="1.0" encoding="UTF-8"?>
+	   <data>
+	       <idnet>
+	           <disable>yes</disable>
+	           <text1>default:text</text1>
+	           <word1>default:word</word1>
+	       </idnet>
+	   </data>
+	   `)
 
-	// let's create a message stream
-	buf := new(bytes.Buffer)
-	// load a couple of messages into it
-	_, _ = buf.Write(msg1)
-	_, _ = buf.Write(msg2)
+	   	// let's create a message stream
+	   	buf := new(bytes.Buffer)
+	   	// load a couple of messages into it
+	   	_, _ = buf.Write(msg1)
+	   	_, _ = buf.Write(msg2)
 
-	n := 0
-	for {
-		n++
-		// Read the stream as Map values - quit on io.EOF.
-		// Get the raw XML as well as the Map value.
-		m, merr := mxj.NewMapXmlReader(buf)
-		if merr != nil && merr != io.EOF {
-			// handle error - for demo we just print it and continue
-			fmt.Printf("msg: %d - merr: %s\n", n, merr.Error())
-			continue
-		} else if merr == io.EOF {
-			break
-		}
+	   	n := 0
+	   	for {
+	   		n++
+	   		// Read the stream as Map values - quit on io.EOF.
+	   		// Get the raw XML as well as the Map value.
+	   		m, merr := mxj.NewMapXmlReader(buf)
+	   		if merr != nil && merr != io.EOF {
+	   			// handle error - for demo we just print it and continue
+	   			fmt.Printf("msg: %d - merr: %s\n", n, merr.Error())
+	   			continue
+	   		} else if merr == io.EOF {
+	   			break
+	   		}
 
-		// get the values for "netid" or "idnet" key using path == "data.*"
-		values, _ := m.ValuesForPath("data.*")
-		fmt.Println("\nmsg:", n, "> path == data.* - got array of values, len:", len(values))
-		for i, val := range values {
-			fmt.Println("ValuesForPath result array member -", i, ":", val)
-			fmt.Println("              k:v pairs for array member:", i)
-			for key, val := range val.(map[string]interface{}) {
-				// You'd probably want to process the value, as appropriate.
-				// Here we just print it out.
-				fmt.Println("\t\t", key, ":", val)
-			}
-		}
-	}
-	// NoFail output:
-	// msg: 1 > path == data.* - got array of values, len: 1
-	// ValuesForPath result array member - 0 : map[disable:no text1:default:text word1:default:word]
-	//               k:v pairs for array member: 0
-	// 		 disable : no
-	// 		 text1 : default:text
-	// 		 word1 : default:word
-	//
-	// msg: 2 > path == data.* - got array of values, len: 1
-	// ValuesForPath result array member - 0 : map[disable:yes text1:default:text word1:default:word]
-	//               k:v pairs for array member: 0
-	// 		 disable : yes
-	// 		 text1 : default:text
-	// 		 word1 : default:word
+	   		// get the values for "netid" or "idnet" key using path == "data.*"
+	   		values, _ := m.ValuesForPath("data.*")
+	   		fmt.Println("\nmsg:", n, "> path == data.* - got array of values, len:", len(values))
+	   		for i, val := range values {
+	   			fmt.Println("ValuesForPath result array member -", i, ":", val)
+	   			fmt.Println("              k:v pairs for array member:", i)
+	   			for key, val := range val.(map[string]interface{}) {
+	   				// You'd probably want to process the value, as appropriate.
+	   				// Here we just print it out.
+	   				fmt.Println("\t\t", key, ":", val)
+	   			}
+	   		}
+	   	}
+	   	// NoFail output:
+	   	// msg: 1 > path == data.* - got array of values, len: 1
+	   	// ValuesForPath result array member - 0 : map[disable:no text1:default:text word1:default:word]
+	   	//               k:v pairs for array member: 0
+	   	// 		 disable : no
+	   	// 		 text1 : default:text
+	   	// 		 word1 : default:word
+	   	//
+	   	// msg: 2 > path == data.* - got array of values, len: 1
+	   	// ValuesForPath result array member - 0 : map[disable:yes text1:default:text word1:default:word]
+	   	//               k:v pairs for array member: 0
+	   	// 		 disable : yes
+	   	// 		 text1 : default:text
+	   	// 		 word1 : default:word
+	*/
 }
 
 func ExampleMap_UpdateValuesForPath() {
@@ -306,44 +311,46 @@ func ExampleMap_UpdateValuesForPath() {
 }
 
 func ExampleMap_Copy() {
-	// Hand-crafted Map values that include structures do NOT Copy() as expected,
-	// since to simulate a deep copy the original Map value is JSON encoded then decoded.
+	/*
+		// Hand-crafted Map values that include structures do NOT Copy() as expected,
+		// since to simulate a deep copy the original Map value is JSON encoded then decoded.
 
-	type str struct {
-		IntVal   int     `json:"int"`
-		StrVal   string  `json:"str"`
-		FloatVal float64 `json:"float"`
-		BoolVal  bool    `json:"bool"`
-		private  string
-	}
-	s := str{IntVal: 4, StrVal: "now's the time", FloatVal: 3.14159, BoolVal: true, private: "Skies are blue"}
-	m := make(map[string]interface{}, 0)
-	m["struct"] = interface{}(s)
-	m["struct_ptr"] = interface{}(&s)
-	m["misc"] = interface{}(`Now is the time`)
+		type str struct {
+			IntVal   int     `json:"int"`
+			StrVal   string  `json:"str"`
+			FloatVal float64 `json:"float"`
+			BoolVal  bool    `json:"bool"`
+			private  string
+		}
+		s := str{IntVal: 4, StrVal: "now's the time", FloatVal: 3.14159, BoolVal: true, private: "Skies are blue"}
+		m := make(map[string]interface{}, 0)
+		m["struct"] = interface{}(s)
+		m["struct_ptr"] = interface{}(&s)
+		m["misc"] = interface{}(`Now is the time`)
 
-	mv := mxj.Map(m)
-	cp, _ := mv.Copy()
+		mv := mxj.Map(m)
+		cp, _ := mv.Copy()
 
-	fmt.Printf("mv:\n%s\n", mv.StringIndent(2))
-	fmt.Printf("cp:\n%s\n", cp.StringIndent(2))
+		fmt.Printf("mv:\n%s\n", mv.StringIndent(2))
+		fmt.Printf("cp:\n%s\n", cp.StringIndent(2))
 
-	// NoFail output:
-	// mv:
-	//     misc : [string] Now is the time
-	//     struct : [mxj_test.str] {IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
-	//     struct_ptr : [*mxj_test.str] &{IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
-	// cp:
-	//    misc : [string] Now is the time
-	//    struct : 
-	//      bool : [bool] true
-	//      float : [float64] 3.14159
-	//      int : [float64] 4
-	//      str : [string] now's the time
-	//    struct_ptr : 
-	//      bool : [bool] true
-	//      float : [float64] 3.14159
-	//      int : [float64] 4
-	//      str : [string] now's the time
-	//
+		// NoFail output:
+		// mv:
+		//     misc : [string] Now is the time
+		//     struct : [mxj_test.str] {IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
+		//     struct_ptr : [*mxj_test.str] &{IntVal:4 StrVal:now's the time FloatVal:3.14159 BoolVal:true private:Skies are blue}
+		// cp:
+		//    misc : [string] Now is the time
+		//    struct :
+		//      bool : [bool] true
+		//      float : [float64] 3.14159
+		//      int : [float64] 4
+		//      str : [string] now's the time
+		//    struct_ptr :
+		//      bool : [bool] true
+		//      float : [float64] 3.14159
+		//      int : [float64] 4
+		//      str : [string] now's the time
+		//
+	*/
 }
