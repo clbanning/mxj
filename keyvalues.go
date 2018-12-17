@@ -34,7 +34,7 @@ func SetArraySize(size int) int {
 }
 
 // Return all values in Map, 'mv', associated with a 'key'. If len(returned_values) == 0, then no match.
-// On error, the returned array is 'nil'. NOTE: 'key' can be wildcard, "*".
+// On error, the returned slice is 'nil'. NOTE: 'key' can be wildcard, "*".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
 //             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
 //             - For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
