@@ -41,6 +41,28 @@ func TestXMLEscapeChars(t *testing.T) {
 	fmt.Println("m:", string(x))
 }
 
+func TestXMLEscapeChars2(t *testing.T) {
+	fmt.Println("================== TestXMLEscapeChars2")
+
+	XMLEscapeChars(true)
+	defer XMLEscapeChars(false)
+
+	ss := []byte(`<doc><simple attr1="an attribute">&quot;&apos;&lt;&gt;&amp;</simple></doc>`)
+	fmt.Println(string(ss))
+
+	mv, err := NewMapXml(ss)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("%v\n", mv)
+
+	x, err := mv.XmlIndent("", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("mv:", string(x))
+}
+
 func TestXMLSeqEscapeChars(t *testing.T) {
 	fmt.Println("================== TestXMLSeqEscapeChars")
 	data := []byte(`
