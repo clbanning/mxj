@@ -891,9 +891,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 
 		// simple element? Note: '#text" is an invalid XML tag.
 		if v, ok := vv["#text"]; ok && n+1 == lenvv {
-            		switch v.(type) {
-            		case string:
-                		if xmlEscapeChars {
+			switch v.(type) {
+			case string:
+				if xmlEscapeChars {
 					v = escapeChars(v.(string))
 				} else {
 					v = v.(string)
