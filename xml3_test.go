@@ -45,3 +45,28 @@ func TestOnlyAttributesSeq(t *testing.T) {
 	}
 	fmt.Println(string(xml))
 }
+
+func TestDecodeSimpleValuesAsMap(t *testing.T) {
+	fmt.Println("========== TestDecodeSimpleValuesAsMap")
+	DecodeSimpleValuesAsMap()
+
+	xml := `<item>
+	<id>30102</id>
+	<title>Mini Drone Inteligente - Branco</title>
+	<price unit="BRL">149.90</price>
+</item>`
+	m, err := NewMapXml([]byte(xml))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("xml:", string(xml))
+	fmt.Printf("m  : %v\n", m)
+
+	fmt.Println("========== (default)")
+	DecodeSimpleValuesAsMap()
+	m, err = NewMapXml([]byte(xml))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("m  : %v\n", m)
+}
