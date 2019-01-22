@@ -21,6 +21,7 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 
 <h4>Notices</h4>
 
+	2019.01.21: DecodeSimpleValuesAsMap - decode to map[<tag>:map["#text":<value>]] rather than map[<tag>:<value>]
 	2018.04.18: mv.Xml/mv.XmlIndent encodes non-map[string]interface{} map values - map[string]string, map[int]uint, etc.
 	2018.03.29: mv.Gob/NewMapGob support gob encoding/decoding of Maps.
 	2018.03.26: Added mxj/x2j-wrapper sub-package for migrating from legacy x2j package.
