@@ -475,6 +475,12 @@ func cast(s string, r bool) interface{} {
 		}
 
 		// handle numeric strings ahead of boolean
+		if f, err := strconv.ParseInt(s, 10, 64); err == nil {
+			return f
+		}
+		if f, err := strconv.ParseUint(s, 10, 64); err == nil {
+			return f
+		}
 		if f, err := strconv.ParseFloat(s, 64); err == nil {
 			return f
 		}
