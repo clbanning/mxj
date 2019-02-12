@@ -258,6 +258,21 @@ func CoerceKeysToSnakeCase(b ...bool) {
 	}
 }
 
+// 10jan19: use of pull request #57 should be conditional - legacy code assumes
+// numeric values are float64.
+var castToInt bool
+
+// CastValuesToInt tries to coerce numeric valus to int64 or uint64 instead of the
+// default float64. Repeated calls with no argument will toggle this on/off, or this
+// handling will be set with the value of 'b'.
+func CastValuesToInt(b ...bool) {
+	if len(b) == 0 {
+		castToInt = !castToInt
+	} else if len(b) == 1 {
+		castToInt = b[0]
+	}
+}
+
 // 05feb17: support processing XMPP streams (issue #36)
 var handleXMPPStreamTag bool
 
@@ -475,11 +490,13 @@ func cast(s string, r bool) interface{} {
 		}
 
 		// handle numeric strings ahead of boolean
-		if f, err := strconv.ParseInt(s, 10, 64); err == nil {
-			return f
-		}
-		if f, err := strconv.ParseUint(s, 10, 64); err == nil {
-			return f
+		if castToInt {
+			if f, err := strconv.ParseInt(s, 10, 64); err == nil {
+				return f
+			}
+			if f, err := strconv.ParseUint(s, 10, 64); err == nil {
+				return f
+			}
 		}
 		if f, err := strconv.ParseFloat(s, 64); err == nil {
 			return f
