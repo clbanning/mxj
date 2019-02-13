@@ -194,9 +194,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 					v.Name.Local = strings.Replace(v.Name.Local, "-", "_", -1)
 				}
 				if len(v.Name.Space) > 0 {
-					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
+					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r, ""), "#seq": i}
 				} else {
-					aa[v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r), "#seq": i}
+					aa[v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r, ""), "#seq": i}
 				}
 			}
 			na["#attr"] = aa
@@ -334,7 +334,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			}
 			if len(tt) > 0 {
 				// every simple element is a #text and has #seq associated with it
-				na["#text"] = cast(tt, r)
+				na["#text"] = cast(tt, r, "")
 				na["#seq"] = seq
 				seq++
 			}
