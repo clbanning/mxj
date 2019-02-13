@@ -481,7 +481,7 @@ func CastNanInf(b bool) {
 // cast - try to cast string values to bool or float64
 // 't' is the tag key that can be checked for 'not-casting'
 func cast(s string, r bool, t ...string) interface{} {
-	if checkTagToSkip {
+	if checkTagToSkip && len(t) == 1 {
 		// call the check-function here with 't[0]'
 		// if 'true' return s
 	}
