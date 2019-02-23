@@ -655,12 +655,7 @@ func (mv Map) ValueForPathString(path string) (string, error) {
 		return "", errors.New("ValueForPath: path not found")
 	}
 	val := vals[0]
-	switch str := val.(type) {
-	case string:
-		return str, nil
-	default:
-		return "", fmt.Errorf("ValueForPath: unsupported type: %T", str)
-	}
+	return fmt.Sprintf("%v", val), nil
 }
 
 // Returns the first found value for the path as a string.
