@@ -481,9 +481,10 @@ func CastNanInf(b bool) {
 // cast - try to cast string values to bool or float64
 // 't' is the tag key that can be checked for 'not-casting'
 func cast(s string, r bool, t string) interface{} {
-	if checkTagToSkip && t != "" {
+	if checkTagToSkip != nil && t != "" && checkTagToSkip(t) {
 		// call the check-function here with 't[0]'
 		// if 'true' return s
+		return s
 	}
 
 	if r {
@@ -524,12 +525,15 @@ func cast(s string, r bool, t string) interface{} {
 
 // checkTagToSkip - switch to address Issue #58
 
-var checkTagToSkip bool
+var checkTagToSkip func(string) bool
 
-// add function(s) to set 'checkTagToSkip
+// SetCheckTagToSkipFunc set function(s) to set 'checkTagToSkip
 // NOTE: key may be "#text" if it's a simple element with attributes
 //       or "decodeSimpleValuesAsMap == true"
 // NOTE: does not apply to NewMapXmlSeq... functions.
+func SetCheckTagToSkipFunc(fn func(string) bool) {
+	checkTagToSkip = fn
+}
 
 // ------------------ END: NewMapXml & NewMapXmlReader -------------------------
 
