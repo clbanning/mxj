@@ -273,6 +273,22 @@ func CastValuesToInt(b ...bool) {
 	}
 }
 
+var castToFloat = true
+
+// CastValuesToFloat can be used to skip casting to float64
+// Default is true
+func CastValuesToFloat(b bool) {
+	castToFloat = b
+}
+
+var castToBool = true
+
+// CastValuesToBool can be used to skip casting to bool.
+// Default is true
+func CastValuesToBool(b bool) {
+	castToBool = b
+}
+
 // 05feb17: support processing XMPP streams (issue #36)
 var handleXMPPStreamTag bool
 
@@ -505,17 +521,23 @@ func cast(s string, r bool, t string) interface{} {
 				return f
 			}
 		}
-		if f, err := strconv.ParseFloat(s, 64); err == nil {
-			return f
+
+		if castToFloat {
+			if f, err := strconv.ParseFloat(s, 64); err == nil {
+				return f
+			}
 		}
+
 		// ParseBool treats "1"==true & "0"==false, we've already scanned those
 		// values as float64. See if value has 't' or 'f' as initial screen to
 		// minimize calls to ParseBool; also, see if len(s) < 6.
-		if len(s) > 0 && len(s) < 6 {
-			switch s[:1] {
-			case "t", "T", "f", "F":
-				if b, err := strconv.ParseBool(s); err == nil {
-					return b
+		if castToBool {
+			if len(s) > 0 && len(s) < 6 {
+				switch s[:1] {
+				case "t", "T", "f", "F":
+					if b, err := strconv.ParseBool(s); err == nil {
+						return b
+					}
 				}
 			}
 		}
