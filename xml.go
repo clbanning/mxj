@@ -344,7 +344,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				if lowerCase {
 					key = strings.ToLower(key)
 				}
-				na[key] = cast(v.Value, r)
+				na[key] = cast(v.Value, r, key)
 			}
 		}
 	}
@@ -452,9 +452,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			tt := strings.Trim(string(t.(xml.CharData)), "\t\r\b\n ")
 			if len(tt) > 0 {
 				if len(na) > 0 || decodeSimpleValuesAsMap {
-					na["#text"] = cast(tt, r)
+					na["#text"] = cast(tt, r, "#text")
 				} else if skey != "" {
-					n[skey] = cast(tt, r)
+					n[skey] = cast(tt, r, skey)
 				} else {
 					// per Adrian (http://www.adrianlungu.com/) catch stray text
 					// in decoder stream -
@@ -479,7 +479,13 @@ func CastNanInf(b bool) {
 }
 
 // cast - try to cast string values to bool or float64
-func cast(s string, r bool) interface{} {
+// 't' is the tag key that can be checked for 'not-casting'
+func cast(s string, r bool, t string) interface{} {
+	if checkTagToSkip && t != "" {
+		// call the check-function here with 't[0]'
+		// if 'true' return s
+	}
+
 	if r {
 		// handle nan and inf
 		if !castNanInf {
@@ -515,6 +521,15 @@ func cast(s string, r bool) interface{} {
 	}
 	return s
 }
+
+// checkTagToSkip - switch to address Issue #58
+
+var checkTagToSkip bool
+
+// add function(s) to set 'checkTagToSkip
+// NOTE: key may be "#text" if it's a simple element with attributes
+//       or "decodeSimpleValuesAsMap == true"
+// NOTE: does not apply to NewMapXmlSeq... functions.
 
 // ------------------ END: NewMapXml & NewMapXmlReader -------------------------
 
