@@ -1,4 +1,4 @@
-// Copyright 2012-2016 Charles Banning. All rights reserved.
+// Copyright 2012-2016, 2018 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
@@ -273,22 +273,6 @@ func CastValuesToInt(b ...bool) {
 	}
 }
 
-var castToFloat = true
-
-// CastValuesToFloat can be used to skip casting to float64
-// Default is true
-func CastValuesToFloat(b bool) {
-	castToFloat = b
-}
-
-var castToBool = true
-
-// CastValuesToBool can be used to skip casting to bool.
-// Default is true
-func CastValuesToBool(b bool) {
-	castToBool = b
-}
-
 // 05feb17: support processing XMPP streams (issue #36)
 var handleXMPPStreamTag bool
 
@@ -545,13 +529,34 @@ func cast(s string, r bool, t string) interface{} {
 	return s
 }
 
+// pull request, #59
+var castToFloat = true
+
+// CastValuesToFloat can be used to skip casting to float64 when
+// "cast" argument is 'true' in NewMapXml, etc.
+// Default is true.
+func CastValuesToFloat(b bool) {
+	castToFloat = b
+}
+
+var castToBool = true
+
+// CastValuesToBool can be used to skip casting to bool when
+// "cast" argument is 'true' in NewMapXml, etc.
+// Default is true.
+func CastValuesToBool(b bool) {
+	castToBool = b
+}
+
 // checkTagToSkip - switch to address Issue #58
 
 var checkTagToSkip func(string) bool
 
-// SetCheckTagToSkipFunc set function(s) to set 'checkTagToSkip
+// SetCheckTagToSkipFunc registers function to test whether the value
+// for a tag should be cast to bool or float64 when "cast" argument is 'true'.
+// (Dot tag path notation is not supported.)
 // NOTE: key may be "#text" if it's a simple element with attributes
-//       or "decodeSimpleValuesAsMap == true"
+//       or "decodeSimpleValuesAsMap == true".
 // NOTE: does not apply to NewMapXmlSeq... functions.
 func SetCheckTagToSkipFunc(fn func(string) bool) {
 	checkTagToSkip = fn
