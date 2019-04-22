@@ -17,6 +17,8 @@ import (
 	"strings"
 )
 
+// NoRoot is returned by NewXmlSeq, etc., when a comment, directive or procinstr element is parsed
+// in the XML data stream and the element is not contained in an XML object with a root element.
 var NoRoot = errors.New("no root key")
 var NO_ROOT = NoRoot // maintain backwards compatibility
 
