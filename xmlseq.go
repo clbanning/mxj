@@ -71,6 +71,10 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	   1. Keys in the Map value that are parsed from a <name space prefix>:<local name> tag preserve the
 //	      "<prefix>:" notation rather than stripping it as with NewMapXml().
 //	   2. Attribute keys for name space prefix declarations preserve "xmlns:<prefix>" notation.
+// 
+//	ERRORS:
+//	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment", 
+//	      "#directive" or #procinst" key.
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -88,6 +92,10 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (Map, error) {
 //	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	      re-encode the message in its original structure.
 //	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
+// 
+//	ERRORS:
+//	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment", 
+//	      "#directive" or #procinst" key.
 func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -120,6 +128,10 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 //	    4. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	       re-encode the message in its original structure.
 //	    5. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
+// 
+//	ERRORS:
+//	    1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment", 
+//	       "#directive" or #procinst" key.
 func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
