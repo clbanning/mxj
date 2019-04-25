@@ -818,13 +818,22 @@ func (e elemListSeq) Swap(i, j int) {
 
 func (e elemListSeq) Less(i, j int) bool {
 	var iseq, jseq int
+	var fiseq, fjseq float64
 	var ok bool
 	if iseq, ok = e[i].v.(map[string]interface{})["#seq"].(int); !ok {
-		iseq = 9999999
+		if fiseq, ok = e[i].v.(map[string]interface{})["#seq"].(float64); ok {
+			iseq = int(fiseq)
+		} else {
+			iseq = 9999999
+		}
 	}
 
 	if jseq, ok = e[j].v.(map[string]interface{})["#seq"].(int); !ok {
-		jseq = 9999999
+		if fjseq, ok = e[j].v.(map[string]interface{})["#seq"].(float64); ok {
+			jseq = int(fjseq)
+		} else {
+			jseq = 9999999
+		}
 	}
 
 	return iseq <= jseq
