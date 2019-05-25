@@ -1,5 +1,5 @@
 // mxj - A collection of map[string]interface{} and associated XML and JSON utilities.
-// Copyright 2012-2015, 2018 Charles Banning. All rights reserved.
+// Copyright 2012-2019, Charles Banning. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file
 
