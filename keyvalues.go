@@ -37,7 +37,8 @@ func SetArraySize(size int) int {
 // On error, the returned slice is 'nil'. NOTE: 'key' can be wildcard, "*".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
 //             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
-//             - For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
+//             - For attributes prefix the label with the attribute prefix character, by default a 
+//               hyphen, '-', e.g., "-seq:3". (See SetAttrPrefix function.)
 //             - If the 'key' refers to a list, then "key:value" could select a list member of the list.
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
@@ -157,7 +158,8 @@ func hasKey(iv interface{}, key string, ret *[]interface{}, cnt *int, subkeys ma
 //            even "*[2].*[0].field".
 //   'subkeys' (optional) are "key:val[:type]" strings representing attributes or elements in a list.
 //             - By default 'val' is of type string. "key:val:bool" and "key:val:float" to coerce them.
-//             - For attributes prefix the label with a hyphen, '-', e.g., "-seq:3".
+//             - For attributes prefix the label with the attribute prefix character, by default a 
+//               hyphen, '-', e.g., "-seq:3". (See SetAttrPrefix function.)
 //             - If the 'path' refers to a list, then "tag:value" would return member of the list.
 //             - The subkey can be wildcarded - "key:*" - to require that it's there with some value.
 //             - If a subkey is preceeded with the '!' character, the key:value[:type] entry is treated as an
