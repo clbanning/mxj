@@ -28,8 +28,8 @@ func (mv Map) Root() (string, error) {
 }
 
 // If the path is an element with sub-elements, return a list of the sub-element
-// keys.  (The list is alphabeticly sorted.)  NOTE: Map keys that are prefixed with
-// '-', a hyphen, are considered attributes; see m.Attributes(path).
+// keys. NOTE: Map keys that are prefixed with '-', a hyphen, are considered 
+// attributes; see m.Attributes(path).
 func (mv Map) Elements(path string) ([]string, error) {
 	e, err := mv.ValueForPath(path)
 	if err != nil {
@@ -48,8 +48,6 @@ func (mv Map) Elements(path string) ([]string, error) {
 			i++
 		}
 		elems = elems[:i]
-		// alphabetic sort keeps things tidy
-		sort.Strings(elems)
 		return elems, nil
 	}
 	return nil, fmt.Errorf("no elements for path: %s", path)
