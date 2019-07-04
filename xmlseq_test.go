@@ -44,26 +44,18 @@ func TestNewMapXmlSeq(t *testing.T) {
    </books>
 </doc>`)
 
-	m, err := NewMapXmlSeq(x)
+	msv, err := NewMapXmlSeq(x)
 	if err != nil && err != io.EOF {
 		t.Fatal("err:", err.Error())
 	}
 	fmt.Println("NewMapXmlSeq, x:\n", string(x))
-	// fmt.Println("NewMapXmlSeq, m:\n", m)
-	fmt.Println("NewMapXmlSeq, s:\n", m.StringIndent())
+	fmt.Println("NewMapXmlSeq, s:\n", msv.StringIndent())
 
-	b, err := m.XmlIndent("", "  ")
-	if err == nil {
-		fmt.Println("NewMapXmlSeq, mv.XmlIndent():\n", string(b))
-		t.Fatal("didn't catch invalid key: #text")
-	}
-	fmt.Println("err ok:", err)
-
-	b, err = m.XmlSeqIndent("", "  ")
+	b, err := msv.XmlIndent("", "  ")
 	if err != nil {
 		t.Fatal("err:", err)
 	}
-	fmt.Println("NewMapXmlSeq, mv.XmlSeqIndent():\n", string(b))
+	fmt.Println("NewMapXmlSeq, msv.XmlIndent():\n", string(b))
 }
 
 func TestXmlSeqDecodeError(t *testing.T) {

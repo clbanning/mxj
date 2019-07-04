@@ -53,12 +53,12 @@ func TestStakeCase(t *testing.T) {
 </software_information>
 </rpc_reply>`
 
-	m, err = NewMapXmlSeq([]byte(data1))
+	ms, err := NewMapXmlSeq([]byte(data1))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	x, err = m.XmlSeqIndent("", "")
+	x, err = ms.XmlIndent("", "")
 	if err != nil {
 		t.Fatal(err)
 	}

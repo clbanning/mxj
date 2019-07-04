@@ -59,7 +59,7 @@ func TestBomDataSeq(t *testing.T) {
 		t.Fatalf("err: didn't find xml.StartElement")
 	}
 	fmt.Printf("m: %v\n", m)
-	j, _ := m.XmlSeq()
+	j, _ := m.Xml()
 	fmt.Println("m:", string(j))
 }
 
@@ -83,6 +83,6 @@ func TestBomDataSeqReader(t *testing.T) {
 		t.Fatalf("err: didn't find xml.StartElement")
 	}
 	fmt.Printf("m: %v\n", m)
-	j, _ := m.XmlSeq()
+	j, _ := m.Xml()
 	fmt.Println("m:", string(j))
 }

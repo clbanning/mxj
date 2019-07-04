@@ -1,4 +1,4 @@
-// Copyright 2012-2016, 2018 Charles Banning. All rights reserved.
+// Copyright 2012-2016, 2018-2019 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
@@ -653,6 +653,7 @@ func (mv Map) XmlWriter(xmlWriter io.Writer, rootTag ...string) error {
 
 // Writes the Map as  XML on the Writer. []byte is the raw XML that was written.
 // See Xml() for encoding rules.
+/*
 func (mv Map) XmlWriterRaw(xmlWriter io.Writer, rootTag ...string) ([]byte, error) {
 	x, err := mv.Xml(rootTag...)
 	if err != nil {
@@ -662,6 +663,7 @@ func (mv Map) XmlWriterRaw(xmlWriter io.Writer, rootTag ...string) ([]byte, erro
 	_, err = xmlWriter.Write(x)
 	return x, err
 }
+*/
 
 // Writes the Map as pretty XML on the Writer.
 // See Xml() for encoding rules.
@@ -677,6 +679,7 @@ func (mv Map) XmlIndentWriter(xmlWriter io.Writer, prefix, indent string, rootTa
 
 // Writes the Map as pretty XML on the Writer. []byte is the raw XML that was written.
 // See Xml() for encoding rules.
+/*
 func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, rootTag ...string) ([]byte, error) {
 	x, err := mv.XmlIndent(prefix, indent, rootTag...)
 	if err != nil {
@@ -686,6 +689,7 @@ func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, roo
 	_, err = xmlWriter.Write(x)
 	return x, err
 }
+*/
 
 // -------------------- END: mv.Xml & mv.XmlWriter -------------------------------
 

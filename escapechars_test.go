@@ -80,7 +80,7 @@ func TestXMLSeqEscapeChars(t *testing.T) {
 	XMLEscapeChars(true)
 	defer XMLEscapeChars(false)
 
-	x, err := m.XmlSeqIndent("", "  ")
+	x, err := m.XmlIndent("", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func TestXMLSeqEscapeChars2(t *testing.T) {
 	XMLEscapeChars(true)
 	defer XMLEscapeChars(false)
 
-	x, err := m.XmlSeqIndent("", "  ")
+	x, err := m.XmlIndent("", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -179,7 +179,7 @@ func TestXmlWriter(t *testing.T) {
 	mv := Map{"tag1": "some data", "tag2": "more data", "boolean": true, "float": 3.14159625}
 	w := new(bytes.Buffer)
 
-	raw, err := mv.XmlWriterRaw(w, "myRootTag")
+	err := mv.XmlWriter(w, "myRootTag")
 	if err != nil {
 		t.Fatal("err:", err.Error())
 	}
@@ -190,7 +190,6 @@ func TestXmlWriter(t *testing.T) {
 		t.Fatal("err:", err.Error())
 	}
 
-	fmt.Println("XmlWriter, raw:", string(raw))
 	fmt.Println("XmlWriter, b  :", string(b))
 }
 

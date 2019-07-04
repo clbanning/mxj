@@ -39,7 +39,7 @@ func TestOnlyAttributesSeq(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	xml, err := dom.XmlSeqIndent("", "  ")
+	xml, err := dom.XmlIndent("", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

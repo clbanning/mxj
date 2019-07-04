@@ -39,7 +39,7 @@ func TestBadXmlSeq(t *testing.T) {
 		t.Fatalf("err: didn't find xmlStartElement")
 	}
 	fmt.Printf("m: %v\n", m)
-	j, _ := m.XmlSeq()
+	j, _ := m.Xml()
 	fmt.Println("m:", string(j))
 }
 
@@ -63,6 +63,6 @@ func TestBadXmlSeqReader(t *testing.T) {
 		t.Fatalf("err: didn't find xmlStartElement")
 	}
 	fmt.Printf("m: %v\n", m)
-	j, _ := m.XmlSeq()
+	j, _ := m.Xml()
 	fmt.Println("m:", string(j))
 }
