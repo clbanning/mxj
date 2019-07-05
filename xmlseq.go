@@ -19,7 +19,7 @@ import (
 
 // MapSeq is like Map but contains seqencing indices to allow recovering the original order of
 // the XML elements when the map[string]interface{} is marshaled. (Also, element attributes are
-// stored as a map["#attr"][]map[<tag>]map[<attr_key>]map[string]interface{}  value instead of 
+// stored as a map["#attr"]map[<attr_key>]map[string]interface{}  value instead of 
 // denoting the keys with a prefix character.
 type MapSeq map[string]interface{}
 
