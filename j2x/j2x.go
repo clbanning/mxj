@@ -31,12 +31,12 @@ func JsonToXml(jsonVal []byte) ([]byte, error) {
 }
 
 // FromJson() --> ToXmlWriter().
-func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) ([]byte, error) {
+func JsonToXmlWriter(jsonVal []byte, xmlWriter io.Writer) error {
 	m, err := NewMapJson(jsonVal)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return m.XmlWriterRaw(xmlWriter)
+	return m.XmlWriter(xmlWriter)
 }
 
 // FromJsonReader() --> ToXml().
@@ -50,13 +50,13 @@ func JsonReaderToXml(jsonReader io.Reader) ([]byte, []byte, error) {
 }
 
 // FromJsonReader() --> ToXmlWriter().  Handy for transforming bulk message sets.
-func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) ([]byte, []byte, error) {
-	m, jraw, err := NewMapJsonReaderRaw(jsonReader)
+func JsonReaderToXmlWriter(jsonReader io.Reader, xmlWriter io.Writer) error {
+	m, err := NewMapJsonReader(jsonReader)
 	if err != nil {
-		return jraw, nil, err
+		return err
 	}
-	xraw, xerr := m.XmlWriterRaw(xmlWriter)
-	return jraw, xraw, xerr
+	err = m.XmlWriter(xmlWriter)
+	return err
 }
 
 // JSON wrappers for Map methods implementing key path and value functions.
