@@ -468,7 +468,6 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				}
 			}
 		default:
-			fmt.Println("unknown Token:", string(t))
 			// noop
 		}
 	}
