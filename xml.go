@@ -52,10 +52,11 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //		}
 //
 //	NOTES:
-//	   1. The 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
+//	   1. Declarations, directives, process instructions and comments are NOT parsed.
+//	   2. The 'xmlVal' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
-//	   2. If CoerceKeysToLower() has been called, then all key values will be lower case.
-//	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
+//	   3. If CoerceKeysToLower() has been called, then all key values will be lower case.
+//	   4. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -66,10 +67,11 @@ func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
 //	NOTES:
-//	   1. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
+//	   1. Declarations, directives, process instructions and comments are NOT parsed.
+//	   2. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
-//	   2. If CoerceKeysToLower() has been called, then all key values will be lower case.
-//	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
+//	   3. If CoerceKeysToLower() has been called, then all key values will be lower case.
+//	   4. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -89,16 +91,17 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
 //	NOTES:
-//	   1. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
+//	   1. Declarations, directives, process instructions and comments are NOT parsed.
+//	   2. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
 //	      using a ByteReader. If the io.Reader is an os.File, there may be significant performance impact.
 //	      See the examples - getmetrics1.go through getmetrics4.go - for comparative use cases on a large
 //	      data set. If the io.Reader is wrapping a []byte value in-memory, however, such as http.Request.Body
 //	      you CAN use it to efficiently unmarshal a XML doc and retrieve the raw XML in a single call.
-//	   2. The 'raw' return value may be larger than the XML text value.
-//	   3. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
+//	   3. The 'raw' return value may be larger than the XML text value.
+//	   4. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
-//	   4. If CoerceKeysToLower() has been called, then all key values will be lower case.
-//	   5. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
+//	   5. If CoerceKeysToLower() has been called, then all key values will be lower case.
+//	   6. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
 func NewMapXmlReaderRaw(xmlReader io.Reader, cast ...bool) (Map, []byte, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -465,6 +468,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				}
 			}
 		default:
+			fmt.Println("unknown Token:", string(t))
 			// noop
 		}
 	}
