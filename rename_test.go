@@ -1,10 +1,12 @@
 package mxj
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestRenameKey(t *testing.T) {
+	fmt.Println("------------ rename_test.go")
 	m := map[string]interface{}{
 		"Div": map[string]interface{}{
 			"Colour": "blue",

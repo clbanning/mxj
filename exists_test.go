@@ -14,11 +14,11 @@ func TestExists(t *testing.T) {
 	}
 	mv := Map(m)
 
-	if !mv.Exists("Div.Colour") {
+	if v, _ := mv.Exists("Div.Colour"); !v {
 		t.Fatal("Haven't found an existing element")
 	}
 
-	if mv.Exists("Div.Color") {
+	if v, _ := mv.Exists("Div.Color"); v {
 		t.Fatal("Have found a non existing element")
 	}
 }

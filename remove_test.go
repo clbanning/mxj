@@ -15,7 +15,7 @@ func TestRemove(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if mv.Exists("Div.Colour") {
+	if v, _ := mv.Exists("Div.Colour"); v {
 		t.Fatal("removed key still remain")
 	}
 }
