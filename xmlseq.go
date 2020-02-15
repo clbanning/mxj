@@ -18,9 +18,10 @@ import (
 )
 
 // MapSeq is like Map but contains seqencing indices to allow recovering the original order of
-// the XML elements when the map[string]interface{} is marshaled. (Also, element attributes are
-// stored as a map["#attr"]map[<attr_key>]map[string]interface{}  value instead of 
-// denoting the keys with a prefix character.
+// the XML elements when the map[string]interface{} is marshaled. Element attributes are
+// stored as a map["#attr"]map[<attr_key>]map[string]interface{}{"#text":"<value>", "#seq":<attr_index>}
+// value instead of denoting the keys with a prefix character.  Also, comments, directives and
+// process instructions are preserved.
 type MapSeq map[string]interface{}
 
 // NoRoot is returned by NewXmlSeq, etc., when a comment, directive or procinstr element is parsed
