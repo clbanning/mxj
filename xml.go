@@ -609,7 +609,7 @@ func XmlDefaultEmptyElemSyntax() {
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	m := map[string]interface{}(mv)
 	var err error
-	s := new(string)
+	b := new(bytes.Buffer)
 	p := new(pretty) // just a stub
 
 	if len(m) == 1 && len(rootTag) == 0 {
@@ -623,20 +623,20 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 					switch v.(type) {
 					case map[string]interface{}: // noop
 					default: // anything else
-						err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
+						err = marshalMapToXmlIndent(false, b, DefaultRootTag, m, p)
 						goto done
 					}
 				}
 			}
-			err = mapToXmlIndent(false, s, key, value, p)
+			err = marshalMapToXmlIndent(false, b, key, value, p)
 		}
 	} else if len(rootTag) == 1 {
-		err = mapToXmlIndent(false, s, rootTag[0], m, p)
+		err = marshalMapToXmlIndent(false, b, rootTag[0], m, p)
 	} else {
-		err = mapToXmlIndent(false, s, DefaultRootTag, m, p)
+		err = marshalMapToXmlIndent(false, b, DefaultRootTag, m, p)
 	}
 done:
-	return []byte(*s), err
+	return b.Bytes(), err
 }
 
 // The following implementation is provided only for symmetry with NewMapXmlReader[Raw]
@@ -854,7 +854,7 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 	m := map[string]interface{}(mv)
 
 	var err error
-	s := new(string)
+	b := new(bytes.Buffer)
 	p := new(pretty)
 	p.indent = indent
 	p.padding = prefix
@@ -864,17 +864,17 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				err = mapToXmlIndent(true, s, DefaultRootTag, m, p)
+				err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
 			} else {
-				err = mapToXmlIndent(true, s, key, value, p)
+				err = marshalMapToXmlIndent(true, b, key, value, p)
 			}
 		}
 	} else if len(rootTag) == 1 {
-		err = mapToXmlIndent(true, s, rootTag[0], m, p)
+		err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
 	} else {
-		err = mapToXmlIndent(true, s, DefaultRootTag, m, p)
+		err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
 	}
-	return []byte(*s), err
+	return b.Bytes(), err
 }
 
 type pretty struct {
@@ -899,7 +899,9 @@ func (p *pretty) Outdent() {
 
 // where the work actually happens
 // returns an error if an attribute is not atomic
-func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp *pretty) error {
+// NOTE: 01may20 - replaces mapToXmlIndent(); uses bytes.Buffer instead for string appends.
+func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value interface{}, pp *pretty) error {
+	var err error
 	var endTag bool
 	var isSimple bool
 	var elen int
@@ -925,9 +927,13 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	// special handling of []interface{} values when len(value) == 0
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32, json.Number:
 		if doIndent {
-			*s += p.padding
+			if _, err = b.WriteString(p.padding); err != nil {
+				return err
+			}
 		}
-		*s += `<` + key
+		if _, err = b.WriteString(`<`+key); err != nil {
+			return err
+		}
 	}
 	switch value.(type) {
 	case map[string]interface{}:
@@ -969,15 +975,22 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			attrlist = attrlist[:n]
 			sort.Sort(attrList(attrlist))
 			for _, v := range attrlist {
-				*s += ` ` + v[0] + `="` + v[1] + `"`
+				if _, err = b.WriteString(` ` + v[0] + `="` + v[1] + `"`); err != nil {
+					return err
+				}
 			}
 		}
 		// only attributes?
 		if n == lenvv {
 			if useGoXmlEmptyElemSyntax {
-				*s += `</` + key + ">"
+				if _, err = b.WriteString(`</` + key + ">"); err != nil {
+					return err
+				}
 			} else {
-				*s += `/>`
+				// *s += `/>`
+				if _, err = b.WriteString(`/>`); err != nil {
+					return err
+				}
 			}
 			break
 		}
@@ -996,7 +1009,9 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 					v = escapeChars(string(v.([]byte)))
 				}
 			}
-			*s += ">" + fmt.Sprintf("%v", v)
+			if _, err = b.WriteString(">" + fmt.Sprintf("%v", v)); err != nil {
+				return err
+			}
 			endTag = true
 			elen = 1
 			isSimple = true
@@ -1010,9 +1025,14 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		}
 
 		// close tag with possible attributes
-		*s += ">"
+		if _, err = b.WriteString(">"); err != nil {
+			return err
+		}
 		if doIndent {
-			*s += "\n"
+			// *s += "\n"
+			if _, err = b.WriteString("\n"); err != nil {
+				return err
+			}
 		}
 		// something more complex
 		p.mapDepth++
@@ -1039,7 +1059,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 				}
 			}
 			i++
-			if err := mapToXmlIndent(doIndent, s, v[0].(string), v[1], p); err != nil {
+			if err := marshalMapToXmlIndent(doIndent, b, v[0].(string), v[1], p); err != nil {
 				return err
 			}
 			switch v[1].(type) {
@@ -1058,9 +1078,13 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		// special case - found during implementing Issue #23
 		if len(value.([]interface{})) == 0 {
 			if doIndent {
-				*s += p.padding + p.indent
+				if _, err = b.WriteString(p.padding + p.indent); err != nil {
+					return err
+				}
 			}
-			*s += "<" + key
+			if _, err = b.WriteString("<" + key); err != nil {
+				return err
+			}
 			elen = 0
 			endTag = true
 			break
@@ -1069,7 +1093,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			if doIndent {
 				p.Indent()
 			}
-			if err := mapToXmlIndent(doIndent, s, key, v, p); err != nil {
+			if err := marshalMapToXmlIndent(doIndent, b, key, v, p); err != nil {
 				return err
 			}
 			if doIndent {
@@ -1086,9 +1110,13 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 		//[]string should be treated exaclty as []interface{}
 		if len(value.([]string)) == 0 {
 			if doIndent {
-				*s += p.padding + p.indent
+				if _, err = b.WriteString(p.padding + p.indent); err != nil {
+					return err
+				}
 			}
-			*s += "<" + key
+			if _, err = b.WriteString("<" + key); err != nil {
+				return err
+			}
 			elen = 0
 			endTag = true
 			break
@@ -1097,7 +1125,7 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			if doIndent {
 				p.Indent()
 			}
-			if err := mapToXmlIndent(doIndent, s, key, v, p); err != nil {
+			if err := marshalMapToXmlIndent(doIndent, b, key, v, p); err != nil {
 				return err
 			}
 			if doIndent {
@@ -1108,9 +1136,14 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	case nil:
 		// terminate the tag
 		if doIndent {
-			*s += p.padding
+			// *s += p.padding
+			if _, err = b.WriteString(p.padding); err != nil {
+				return err
+			}
 		}
-		*s += "<" + key
+		if _, err = b.WriteString("<" + key); err != nil {
+			return err
+		}
 		endTag, isSimple = true, true
 		break
 	default: // handle anything - even goofy stuff
@@ -1123,12 +1156,17 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			}
 			elen = len(v)
 			if elen > 0 {
-				*s += ">" + v
+				// *s += ">" + v
+				if _, err = b.WriteString(">" + v); err != nil {
+					return err
+				}
 			}
 		case float64, bool, int, int32, int64, float32, json.Number:
 			v := fmt.Sprintf("%v", value)
 			elen = len(v) // always > 0
-			*s += ">" + v
+			if _, err = b.WriteString(">" + v); err != nil {
+				return err
+			}
 		case []byte: // NOTE: byte is just an alias for uint8
 			// similar to how xml.Marshal handles []byte structure members
 			v := string(value.([]byte))
@@ -1137,7 +1175,10 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 			}
 			elen = len(v)
 			if elen > 0 {
-				*s += ">" + v
+				// *s += ">" + v
+				if _, err = b.WriteString(">" + v); err != nil {
+					return err
+				}
 			}
 		default:
 			var v []byte
@@ -1148,11 +1189,15 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 				v, err = xml.Marshal(value)
 			}
 			if err != nil {
-				*s += ">UNKNOWN"
+				if _, err = b.WriteString(">UNKNOWN"); err != nil {
+					return err
+				}
 			} else {
 				elen = len(v)
 				if elen > 0 {
-					*s += string(v)
+					if _, err = b.Write(v); err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -1162,21 +1207,31 @@ func mapToXmlIndent(doIndent bool, s *string, key string, value interface{}, pp 
 	if endTag {
 		if doIndent {
 			if !isSimple {
-				*s += p.padding
+				if _, err = b.WriteString(p.padding); err != nil {
+					return err
+				}
 			}
 		}
 		if elen > 0 || useGoXmlEmptyElemSyntax {
 			if elen == 0 {
-				*s += ">"
+				if _, err = b.WriteString(">"); err != nil {
+					return err
+				}
 			}
-			*s += `</` + key + ">"
+			if _, err = b.WriteString(`</` + key + ">"); err != nil {
+				return err
+			}
 		} else {
-			*s += `/>`
+			if _, err = b.WriteString(`/>`); err != nil {
+				return err
+			}
 		}
 	}
 	if doIndent {
 		if p.cnt > p.start {
-			*s += "\n"
+			if _, err = b.WriteString("\n"); err != nil {
+				return err
+			}
 		}
 		p.Outdent()
 	}
@@ -1213,3 +1268,41 @@ func (e elemList) Swap(i, j int) {
 func (e elemList) Less(i, j int) bool {
 	return e[i][0].(string) <= e[j][0].(string)
 }
+
+// ======================== newMapToXmlIndent
+
+func (mv Map) MarshalXml(rootTag ...string) ([]byte, error) {
+	m := map[string]interface{}(mv)
+	var err error
+	// s := new(string)
+	// b := new(strings.Builder)
+	b := new(bytes.Buffer)
+	p := new(pretty) // just a stub
+
+	if len(m) == 1 && len(rootTag) == 0 {
+		for key, value := range m {
+			// if it an array, see if all values are map[string]interface{}
+			// we force a new root tag if we'll end up with no key:value in the list
+			// so: key:[string_val, bool:true] --> <doc><key>string_val</key><bool>true</bool></doc>
+			switch value.(type) {
+			case []interface{}:
+				for _, v := range value.([]interface{}) {
+					switch v.(type) {
+					case map[string]interface{}: // noop
+					default: // anything else
+						err = marshalMapToXmlIndent(false, b, DefaultRootTag, m, p)
+						goto done
+					}
+				}
+			}
+			err = marshalMapToXmlIndent(false, b, key, value, p)
+		}
+	} else if len(rootTag) == 1 {
+		err = marshalMapToXmlIndent(false, b, rootTag[0], m, p)
+	} else {
+		err = marshalMapToXmlIndent(false, b, DefaultRootTag, m, p)
+	}
+done:
+	return b.Bytes(), err
+}
+
