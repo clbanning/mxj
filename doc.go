@@ -14,6 +14,7 @@ Related Packages:
 	checkxml: github.com/clbanning/checkxml provides functions for validating XML data.
 
 Notes:
+	2020.05.01: v2.2 - optimize map to XML encoding for large XML docs.
 	2019.07.04: v2.0 - remove unnecessary methods - mv.XmlWriterRaw, mv.XmlIndentWriterRaw - for Map and MapSeq.
 	2019.07.04: Add MapSeq type and move associated functions and methods from Map to MapSeq.
 	2019.01.21: DecodeSimpleValuesAsMap - decode to map[<tag>:map["#text":<value>]] rather than map[<tag>:<value>].
