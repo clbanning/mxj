@@ -924,17 +924,23 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 	}
 
 	switch value.(type) {
-	// special handling of []interface{} values when len(value) == 0
+	// these types are handled during encoding
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32, json.Number:
-		if doIndent {
-			if _, err = b.WriteString(p.padding); err != nil {
-				return err
-			}
-		}
-		if _, err = b.WriteString(`<`+key); err != nil {
+	default:
+		// coerce eveything else into a string value
+		value = fmt.Sprint(value)
+	}
+
+	// start the XML tag with required indentaton and padding
+	if doIndent {
+		if _, err = b.WriteString(p.padding); err != nil {
 			return err
 		}
 	}
+	if _, err = b.WriteString(`<` + key); err != nil {
+		return err
+	}
+
 	switch value.(type) {
 	case map[string]interface{}:
 		vv := value.(map[string]interface{})
@@ -1305,4 +1311,3 @@ func (mv Map) MarshalXml(rootTag ...string) ([]byte, error) {
 done:
 	return b.Bytes(), err
 }
-
