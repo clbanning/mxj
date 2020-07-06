@@ -926,6 +926,8 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 	switch value.(type) {
 	// these types are handled during encoding
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32, json.Number:
+	case []map[string]interface{}, []string, []float64, []bool, []int, []int32, []int64, []float32, []json.Number:
+	case []interface{}:
 	default:
 		// coerce eveything else into a string value
 		value = fmt.Sprint(value)
@@ -993,7 +995,6 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 					return err
 				}
 			} else {
-				// *s += `/>`
 				if _, err = b.WriteString(`/>`); err != nil {
 					return err
 				}
@@ -1187,6 +1188,9 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 				}
 			}
 		default:
+			if _, err = b.WriteString(">"); err != nil {
+				return err
+			}
 			var v []byte
 			var err error
 			if doIndent {
