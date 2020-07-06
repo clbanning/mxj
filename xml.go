@@ -939,8 +939,12 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 			return err
 		}
 	}
-	if _, err = b.WriteString(`<` + key); err != nil {
-		return err
+	switch value.(type) {
+	case []interface{}:
+	default:
+		if _, err = b.WriteString(`<` + key); err != nil {
+			return err
+		}
 	}
 
 	switch value.(type) {
