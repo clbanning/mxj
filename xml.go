@@ -923,6 +923,9 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 		}
 	}
 
+	// 14jul20.  The following block of code has become something of a catch all for odd stuff
+	// that might be passed in as a result of casting an arbitrary map[<T>]<T> to an mxj.Map
+	// value and then call m.Xml or m.XmlIndent. See issue #71 (and #73) for such edge cases.
 	switch value.(type) {
 	// these types are handled during encoding
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32, json.Number:
