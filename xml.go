@@ -208,8 +208,12 @@ var includeTagSeqNum bool
 			}
 		}
 */
-func IncludeTagSeqNum(b bool) {
-	includeTagSeqNum = b
+func IncludeTagSeqNum(b ...bool) {
+	if len(b) == 0 {
+		includeTagSeqNum = !includeTagSeqNum
+	} else if len(b) == 1 {
+		includeTagSeqNum = b[0]
+	}
 }
 
 // all keys will be "lower case"
@@ -477,8 +481,12 @@ var castNanInf bool
 
 // Cast "Nan", "Inf", "-Inf" XML values to 'float64'.
 // By default, these values will be decoded as 'string'.
-func CastNanInf(b bool) {
-	castNanInf = b
+func CastNanInf(b ...bool) {
+	if len(b) == 0 {
+		castNanInf = !castNanInf
+	} else if len(b) == 1 {
+		castNanInf = b[0]
+	}
 }
 
 // cast - try to cast string values to bool or float64
@@ -538,8 +546,12 @@ var castToFloat = true
 // CastValuesToFloat can be used to skip casting to float64 when
 // "cast" argument is 'true' in NewMapXml, etc.
 // Default is true.
-func CastValuesToFloat(b bool) {
-	castToFloat = b
+func CastValuesToFloat(b ...bool) {
+	if len(b) == 0 {
+		castToFloat = !castToFloat
+	} else if len(b) == 1 {
+		castToFloat = b[0]
+	}
 }
 
 var castToBool = true
@@ -547,8 +559,12 @@ var castToBool = true
 // CastValuesToBool can be used to skip casting to bool when
 // "cast" argument is 'true' in NewMapXml, etc.
 // Default is true.
-func CastValuesToBool(b bool) {
-	castToBool = b
+func CastValuesToBool(b ...bool) {
+	if len(b) == 0 {
+		castToBool = !castToBool
+	} else if len(b) == 1 {
+		castToBool = b[0]
+	}
 }
 
 // checkTagToSkip - switch to address Issue #58
