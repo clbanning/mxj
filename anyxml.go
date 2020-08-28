@@ -51,6 +51,8 @@ const (
 		  <element>3.14159265</element>
 		  <element>true</element>
 		</mydoc>
+
+An extreme example is available in examples/goofy_map.go.
 */
 // Alternative values for DefaultRootTag and DefaultElementTag can be set as:
 // AnyXml( v, myRootTag, myElementTag).
