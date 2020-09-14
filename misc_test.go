@@ -197,3 +197,18 @@ func TestAttributesNoAttrPrefix(t *testing.T) {
 	}
 	PrependAttrWithHyphen(true)
 }
+
+func TestPreserveSpace(t *testing.T) {
+	m, err := NewMapXml([]byte("<a> hello world </a>"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := m.ValueForPath("a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s != " hello world " {
+		t.Fatal("Spaces in value was not preserved")
+	}
+	fmt.Printf("'%v'\n", s)
+}

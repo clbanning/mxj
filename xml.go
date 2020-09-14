@@ -456,7 +456,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			return n, nil
 		case xml.CharData:
 			// clean up possible noise
-			tt := strings.Trim(string(t.(xml.CharData)), "\t\r\b\n ")
+			tt := string(t.(xml.CharData))
 			if len(tt) > 0 {
 				if len(na) > 0 || decodeSimpleValuesAsMap {
 					na["#text"] = cast(tt, r, "#text")
