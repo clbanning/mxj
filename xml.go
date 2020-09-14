@@ -235,12 +235,12 @@ func CoerceKeysToLower(b ...bool) {
 	}
 }
 
-// disableTrimWhiteSpace will set if
+// disableTrimWhiteSpace sets if the white space should be removed or not
 var disableTrimWhiteSpace bool
 
 // TrimValueWhiteSpace set if the white space should be trimmed or not. By default white space is always trimmed.
 func TrimValueWhiteSpace(b bool) {
-	disableTrimWhiteSpace = b
+	disableTrimWhiteSpace = !b
 }
 
 // 25jun16: Allow user to specify the "prefix" character for XML attribute key labels.

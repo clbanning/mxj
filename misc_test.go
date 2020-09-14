@@ -198,20 +198,58 @@ func TestAttributesNoAttrPrefix(t *testing.T) {
 	PrependAttrWithHyphen(true)
 }
 
-func TestPreserveSpace(t *testing.T) {
-	TrimValueWhiteSpace(true)
-	defer TrimValueWhiteSpace(false)
+var whiteSpaceData = []byte("<doc><elem3> hello world </elem3></doc>")
 
-	m, err := NewMapXml([]byte("<a> hello world </a>"))
+func TestPreserveSpaceDisableByDefault(t *testing.T) {
+	const path = "doc.elem3"
+	m, err := NewMapXml(whiteSpaceData)
 	if err != nil {
 		t.Fatal(err)
 	}
-	s, err := m.ValueForPath("a")
+
+	s, err := m.ValueForPath(path)
 	if err != nil {
 		t.Fatal(err)
 	}
+	if s != "hello world" {
+		t.Fatal("space value was not trimmed")
+	}
+}
+
+func TestPreserveSpaceOn(t *testing.T) {
+	const path = "doc.elem3"
+	TrimValueWhiteSpace(false)
+
+	m, err := NewMapXml(whiteSpaceData)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s, err := m.ValueForPath(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(' ', s)
 	if s != " hello world " {
-		t.Fatal("Spaces in value was not preserved")
+		t.Fatal("space in value was trimmed ")
 	}
-	fmt.Printf("'%v'\n", s)
+}
+
+func TestPreserveSpaceOff(t *testing.T) {
+	const path = "doc.elem3"
+	TrimValueWhiteSpace(true)
+
+	m, err := NewMapXml(whiteSpaceData)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s, err := m.ValueForPath(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(' ', s)
+	if s == " hello world " {
+		t.Fatal("space in value was not trimmed ")
+	}
 }
