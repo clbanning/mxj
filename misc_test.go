@@ -199,6 +199,9 @@ func TestAttributesNoAttrPrefix(t *testing.T) {
 }
 
 func TestPreserveSpace(t *testing.T) {
+	TrimValueWhiteSpace(true)
+	defer TrimValueWhiteSpace(false)
+
 	m, err := NewMapXml([]byte("<a> hello world </a>"))
 	if err != nil {
 		t.Fatal(err)

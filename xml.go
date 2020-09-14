@@ -235,6 +235,14 @@ func CoerceKeysToLower(b ...bool) {
 	}
 }
 
+// disableTrimWhiteSpace will set if
+var disableTrimWhiteSpace bool
+
+// TrimValueWhiteSpace set where the white space should be trimmed or not. By default white space is always trimmed.
+func TrimValueWhiteSpace(b bool) {
+	disableTrimWhiteSpace = b
+}
+
 // 25jun16: Allow user to specify the "prefix" character for XML attribute key labels.
 // We do this by replacing '`' constant with attrPrefix var, replacing useHyphen with attrPrefix = "",
 // and adding a SetAttrPrefix(s string) function.
@@ -456,7 +464,14 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			return n, nil
 		case xml.CharData:
 			// clean up possible noise
-			tt := string(t.(xml.CharData))
+			sb := strings.Builder{}
+			sb.WriteString("\t\r\b\n")
+			fmt.Printf("Trim white space? %v\n", disableTrimWhiteSpace)
+			if !disableTrimWhiteSpace {
+				sb.WriteRune(' ')
+			}
+
+			tt := strings.Trim(string(t.(xml.CharData)), sb.String())
 			if len(tt) > 0 {
 				if len(na) > 0 || decodeSimpleValuesAsMap {
 					na["#text"] = cast(tt, r, "#text")
