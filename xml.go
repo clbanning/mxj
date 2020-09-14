@@ -238,7 +238,7 @@ func CoerceKeysToLower(b ...bool) {
 // disableTrimWhiteSpace will set if
 var disableTrimWhiteSpace bool
 
-// TrimValueWhiteSpace set where the white space should be trimmed or not. By default white space is always trimmed.
+// TrimValueWhiteSpace set if the white space should be trimmed or not. By default white space is always trimmed.
 func TrimValueWhiteSpace(b bool) {
 	disableTrimWhiteSpace = b
 }
@@ -466,7 +466,6 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			// clean up possible noise
 			sb := strings.Builder{}
 			sb.WriteString("\t\r\b\n")
-			fmt.Printf("Trim white space? %v\n", disableTrimWhiteSpace)
 			if !disableTrimWhiteSpace {
 				sb.WriteRune(' ')
 			}
