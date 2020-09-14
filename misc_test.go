@@ -219,6 +219,7 @@ func TestPreserveSpaceDisableByDefault(t *testing.T) {
 func TestPreserveSpaceOn(t *testing.T) {
 	const path = "doc.elem3"
 	TrimValueWhiteSpace(false)
+	defer TrimValueWhiteSpace(true)
 
 	m, err := NewMapXml(whiteSpaceData)
 	if err != nil {
