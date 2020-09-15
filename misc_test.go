@@ -201,56 +201,68 @@ func TestAttributesNoAttrPrefix(t *testing.T) {
 var whiteSpaceData = []byte("<doc><elem3> hello world </elem3></doc>")
 
 func TestPreserveSpaceDisableByDefault(t *testing.T) {
-	const path = "doc.elem3"
-	m, err := NewMapXml(whiteSpaceData)
-	if err != nil {
-		t.Fatal(err)
+	const (
+		path       = "doc.elem3"
+		input      = " hello world "
+		trimmed    = "hello world"
+		notTrimmed = input
+	)
+	tcs := []struct {
+		name           string
+		args           []bool
+		expectedOutput string
+	}{
+		{
+			name:           "Default Preserve Space disabled should trim values",
+			args:           nil, // nil will result in the `DisableWhiteSpace` to be skipped
+			expectedOutput: trimmed,
+		},
+		{
+			name:           "Single true is passed should not trim values",
+			args:           []bool{true},
+			expectedOutput: notTrimmed,
+		},
+		{
+			name:           "Single false is passed should trim values",
+			args:           []bool{false},
+			expectedOutput: trimmed,
+		},
+		{
+			name:           "No args are passed should not trim values",
+			args:           []bool{},
+			expectedOutput: notTrimmed,
+		},
+		{
+			name:           "Extra arguments should be ignored",
+			args:           []bool{true, false},
+			expectedOutput: notTrimmed,
+		},
+		{
+			name:           "Extra arguments should be ignored with false",
+			args:           []bool{false, true},
+			expectedOutput: trimmed,
+		},
 	}
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.args != nil {
+				DisableTrimWhiteSpace(tc.args...)
+			}
+			m, err := NewMapXml(whiteSpaceData)
 
-	s, err := m.ValueForPath(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if s != "hello world" {
-		t.Fatal("space value was not trimmed")
-	}
-}
+			if err != nil {
+				t.Fatal(err)
+			}
 
-func TestPreserveSpaceOn(t *testing.T) {
-	const path = "doc.elem3"
-	TrimValueWhiteSpace(false)
-	defer TrimValueWhiteSpace(true)
-
-	m, err := NewMapXml(whiteSpaceData)
-	if err != nil {
-		t.Fatal(err)
+			s, err := m.ValueForPath(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if s != tc.expectedOutput {
+				t.Fatalf("expected '%s' got '%s'", tc.expectedOutput, s)
+			}
+		})
 	}
-
-	s, err := m.ValueForPath(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(' ', s)
-	if s != " hello world " {
-		t.Fatal("space in value was trimmed ")
-	}
-}
-
-func TestPreserveSpaceOff(t *testing.T) {
-	const path = "doc.elem3"
-	TrimValueWhiteSpace(true)
-
-	m, err := NewMapXml(whiteSpaceData)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, err := m.ValueForPath(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(' ', s)
-	if s == " hello world " {
-		t.Fatal("space in value was not trimmed ")
-	}
+	// Set it back to false after all tests are done
+	DisableTrimWhiteSpace(false)
 }
