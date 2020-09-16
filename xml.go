@@ -57,6 +57,8 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   3. If CoerceKeysToLower() has been called, then all key values will be lower case.
 //	   4. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
+//     5. If DisableTrimWhiteSpace(b bool) has been called, then all values will be trimmed or not. By default
+//        this is true.
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
@@ -232,6 +234,27 @@ func CoerceKeysToLower(b ...bool) {
 		lowerCase = !lowerCase
 	} else if len(b) == 1 {
 		lowerCase = b[0]
+	}
+}
+
+// disableTrimWhiteSpace sets if the white space should be removed or not
+var disableTrimWhiteSpace bool
+
+var trimRunes = "\t\r\b\n "
+
+// DisableTrimWhiteSpace set if the white space should be trimmed or not. By default white space is always trimmed. If
+// no argument is provided, trim white space will be disabled.
+func DisableTrimWhiteSpace(b ...bool) {
+	if len(b) == 0 {
+		disableTrimWhiteSpace = true
+	} else {
+		disableTrimWhiteSpace = b[0]
+	}
+
+	if disableTrimWhiteSpace {
+		trimRunes = "\t\r\b\n"
+	} else {
+		trimRunes = "\t\r\b\n "
 	}
 }
 
@@ -456,7 +479,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			return n, nil
 		case xml.CharData:
 			// clean up possible noise
-			tt := strings.Trim(string(t.(xml.CharData)), "\t\r\b\n ")
+			tt := strings.Trim(string(t.(xml.CharData)), trimRunes)
 			if len(tt) > 0 {
 				if len(na) > 0 || decodeSimpleValuesAsMap {
 					na["#text"] = cast(tt, r, "#text")
