@@ -338,7 +338,7 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			return n, nil
 		case xml.CharData:
 			// clean up possible noise
-			tt := strings.Trim(string(t.(xml.CharData)), "\t\r\b\n ")
+			tt := strings.Trim(string(t.(xml.CharData)), trimRunes)
 			if skey == "" {
 				// per Adrian (http://www.adrianlungu.com/) catch stray text
 				// in decoder stream -
