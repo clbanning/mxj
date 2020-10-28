@@ -6,7 +6,9 @@ mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use m
 <h4>Installation</h4>
 <pre>
 go get github.com/clbanning/mxj/v2@v2.3.2
+</pre>
 
+<pre>
 import "github.com/clbanning/mxj/v2"
 </pre>
 
