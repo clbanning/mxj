@@ -4,6 +4,7 @@ Decode/encode XML to/from map[string]interface{} (or JSON) values, and extract/m
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
 <h4>Installation</h4>
+Using go.mod:
 <pre>
 go get github.com/clbanning/mxj/v2@v2.3.2
 </pre>
@@ -11,6 +12,8 @@ go get github.com/clbanning/mxj/v2@v2.3.2
 <pre>
 import "github.com/clbanning/mxj/v2"
 </pre>
+
+... or just vendor the package.
 
 <h4>Related Packages</h4>
 
