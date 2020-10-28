@@ -4,15 +4,11 @@ Decode/encode XML to/from map[string]interface{} (or JSON) values, and extract/m
 mxj supplants the legacy x2j and j2x packages. If you want the old syntax, use mxj/x2j and mxj/j2x packages.
 
 <h4>Installation</h4>
-```
+<pre>
 go get github.com/clbanning/mxj/v2@v2.3.2
-```
 
-```
 import "github.com/clbanning/mxj/v2"
-
-data, _ := mxj.NewMapXml([]byte(`<user><name>xxx</name></user>`))
-```
+</pre>
 
 <h4>Related Packages</h4>
 
