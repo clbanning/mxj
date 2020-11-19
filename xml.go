@@ -57,8 +57,7 @@ var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 //	      extraneous xml.CharData will be ignored unless io.EOF is reached first.
 //	   3. If CoerceKeysToLower() has been called, then all key values will be lower case.
 //	   4. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
-//    5. If DisableTrimWhiteSpace(b bool) has been called, then all values will be trimmed or not. By default
-//       this is true.
+//	   4. If DisableTrimWhiteSpace(b bool) has been called, then all values will be trimmed or not. 'true' by default.
 func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 	var r bool
 	if len(cast) == 1 {
