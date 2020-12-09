@@ -969,8 +969,17 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 	case []map[string]interface{}, []string, []float64, []bool, []int, []int32, []int64, []float32, []json.Number:
 	case []interface{}:
 	default:
-		// coerce eveything else into a string value
-		value = fmt.Sprint(value)
+		// see if value is a struct, if so marshal using encoding/xml package
+		if reflect.ValueOf(value).Kind() == reflect.Struct {
+			if v, err := xml.Marshal(value); err != nil {
+				return err
+			} else {
+				value = string(v)
+			}
+		} else {
+			// coerce eveything else into a string value
+			value = fmt.Sprint(value)
+		}
 	}
 
 	// start the XML tag with required indentaton and padding
@@ -1322,4 +1331,3 @@ func (e elemList) Swap(i, j int) {
 func (e elemList) Less(i, j int) bool {
 	return e[i][0].(string) <= e[j][0].(string)
 }
-
