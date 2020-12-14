@@ -372,6 +372,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				if lowerCase {
 					key = strings.ToLower(key)
 				}
+				if xmlEscapeCharsDecoder { // per issue#84
+					v.Value = escapeChars(v.Value)
+				}
 				na[key] = cast(v.Value, r, key)
 			}
 		}
@@ -478,6 +481,9 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 		case xml.CharData:
 			// clean up possible noise
 			tt := strings.Trim(string(t.(xml.CharData)), trimRunes)
+			if xmlEscapeCharsDecoder { // issue#84
+				tt = escapeChars(tt)
+			}
 			if len(tt) > 0 {
 				if len(na) > 0 || decodeSimpleValuesAsMap {
 					na["#text"] = cast(tt, r, "#text")

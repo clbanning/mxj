@@ -77,9 +77,9 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	   1. Keys in the MapSeq value that are parsed from a <name space prefix>:<local name> tag preserve the
 //	      "<prefix>:" notation rather than stripping it as with NewMapXml().
 //	   2. Attribute keys for name space prefix declarations preserve "xmlns:<prefix>" notation.
-// 
+//
 //	ERRORS:
-//	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment", 
+//	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment",
 //	      "#directive" or #procinst" key.
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
 	var r bool
@@ -96,9 +96,9 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
 //	   2. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	      re-encode the message in its original structure.
 //	   3. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
-// 
+//
 //	ERRORS:
-//	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment", 
+//	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment",
 //	      "#directive" or #procinst" key.
 func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (MapSeq, error) {
 	var r bool
@@ -131,9 +131,9 @@ func NewMapXmlSeqReader(xmlReader io.Reader, cast ...bool) (MapSeq, error) {
 //	    4. CoerceKeysToLower() is NOT recognized, since the intent here is to eventually call m.XmlSeq() to
 //	       re-encode the message in its original structure.
 //	    5. If CoerceKeysToSnakeCase() has been called, then all key values will be converted to snake case.
-// 
+//
 //	ERRORS:
-//	    1. If a NoRoot error, "no root key," is returned, check if the initial map key is "#comment", 
+//	    1. If a NoRoot error, "no root key," is returned, check if the initial map key is "#comment",
 //	       "#directive" or #procinst" key.
 func NewMapXmlSeqReaderRaw(xmlReader io.Reader, cast ...bool) (MapSeq, []byte, error) {
 	var r bool
@@ -207,6 +207,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			for i, v := range a {
 				if snakeCaseKeys {
 					v.Name.Local = strings.Replace(v.Name.Local, "-", "_", -1)
+				}
+				if xmlEscapeCharsDecoder { // per issue#84
+					v.Value = escapeChars(v.Value)
 				}
 				if len(v.Name.Space) > 0 {
 					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r, ""), "#seq": i}
@@ -339,6 +342,9 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 		case xml.CharData:
 			// clean up possible noise
 			tt := strings.Trim(string(t.(xml.CharData)), trimRunes)
+			if xmlEscapeCharsDecoder { // issue#84
+				tt = escapeChars(tt)
+			}
 			if skey == "" {
 				// per Adrian (http://www.adrianlungu.com/) catch stray text
 				// in decoder stream -
@@ -834,7 +840,7 @@ func (e elemListSeq) Less(i, j int) bool {
 // =============== https://groups.google.com/forum/#!topic/golang-nuts/lHPOHD-8qio
 
 // BeautifyXml (re)formats an XML doc similar to Map.XmlIndent().
-// It preserves comments, directives and process instructions, 
+// It preserves comments, directives and process instructions,
 func BeautifyXml(b []byte, prefix, indent string) ([]byte, error) {
 	x, err := NewMapXmlSeq(b)
 	if err != nil {
