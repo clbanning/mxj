@@ -42,6 +42,8 @@ For over a year I've wanted to refactor the XML-to-map[string]interface{} decode
 
 <h4>Notices</h4>
 
+	2020.12.14: v2.4 - add XMLEscapeCharsDecoder to preserve XML escaped characters in values
+	2020.12.14: v2.3 - add TrimWhiteSpace option
 	2020.05.01: v2.2 - optimize map to XML encoding for large XML docs.
 	2019.07.04: v2.0 - remove unnecessary methods - mv.XmlWriterRaw, mv.XmlIndentWriterRaw - for Map and MapSeq.
 	2019.07.04: Add MapSeq type and move associated functions and methods from Map to MapSeq.
