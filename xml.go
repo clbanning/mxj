@@ -633,6 +633,20 @@ func XmlDefaultEmptyElemSyntax() {
 	useGoXmlEmptyElemSyntax = false
 }
 
+// ------- issue #88 ----------
+// xmlCheckIsValid set switch to force decoding the encoded XML to
+// see if it is valid XML.
+var xmlCheckIsValid bool
+
+// XmlCheckIsValid forces the encoded XML to be checked for validity.
+func XmlCheckIsValid(b ...bool) {
+	if len(b) == 1 {
+		xmlCheckIsValid = b[0]
+		return
+	}
+	 xmlCheckIsValid = !xmlCheckIsValid
+}
+
 // Encode a Map as XML.  The companion of NewMapXml().
 // The following rules apply.
 //    - The key label "#text" is treated as the value for a simple element with attributes.
@@ -679,6 +693,11 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 		err = marshalMapToXmlIndent(false, b, DefaultRootTag, m, p)
 	}
 done:
+	if xmlCheckIsValid {
+		if _, err = NewMapXml(b.Bytes()); err != nil {
+			return nil, err
+		}
+	}
 	return b.Bytes(), err
 }
 
@@ -916,6 +935,11 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 		err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
 	} else {
 		err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
+	}
+	if xmlCheckIsValid {
+		if _, err = NewMapXml(b.Bytes()); err != nil {
+			return nil, err
+		}
 	}
 	return b.Bytes(), err
 }
