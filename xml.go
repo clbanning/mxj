@@ -694,8 +694,15 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	}
 done:
 	if xmlCheckIsValid {
-		if _, err = NewMapXml(b.Bytes()); err != nil {
-			return nil, err
+		d := xml.NewDecoder(bytes.NewReader(b.Bytes()))
+		for _, err = d.Token(); err != io.EOF; {
+			_, err = d.Token()
+			if err == io.EOF {
+				err = nil
+				break
+			} else if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return b.Bytes(), err
@@ -937,8 +944,15 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 		err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
 	}
 	if xmlCheckIsValid {
-		if _, err = NewMapXml(b.Bytes()); err != nil {
-			return nil, err
+		d := xml.NewDecoder(bytes.NewReader(b.Bytes()))
+		for _, err = d.Token(); err != io.EOF; {
+			_, err = d.Token()
+			if err == io.EOF {
+				err = nil
+				break
+			} else if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return b.Bytes(), err
