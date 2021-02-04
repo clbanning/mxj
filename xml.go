@@ -695,7 +695,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 done:
 	if xmlCheckIsValid {
 		d := xml.NewDecoder(bytes.NewReader(b.Bytes()))
-		for _, err = d.Token(); err != io.EOF; {
+		for {
 			_, err = d.Token()
 			if err == io.EOF {
 				err = nil
@@ -945,7 +945,7 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 	}
 	if xmlCheckIsValid {
 		d := xml.NewDecoder(bytes.NewReader(b.Bytes()))
-		for _, err = d.Token(); err != io.EOF; {
+		for {
 			_, err = d.Token()
 			if err == io.EOF {
 				err = nil
