@@ -1012,6 +1012,8 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32, json.Number:
 	case []map[string]interface{}, []string, []float64, []bool, []int, []int32, []int64, []float32, []json.Number:
 	case []interface{}:
+	case nil:
+		value = ""
 	default:
 		// see if value is a struct, if so marshal using encoding/xml package
 		if reflect.ValueOf(value).Kind() == reflect.Struct {
