@@ -55,11 +55,12 @@ func TestXmlCheckIsValid(t *testing.T) {
 		t.Fatal("NewMapJson err;", err)
 	}
 	fmt.Printf("%v\n", m)
-	if _, err = m.Xml(); err == nil {
-		t.Fatal("Xml err: nil")
+	if b, err := m.Xml(); err != nil {
+		fmt.Println("m:", string(b))
+		t.Fatal("Xml err:", err)
 	}
-	if _, err = m.XmlIndent("", "   "); err == nil {
-		t.Fatal("XmlIndent err: nil")
+	if _, err = m.XmlIndent("", "   "); err != nil {
+		t.Fatal("XmlIndent err:", nil)
 	}
 
 	ms, err := NewMapXmlSeq([]byte(`<doc><elem>element</elem></doc>`))

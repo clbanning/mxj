@@ -158,7 +158,7 @@ func TestNilMap(t *testing.T) {
 
 func TestNilValue(t *testing.T) {
 	val := map[string]interface{}{"toplevel": nil}
-	checkval := "<root><toplevel><nil></toplevel></root>"
+	checkval := "<root><toplevel/></root>"
 
 	XmlDefaultEmptyElemSyntax()
 	xmlout, err := AnyXml(val, "root")
@@ -171,7 +171,7 @@ func TestNilValue(t *testing.T) {
 	}
 
 	checkval = `   <root>
-     <toplevel><nil></toplevel>
+     <toplevel/>
    </root>`
 	xmlout, err = AnyXmlIndent(val, "   ", "  ", "root")
 	if err != nil {
@@ -183,7 +183,7 @@ func TestNilValue(t *testing.T) {
 	}
 
 	XmlGoEmptyElemSyntax()
-	checkval = "<root><toplevel><nil></toplevel></root>"
+	checkval = "<root><toplevel></toplevel></root>"
 	xmlout, err = AnyXml(val, "root")
 	if err != nil {
 		t.Fatal(err)
@@ -194,7 +194,7 @@ func TestNilValue(t *testing.T) {
 	}
 
 	checkval = `   <root>
-     <toplevel><nil></toplevel>
+     <toplevel></toplevel>
    </root>`
 	xmlout, err = AnyXmlIndent(val, "   ", "  ", "root")
 	if err != nil {

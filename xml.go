@@ -476,6 +476,12 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				} else {
 					n[skey] = "" // empty element
 				}
+			} else if len(n) == 1 && len(na) > 0 {
+				// it's a simple element w/ no attributes w/ subelements
+				for _, v := range n {
+					na["#text"] = v
+				}
+				n[skey] = na
 			}
 			return n, nil
 		case xml.CharData:
