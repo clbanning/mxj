@@ -650,7 +650,7 @@ func XmlCheckIsValid(b ...bool) {
 		xmlCheckIsValid = b[0]
 		return
 	}
-	 xmlCheckIsValid = !xmlCheckIsValid
+	xmlCheckIsValid = !xmlCheckIsValid
 }
 
 // Encode a Map as XML.  The companion of NewMapXml().
@@ -1108,7 +1108,9 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 		}
 
 		// simple element? Note: '#text" is an invalid XML tag.
+		isComplex := false
 		if v, ok := vv["#text"]; ok && n+1 == lenvv {
+			// just the value and attributes
 			switch v.(type) {
 			case string:
 				if xmlEscapeChars {
@@ -1119,6 +1121,8 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 			case []byte:
 				if xmlEscapeChars {
 					v = escapeChars(string(v.([]byte)))
+				} else {
+					v = string(v.([]byte))
 				}
 			}
 			if _, err = b.WriteString(">" + fmt.Sprintf("%v", v)); err != nil {
@@ -1129,16 +1133,33 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 			isSimple = true
 			break
 		} else if ok {
-			// Handle edge case where simple element with attributes
-			// is unmarshal'd using NewMapXml() where attribute prefix
-			// has been set to "".
-			// TODO(clb): should probably scan all keys for invalid chars.
-			return fmt.Errorf("invalid attribute key label: #text - due to attributes not being prefixed")
+			// need to handle when there are subelements in addition to the simple element value
+			// issue #90
+			switch v.(type) {
+			case string:
+				if xmlEscapeChars {
+					v = escapeChars(v.(string))
+				} else {
+					v = v.(string)
+				}
+			case []byte:
+				if xmlEscapeChars {
+					v = escapeChars(string(v.([]byte)))
+				} else {
+					v = string(v.([]byte))
+				}
+			}
+			if _, err = b.WriteString(">" + fmt.Sprintf("%v", v)); err != nil {
+				return err
+			}
+			isComplex = true
 		}
 
 		// close tag with possible attributes
-		if _, err = b.WriteString(">"); err != nil {
-			return err
+		if !isComplex {
+			if _, err = b.WriteString(">"); err != nil {
+				return err
+			}
 		}
 		if doIndent {
 			// *s += "\n"
@@ -1152,6 +1173,10 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 		elemlist := make([][2]interface{}, len(vv))
 		n = 0
 		for k, v := range vv {
+			if k == "#text" {
+				// simple element handled above
+				continue
+			}
 			if lenAttrPrefix > 0 && lenAttrPrefix < len(k) && k[:lenAttrPrefix] == attrPrefix {
 				continue
 			}

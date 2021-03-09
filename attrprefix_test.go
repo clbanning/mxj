@@ -120,16 +120,17 @@ func TestMarshalPrefixDefault(t *testing.T) {
 
 func TestMarshalPrefixNoHyphen(t *testing.T) {
 	fmt.Println("----------------- TestMarshalPrefixNoHyphen ...")
+	// 2021.03.09 - per issue #90, no produces a complex element
 	PrependAttrWithHyphen(false)
 	m, err := NewMapXml(data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = m.XmlIndent("", "  ")
-	if err == nil {
+	x, err := m.XmlIndent("", "  ")
+	if err != nil {
 		t.Fatal("error not reported for invalid key label")
 	}
-	fmt.Println("err ok:", err)
+	fmt.Println("x:", string(x))
 }
 
 func TestMarshalPrefixUnderscore(t *testing.T) {
