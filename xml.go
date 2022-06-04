@@ -1038,6 +1038,7 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 	if doIndent {
 		switch value.(type) {
 		case []interface{}, []string:
+			// list processing handles indentation for all elements
 		default:
 			if _, err = b.WriteString(p.padding); err != nil {
 				return err
