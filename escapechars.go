@@ -51,13 +51,26 @@ var escapechars = [][2][]byte{
 	{[]byte(`'`), []byte(`&apos;`)},
 }
 
+// Escape double quotes (") in values of attributes to generate correct XML
+var escapeattrchars = [][2][]byte{
+	{[]byte(`"`), []byte(`&quot;`)},
+}
+
 func escapeChars(s string) string {
+	return escapeCharsBySet(s, &escapechars)
+}
+
+func escapeAttribute(s string) string {
+	return escapeCharsBySet(s, &escapeattrchars)
+}
+
+func escapeCharsBySet(s string, set *[][2][]byte) string {
 	if len(s) == 0 {
 		return s
 	}
 
 	b := []byte(s)
-	for _, v := range escapechars {
+	for _, v := range *set {
 		n := bytes.Count(b, v[0])
 		if n == 0 {
 			continue
