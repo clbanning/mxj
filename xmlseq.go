@@ -626,7 +626,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 					if xmlEscapeChars {
 						ss = escapeChars(vv["#text"].(string))
 					} else {
-						ss = vv["#text"].(string)
+						ss = escapeAttribute(vv["#text"].(string))
 					}
 					*s += ` ` + a.k + `="` + ss + `"`
 				case float64, bool, int, int32, int64, float32:
@@ -635,7 +635,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 					if xmlEscapeChars {
 						ss = escapeChars(string(vv["#text"].([]byte)))
 					} else {
-						ss = string(vv["#text"].([]byte))
+						ss = escapeAttribute(string(vv["#text"].([]byte)))
 					}
 					*s += ` ` + a.k + `="` + ss + `"`
 				default:

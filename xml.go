@@ -1122,13 +1122,13 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 				if xmlEscapeChars {
 					v = escapeChars(v.(string))
 				} else {
-					v = v.(string)
+					v = escapeAttribute(v.(string))
 				}
 			case []byte:
 				if xmlEscapeChars {
 					v = escapeChars(string(v.([]byte)))
 				} else {
-					v = string(v.([]byte))
+					v = escapeAttribute(string(v.([]byte)))
 				}
 			}
 			if _, err = b.WriteString(">" + fmt.Sprintf("%v", v)); err != nil {
