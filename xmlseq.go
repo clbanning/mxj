@@ -342,6 +342,13 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 		case xml.CharData:
 			// clean up possible noise
 			tt := strings.Trim(string(t.(xml.CharData)), trimRunes)
+			if trimRunes == "\t\r\b\n" {
+				spaceCount := strings.Count(tt, " ")
+				spaceLength := len(tt)
+				if spaceCount == spaceLength {
+					tt = ""
+				}
+			}
 			if xmlEscapeCharsDecoder { // issue#84
 				tt = escapeChars(tt)
 			}
