@@ -21,10 +21,10 @@ var whiteSpaceDataSeqTest = []byte(`<books>
 </books>`)
 
 func TestNewMapXmlSeqWhiteSpace(t *testing.T) {
-	t.Run("Testing NewMapXMLSeq with WhiteSpacing", func(t *testing.T) {
+	t.Run("Testing NewMapFormattedXmlSeq with WhiteSpacing", func(t *testing.T) {
 		DisableTrimWhiteSpace(true)
 
-		m, err := NewMapXmlSeq(whiteSpaceDataSeqTest)
+		m, err := NewMapFormattedXmlSeq(whiteSpaceDataSeqTest)
 		if err != nil {
 			t.Fatal(err)
 		}
