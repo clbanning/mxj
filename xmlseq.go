@@ -89,6 +89,28 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
 	return xmlSeqToMap(xmlVal, r)
 }
 
+// NewMapFormattedXmlSeq performs the same as NewMapXmlSeq but is useful for processing XML objects that
+// are formatted using the whitespace character, " ".  (The stdlib xml.Decoder, by default, treats all
+// whitespace as significant; Decoder.Token() and Decoder.RawToken() will return strings of one or more
+// whitespace characters and without alphanumeric or punctuation characters as xml.CharData values.)
+//
+// If you're processing such XML, then this will convert all occurrences of whitespace-only strings
+// into an empty string, "", prior to parsing the XML - irrespective of whether the occurrence is
+// formatting or is a actual element value.
+func NewMapFormattedXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
+   var c bool
+   if len(cast) == 1 {
+      c = cast[0]
+   }
+
+   // Per PR #104 - clean out formatting characters so they don't show up in Decoder.RawToken() stream.
+   // NOTE: Also replaces element values that are solely comprised of formatting/whitespace characters
+   // with empty string, "".
+   r := regexp.MustCompile(`>[\n\t\r ]*<`)
+   xmlVal = r.ReplaceAll(xmlVal, []byte("><"))
+   return xmlSeqToMap(xmlVal, c)
+}
+
 // NewMpaXmlSeqReader returns next XML doc from an io.Reader as a MapSeq value.
 //	NOTES:
 //	   1. The 'xmlReader' will be parsed looking for an xml.StartElement, xml.Comment, etc., so BOM and other
