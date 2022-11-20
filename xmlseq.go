@@ -81,6 +81,8 @@ var NO_ROOT = NoRoot // maintain backwards compatibility
 //	ERRORS:
 //	   1. If a NoRoot error, "no root key," is returned, check the initial map key for a "#comment",
 //	      "#directive" or #procinst" key.
+//	   2. Unmarshaling an XML doc that is formatted using the whitespace character, " ", will error, since
+//	      Decoder.RawToken treats such occurances as significant. See NewMapFormattedXmlSeq().
 func NewMapXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
 	var r bool
 	if len(cast) == 1 {
