@@ -8,6 +8,7 @@
 package mxj
 
 import (
+	"regexp"
 	"bytes"
 	"encoding/xml"
 	"errors"
