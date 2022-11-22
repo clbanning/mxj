@@ -23,7 +23,7 @@ func TestNewMapXml(t *testing.T) {
 	want := Map{"root2":
 		map[string]interface{}{
 			"newtag":
-				map[string]interface{}{"-newattr": "some_attr_value", "#text":"something more"},
+				map[string]interface{}{"-newattr": "some_attr_value", textK:"something more"},
 			"list":
 				map[string]interface{}{"-listattr":"val", "item":[]interface{}{"1", "2"}},
 		}}
@@ -48,7 +48,7 @@ func TestAttrHyphenFalse(t *testing.T) {
 	want := Map{"root2":
 		map[string]interface{}{
 			"newtag":
-				map[string]interface{}{"newattr": "some_attr_value", "#text":"something more"},
+				map[string]interface{}{"newattr": "some_attr_value", textK:"something more"},
 			"list":
 				map[string]interface{}{"listattr":"val", "item":[]interface{}{"1", "2"}},
 		}}
