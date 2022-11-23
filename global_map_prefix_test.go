@@ -110,5 +110,6 @@ func TestSetGlobalKeyMapPrefix(t *testing.T) {
 		})
 
 	}
+	SetGlobalKeyMapPrefix("#")
 
 }
