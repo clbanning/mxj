@@ -86,11 +86,11 @@ func TestUpdateValuesForPath_Author(t *testing.T) {
 	}
 	fmt.Println("\nnewDoc:", string(newDoc))
 	fmt.Println("m:", m)
-	fmt.Println("m.UpdateValuesForPath(\"#text:maybe not so simple element\", \"tag\")")
-	n, _ = m.UpdateValuesForPath("#text:maybe not so simple element", "tag")
+	fmt.Println("m.UpdateValuesForPath(\"" + textK + ":maybe not so simple element\", \"tag\")")
+	n, _ = m.UpdateValuesForPath(textK + ":maybe not so simple element", "tag")
 	fmt.Println("n:", n, "m:", m)
-	fmt.Println("m.UpdateValuesForPath(\"#text:simple element again\", \"*\")")
-	n, _ = m.UpdateValuesForPath("#text:simple element again", "*")
+	fmt.Println("m.UpdateValuesForPath(\"" + textK + ":simple element again\", \"*\")")
+	n, _ = m.UpdateValuesForPath(textK + ":simple element again", "*")
 	fmt.Println("n:", n, "m:", m)
 
 	/*
