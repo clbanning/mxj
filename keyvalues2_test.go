@@ -27,8 +27,8 @@ func TestSetSubkeyFieldSeparator(t *testing.T) {
 	if len(vals) != 1 {
 		t.Fatal(":len(vals);", len(vals), vals)
 	}
-	if vals[0].(map[string]interface{})["#text"].(string) != "value 2" {
-		t.Fatal(":expecting: value 2; got:", vals[0].(map[string]interface{})["#text"])
+	if vals[0].(map[string]interface{})[textK].(string) != "value 2" {
+		t.Fatal(":expecting: value 2; got:", vals[0].(map[string]interface{})[textK])
 	}
 
 	SetFieldSeparator("|")
@@ -40,8 +40,8 @@ func TestSetSubkeyFieldSeparator(t *testing.T) {
 	if len(vals) != 1 {
 		t.Fatal("|len(vals);", len(vals), vals)
 	}
-	if vals[0].(map[string]interface{})["#text"].(string) != "value 2" {
-		t.Fatal("|expecting: value 2; got:", vals[0].(map[string]interface{})["#text"])
+	if vals[0].(map[string]interface{})[textK].(string) != "value 2" {
+		t.Fatal("|expecting: value 2; got:", vals[0].(map[string]interface{})[textK])
 	}
 }
 
