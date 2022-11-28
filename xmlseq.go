@@ -8,12 +8,12 @@
 package mxj
 
 import (
-	"regexp"
 	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -101,17 +101,17 @@ func NewMapXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
 // into an empty string, "", prior to parsing the XML - irrespective of whether the occurrence is
 // formatting or is a actual element value.
 func NewMapFormattedXmlSeq(xmlVal []byte, cast ...bool) (MapSeq, error) {
-   var c bool
-   if len(cast) == 1 {
-      c = cast[0]
-   }
+	var c bool
+	if len(cast) == 1 {
+		c = cast[0]
+	}
 
-   // Per PR #104 - clean out formatting characters so they don't show up in Decoder.RawToken() stream.
-   // NOTE: Also replaces element values that are solely comprised of formatting/whitespace characters
-   // with empty string, "".
-   r := regexp.MustCompile(`>[\n\t\r ]*<`)
-   xmlVal = r.ReplaceAll(xmlVal, []byte("><"))
-   return xmlSeqToMap(xmlVal, c)
+	// Per PR #104 - clean out formatting characters so they don't show up in Decoder.RawToken() stream.
+	// NOTE: Also replaces element values that are solely comprised of formatting/whitespace characters
+	// with empty string, "".
+	r := regexp.MustCompile(`>[\n\t\r ]*<`)
+	xmlVal = r.ReplaceAll(xmlVal, []byte("><"))
+	return xmlSeqToMap(xmlVal, c)
 }
 
 // NewMpaXmlSeqReader returns next XML doc from an io.Reader as a MapSeq value.
