@@ -22,6 +22,30 @@ import (
 	"time"
 )
 
+var (
+	textK      = "#text"
+	seqK       = "#seq"
+	commentK   = "#comment"
+	attrK      = "#attr"
+	directiveK = "#directive"
+	procinstK  = "#procinst"
+	targetK    = "#target"
+	instK      = "#inst"
+)
+
+// Support overriding default Map keys prefix
+
+func SetGlobalKeyMapPrefix(s string) {
+	textK = strings.ReplaceAll(textK, textK[0:1], s)
+	seqK = strings.ReplaceAll(seqK, seqK[0:1], s)
+	commentK = strings.ReplaceAll(commentK, commentK[0:1], s)
+	directiveK = strings.ReplaceAll(directiveK, directiveK[0:1], s)
+	procinstK = strings.ReplaceAll(procinstK, procinstK[0:1], s)
+	targetK = strings.ReplaceAll(targetK, targetK[0:1], s)
+	instK = strings.ReplaceAll(instK, instK[0:1], s)
+	attrK = strings.ReplaceAll(attrK, attrK[0:1], s)
+}
+
 // ------------------- NewMapXml & NewMapXmlReader ... -------------------------
 
 // If XmlCharsetReader != nil, it will be used to decode the XML, if required.
@@ -441,7 +465,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 					val.(map[string]interface{})["_seq"] = seq // will overwrite an "_seq" XML tag
 					seq++
 				case interface{}: // a non-nil simple element: string, float64, bool
-					v := map[string]interface{}{"#text": val}
+					v := map[string]interface{}{textK: val}
 					v["_seq"] = seq
 					seq++
 					val = v
@@ -479,7 +503,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			} else if len(n) == 1 && len(na) > 0 {
 				// it's a simple element w/ no attributes w/ subelements
 				for _, v := range n {
-					na["#text"] = v
+					na[textK] = v
 				}
 				n[skey] = na
 			}
@@ -492,7 +516,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			}
 			if len(tt) > 0 {
 				if len(na) > 0 || decodeSimpleValuesAsMap {
-					na["#text"] = cast(tt, r, "#text")
+					na[textK] = cast(tt, r, textK)
 				} else if skey != "" {
 					n[skey] = cast(tt, r, skey)
 				} else {
@@ -1115,7 +1139,7 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 
 		// simple element? Note: '#text" is an invalid XML tag.
 		isComplex := false
-		if v, ok := vv["#text"]; ok && n+1 == lenvv {
+		if v, ok := vv[textK]; ok && n+1 == lenvv {
 			// just the value and attributes
 			switch v.(type) {
 			case string:
@@ -1179,7 +1203,7 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 		elemlist := make([][2]interface{}, len(vv))
 		n = 0
 		for k, v := range vv {
-			if k == "#text" {
+			if k == textK {
 				// simple element handled above
 				continue
 			}

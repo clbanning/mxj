@@ -237,12 +237,12 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 					v.Value = escapeChars(v.Value)
 				}
 				if len(v.Name.Space) > 0 {
-					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r, ""), "#seq": i}
+					aa[v.Name.Space+`:`+v.Name.Local] = map[string]interface{}{textK: cast(v.Value, r, ""), seqK: i}
 				} else {
-					aa[v.Name.Local] = map[string]interface{}{"#text": cast(v.Value, r, ""), "#seq": i}
+					aa[v.Name.Local] = map[string]interface{}{textK: cast(v.Value, r, ""), seqK: i}
 				}
 			}
-			na["#attr"] = aa
+			na[attrK] = aa
 		}
 	}
 
@@ -310,10 +310,10 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			// where all the "list" subelements are decoded into an array.
 			switch val.(type) {
 			case map[string]interface{}:
-				val.(map[string]interface{})["#seq"] = seq
+				val.(map[string]interface{})[seqK] = seq
 				seq++
 			case interface{}: // a non-nil simple element: string, float64, bool
-				v := map[string]interface{}{"#text": val, "#seq": seq}
+				v := map[string]interface{}{textK: val, seqK: seq}
 				seq++
 				val = v
 			}
@@ -380,42 +380,42 @@ func xmlSeqToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[s
 			}
 			if len(tt) > 0 {
 				// every simple element is a #text and has #seq associated with it
-				na["#text"] = cast(tt, r, "")
-				na["#seq"] = seq
+				na[textK] = cast(tt, r, "")
+				na[seqK] = seq
 				seq++
 			}
 		case xml.Comment:
 			if n == nil { // no root 'key'
-				n = map[string]interface{}{"#comment": string(t.(xml.Comment))}
+				n = map[string]interface{}{commentK: string(t.(xml.Comment))}
 				return n, NoRoot
 			}
 			cm := make(map[string]interface{}, 2)
-			cm["#text"] = string(t.(xml.Comment))
-			cm["#seq"] = seq
+			cm[textK] = string(t.(xml.Comment))
+			cm[seqK] = seq
 			seq++
-			na["#comment"] = cm
+			na[commentK] = cm
 		case xml.Directive:
 			if n == nil { // no root 'key'
-				n = map[string]interface{}{"#directive": string(t.(xml.Directive))}
+				n = map[string]interface{}{directiveK: string(t.(xml.Directive))}
 				return n, NoRoot
 			}
 			dm := make(map[string]interface{}, 2)
-			dm["#text"] = string(t.(xml.Directive))
-			dm["#seq"] = seq
+			dm[textK] = string(t.(xml.Directive))
+			dm[seqK] = seq
 			seq++
-			na["#directive"] = dm
+			na[directiveK] = dm
 		case xml.ProcInst:
 			if n == nil {
-				na = map[string]interface{}{"#target": t.(xml.ProcInst).Target, "#inst": string(t.(xml.ProcInst).Inst)}
-				n = map[string]interface{}{"#procinst": na}
+				na = map[string]interface{}{targetK: t.(xml.ProcInst).Target, instK: string(t.(xml.ProcInst).Inst)}
+				n = map[string]interface{}{procinstK: na}
 				return n, NoRoot
 			}
 			pm := make(map[string]interface{}, 3)
-			pm["#target"] = t.(xml.ProcInst).Target
-			pm["#inst"] = string(t.(xml.ProcInst).Inst)
-			pm["#seq"] = seq
+			pm[targetK] = t.(xml.ProcInst).Target
+			pm[instK] = string(t.(xml.ProcInst).Inst)
+			pm[seqK] = seq
 			seq++
-			na["#procinst"] = pm
+			na[procinstK] = pm
 		default:
 			// noop - shouldn't ever get here, now, since we handle all token types
 		}
@@ -605,7 +605,7 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		if doIndent {
 			*s += p.padding
 		}
-		if key != "#comment" && key != "#directive" && key != "#procinst" {
+		if key != commentK && key != directiveK && key != procinstK {
 			*s += `<` + key
 		}
 	}
@@ -613,27 +613,27 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 	case map[string]interface{}:
 		val := value.(map[string]interface{})
 
-		if key == "#comment" {
-			*s += `<!--` + val["#text"].(string) + `-->`
+		if key == commentK {
+			*s += `<!--` + val[textK].(string) + `-->`
 			noEndTag = true
 			break
 		}
 
-		if key == "#directive" {
-			*s += `<!` + val["#text"].(string) + `>`
+		if key == directiveK {
+			*s += `<!` + val[textK].(string) + `>`
 			noEndTag = true
 			break
 		}
 
-		if key == "#procinst" {
-			*s += `<?` + val["#target"].(string) + ` ` + val["#inst"].(string) + `?>`
+		if key == procinstK {
+			*s += `<?` + val[targetK].(string) + ` ` + val[instK].(string) + `?>`
 			noEndTag = true
 			break
 		}
 
 		haveAttrs := false
 		// process attributes first
-		if v, ok := val["#attr"].(map[string]interface{}); ok {
+		if v, ok := val[attrK].(map[string]interface{}); ok {
 			// First, unroll the map[string]interface{} into a []keyval array.
 			// Then sequence it.
 			kv := make([]keyval, len(v))
@@ -646,21 +646,21 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 			// Now encode the attributes in original decoding sequence, using keyval array.
 			for _, a := range kv {
 				vv := a.v.(map[string]interface{})
-				switch vv["#text"].(type) {
+				switch vv[textK].(type) {
 				case string:
 					if xmlEscapeChars {
-						ss = escapeChars(vv["#text"].(string))
+						ss = escapeChars(vv[textK].(string))
 					} else {
-						ss = vv["#text"].(string)
+						ss = vv[textK].(string)
 					}
 					*s += ` ` + a.k + `="` + ss + `"`
 				case float64, bool, int, int32, int64, float32:
-					*s += ` ` + a.k + `="` + fmt.Sprintf("%v", vv["#text"]) + `"`
+					*s += ` ` + a.k + `="` + fmt.Sprintf("%v", vv[textK]) + `"`
 				case []byte:
 					if xmlEscapeChars {
-						ss = escapeChars(string(vv["#text"].([]byte)))
+						ss = escapeChars(string(vv[textK].([]byte)))
 					} else {
-						ss = string(vv["#text"].([]byte))
+						ss = string(vv[textK].([]byte))
 					}
 					*s += ` ` + a.k + `="` + ss + `"`
 				default:
@@ -672,8 +672,8 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 
 		// simple element?
 		// every map value has, at least, "#seq" and, perhaps, "#text" and/or "#attr"
-		_, seqOK := val["#seq"] // have key
-		if v, ok := val["#text"]; ok && ((len(val) == 3 && haveAttrs) || (len(val) == 2 && !haveAttrs)) && seqOK {
+		_, seqOK := val[seqK] // have key
+		if v, ok := val[textK]; ok && ((len(val) == 3 && haveAttrs) || (len(val) == 2 && !haveAttrs)) && seqOK {
 			if stmp, ok := v.(string); ok && stmp != "" {
 				if xmlEscapeChars {
 					stmp = escapeChars(stmp)
@@ -694,10 +694,10 @@ func mapToXmlSeqIndent(doIndent bool, s *string, key string, value interface{}, 
 		// 'kv' will hold everything that needs to be written
 		kv := make([]keyval, 0)
 		for k, v := range val {
-			if k == "#attr" { // already processed
+			if k == attrK { // already processed
 				continue
 			}
-			if k == "#seq" { // ignore - just for sorting
+			if k == seqK { // ignore - just for sorting
 				continue
 			}
 			switch v.(type) {
@@ -870,16 +870,16 @@ func (e elemListSeq) Less(i, j int) bool {
 	var iseq, jseq int
 	var fiseq, fjseq float64
 	var ok bool
-	if iseq, ok = e[i].v.(map[string]interface{})["#seq"].(int); !ok {
-		if fiseq, ok = e[i].v.(map[string]interface{})["#seq"].(float64); ok {
+	if iseq, ok = e[i].v.(map[string]interface{})[seqK].(int); !ok {
+		if fiseq, ok = e[i].v.(map[string]interface{})[seqK].(float64); ok {
 			iseq = int(fiseq)
 		} else {
 			iseq = 9999999
 		}
 	}
 
-	if jseq, ok = e[j].v.(map[string]interface{})["#seq"].(int); !ok {
-		if fjseq, ok = e[j].v.(map[string]interface{})["#seq"].(float64); ok {
+	if jseq, ok = e[j].v.(map[string]interface{})[seqK].(int); !ok {
+		if fjseq, ok = e[j].v.(map[string]interface{})[seqK].(float64); ok {
 			jseq = int(fjseq)
 		} else {
 			jseq = 9999999
