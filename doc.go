@@ -14,7 +14,8 @@ Related Packages:
 	checkxml: github.com/clbanning/checkxml provides functions for validating XML data.
 
 Notes:
-	2022.10.20: v2.6 - add NewMapForattedXmlSeq for XML docs formatted with whitespace character
+	2022.11.28: v2.7 - add SetGlobalKeyMapPrefix to change default prefix, '#', for default keys
+	2022.11.20: v2.6 - add NewMapForattedXmlSeq for XML docs formatted with whitespace character
 	2021.02.02: v2.5 - add XmlCheckIsValid toggle to force checking that the encoded XML is valid
 	2020.12.14: v2.4 - add XMLEscapeCharsDecoder to preserve XML escaped characters in Map values
 	2020.10.28: v2.3 - add TrimWhiteSpace option
