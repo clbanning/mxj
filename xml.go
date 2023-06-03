@@ -51,17 +51,19 @@ func SetGlobalKeyMapPrefix(s string) {
 // If XmlCharsetReader != nil, it will be used to decode the XML, if required.
 // Note: if CustomDecoder != nil, then XmlCharsetReader is ignored;
 // set the CustomDecoder attribute instead.
-//   import (
-//	     charset "code.google.com/p/go-charset/charset"
-//	     github.com/clbanning/mxj
-//	 )
-//   ...
-//   mxj.XmlCharsetReader = charset.NewReader
-//   m, merr := mxj.NewMapXml(xmlValue)
+//
+//	  import (
+//		     charset "code.google.com/p/go-charset/charset"
+//		     github.com/clbanning/mxj
+//		 )
+//	  ...
+//	  mxj.XmlCharsetReader = charset.NewReader
+//	  m, merr := mxj.NewMapXml(xmlValue)
 var XmlCharsetReader func(charset string, input io.Reader) (io.Reader, error)
 
 // NewMapXml - convert a XML doc into a Map
 // (This is analogous to unmarshalling a JSON string to map[string]interface{} using json.Unmarshal().)
+//
 //	If the optional argument 'cast' is 'true', then values will be converted to boolean or float64 if possible.
 //
 //	Converting XML to JSON is a simple as:
@@ -91,6 +93,7 @@ func NewMapXml(xmlVal []byte, cast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value.
+//
 //	NOTES:
 //	   1. Declarations, directives, process instructions and comments are NOT parsed.
 //	   2. The 'xmlReader' will be parsed looking for an xml.StartElement, so BOM and other
@@ -115,6 +118,7 @@ func NewMapXmlReader(xmlReader io.Reader, cast ...bool) (Map, error) {
 }
 
 // Get next XML doc from an io.Reader as a Map value.  Returns Map value and slice with the raw XML.
+//
 //	NOTES:
 //	   1. Declarations, directives, process instructions and comments are NOT parsed.
 //	   2. Due to the implementation of xml.Decoder, the raw XML off the reader is buffered to []byte
@@ -177,6 +181,7 @@ func xmlToMap(doc []byte, r bool) (map[string]interface{}, error) {
 
 // PrependAttrWithHyphen. Prepend attribute tags with a hyphen.
 // Default is 'true'. (Not applicable to NewMapXmlSeq(), mv.XmlSeq(), etc.)
+//
 //	Note:
 //		If 'false', unmarshaling and marshaling is not symmetric. Attributes will be
 //		marshal'd as <attr_tag>attr</attr_tag> and may be part of a list.
@@ -247,6 +252,7 @@ var lowerCase bool
 // Coerce all tag values to keys in lower case.  This is useful if you've got sources with variable
 // tag capitalization, and you want to use m.ValuesForKeys(), etc., with the key or path spec
 // in lower case.
+//
 //	CoerceKeysToLower() will toggle the coercion flag true|false - on|off
 //	CoerceKeysToLower(true|false) will set the coercion flag on|off
 //
@@ -295,6 +301,30 @@ func SetAttrPrefix(s string) {
 	lenAttrPrefix = len(attrPrefix)
 }
 
+var keepNamespace bool
+
+// KeepNamespace set if namespace in elements and attributes must be preserved. By default, namespace are removed.
+func KeepNamespace(b bool) {
+	keepNamespace = b
+}
+
+var forceList map[string]interface{}
+
+// ForceList force element with name to be a slice (array) even if there is only one single element with this name.
+func ForceList(n ...string) {
+	if len(n) != 0 {
+		if forceList == nil {
+			forceList = make(map[string]interface{})
+		}
+		for _, l := range n {
+			p := strings.Split(l, ",")
+			for _, s := range p {
+				forceList[s] = nil
+			}
+		}
+	}
+}
+
 // 18jan17: Allows user to specify if the map keys should be in snake case instead
 // of the default hyphenated notation.
 var snakeCaseKeys bool
@@ -331,6 +361,7 @@ var handleXMPPStreamTag bool
 // HandleXMPPStreamTag causes decoder to parse XMPP <stream:stream> elements.
 // If called with no argument, XMPP stream element handling is toggled on/off.
 // (See xmppStream_test.go for example.)
+//
 //	If called with NewMapXml, NewMapXmlReader, New MapXmlReaderRaw the "stream"
 //	element will be  returned as:
 //		map["stream"]interface{}{map[-<attrs>]interface{}}.
@@ -392,7 +423,11 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 					v.Name.Local = strings.Replace(v.Name.Local, "-", "_", -1)
 				}
 				var key string
-				key = attrPrefix + v.Name.Local
+				if keepNamespace && v.Name.Space != "" {
+					key = attrPrefix + v.Name.Space + ":" + v.Name.Local
+				} else {
+					key = attrPrefix + v.Name.Local
+				}
 				if lowerCase {
 					key = strings.ToLower(key)
 				}
@@ -420,6 +455,12 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 		switch t.(type) {
 		case xml.StartElement:
 			tt := t.(xml.StartElement)
+			var key string
+			if keepNamespace && tt.Name.Space != "" {
+				key = tt.Name.Space + ":" + tt.Name.Local
+			} else {
+				key = tt.Name.Local
+			}
 
 			// First call to xmlToMapParser() doesn't pass xml.StartElement - the map key.
 			// So when the loop is first entered, the first token is the root tag along
@@ -429,12 +470,12 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			// processing before getting the next token which is the element value,
 			// which is done above.
 			if skey == "" {
-				return xmlToMapParser(tt.Name.Local, tt.Attr, p, r)
+				return xmlToMapParser(key, tt.Attr, p, r)
 			}
 
 			// If not initializing the map, parse the element.
 			// len(nn) == 1, necessarily - it is just an 'n'.
-			nn, err := xmlToMapParser(tt.Name.Local, tt.Attr, p, r)
+			nn, err := xmlToMapParser(key, tt.Attr, p, r)
 			if err != nil {
 				return nil, err
 			}
@@ -446,7 +487,6 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			// Note:
 			// * if CoerceKeysToLower() called, then key will be lower case.
 			// * if CoerceKeysToSnakeCase() called, then key will be converted to snake case.
-			var key string
 			var val interface{}
 			for key, val = range nn {
 				break
@@ -485,6 +525,8 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				}
 				a = append(a, val)
 				na[key] = a
+			} else if _, ok := forceList[key]; ok {
+				na[key] = []interface{}{val}
 			} else {
 				na[key] = val // save it as a singleton
 			}
@@ -632,7 +674,9 @@ var checkTagToSkip func(string) bool
 // for a tag should be cast to bool or float64 when "cast" argument is 'true'.
 // (Dot tag path notation is not supported.)
 // NOTE: key may be "#text" if it's a simple element with attributes
-//       or "decodeSimpleValuesAsMap == true".
+//
+//	or "decodeSimpleValuesAsMap == true".
+//
 // NOTE: does not apply to NewMapXmlSeq... functions.
 func SetCheckTagToSkipFunc(fn func(string) bool) {
 	checkTagToSkip = fn
@@ -649,6 +693,7 @@ const (
 var useGoXmlEmptyElemSyntax bool
 
 // XmlGoEmptyElemSyntax() - <tag ...></tag> rather than <tag .../>.
+//
 //	Go's encoding/xml package marshals empty XML elements as <tag ...></tag>.  By default this package
 //	encodes empty elements as <tag .../>.  If you're marshaling Map values that include structures
 //	(which are passed to xml.Marshal for encoding), this will let you conform to the standard package.
@@ -679,18 +724,19 @@ func XmlCheckIsValid(b ...bool) {
 
 // Encode a Map as XML.  The companion of NewMapXml().
 // The following rules apply.
-//    - The key label "#text" is treated as the value for a simple element with attributes.
-//    - Map keys that begin with a hyphen, '-', are interpreted as attributes.
-//      It is an error if the attribute doesn't have a []byte, string, number, or boolean value.
-//    - Map value type encoding:
-//          > string, bool, float64, int, int32, int64, float32: per "%v" formating
-//          > []bool, []uint8: by casting to string
-//          > structures, etc.: handed to xml.Marshal() - if there is an error, the element
-//            value is "UNKNOWN"
-//    - Elements with only attribute values or are null are terminated using "/>".
-//    - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag, possible.
-//      Thus, `{ "key":"value" }` encodes as "<key>value</key>".
-//    - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
+//   - The key label "#text" is treated as the value for a simple element with attributes.
+//   - Map keys that begin with a hyphen, '-', are interpreted as attributes.
+//     It is an error if the attribute doesn't have a []byte, string, number, or boolean value.
+//   - Map value type encoding:
+//     > string, bool, float64, int, int32, int64, float32: per "%v" formating
+//     > []bool, []uint8: by casting to string
+//     > structures, etc.: handed to xml.Marshal() - if there is an error, the element
+//     value is "UNKNOWN"
+//   - Elements with only attribute values or are null are terminated using "/>".
+//   - If len(mv) == 1 and no rootTag is provided, then the map key is used as the root tag, possible.
+//     Thus, `{ "key":"value" }` encodes as "<key>value</key>".
+//   - To encode empty elements in a syntax consistent with encoding/xml call UseGoXmlEmptyElementSyntax().
+//
 // The attributes tag=value pairs are alphabetized by "tag".  Also, when encoding map[string]interface{} values -
 // complex elements, etc. - the key:value pairs are alphabetized by key so the resulting tags will appear sorted.
 func (mv Map) Xml(rootTag ...string) ([]byte, error) {
@@ -802,6 +848,7 @@ func (mv Map) XmlIndentWriterRaw(xmlWriter io.Writer, prefix, indent string, roo
 var xhandlerPollInterval = time.Millisecond
 
 // Bulk process XML using handlers that process a Map value.
+//
 //	'rdr' is an io.Reader for XML (stream)
 //	'mapHandler' is the Map processor. Return of 'false' stops io.Reader processing.
 //	'errHandler' is the error processor. Return of 'false' stops io.Reader processing and returns the error.
@@ -841,6 +888,7 @@ func HandleXmlReader(xmlReader io.Reader, mapHandler func(Map) bool, errHandler 
 }
 
 // Bulk process XML using handlers that process a Map value and the raw XML.
+//
 //	'rdr' is an io.Reader for XML (stream)
 //	'mapHandler' is the Map and raw XML - []byte - processor. Return of 'false' stops io.Reader processing.
 //	'errHandler' is the error and raw XML processor. Return of 'false' stops io.Reader processing and returns the error.
@@ -959,12 +1007,16 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 	p.indent = indent
 	p.padding = prefix
 
-	if len(m) == 1 && len(rootTag) == 0 {
+	if len(m) == 1 {
 		// this can extract the key for the single map element
 		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
+				if len(rootTag) == 0 {
+					err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
+				} else {
+					err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
+				}
 			} else {
 				err = marshalMapToXmlIndent(true, b, key, value, p)
 			}
