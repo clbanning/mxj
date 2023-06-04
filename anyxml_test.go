@@ -109,7 +109,6 @@ func TestAnyXmlIndent(t *testing.T) {
 	fmt.Println("s->x:\n", string(x))
 }
 
-
 func TestNilMap(t *testing.T) {
 	XmlDefaultEmptyElemSyntax()
 	checkval := "<root/>"
@@ -205,4 +204,30 @@ func TestNilValue(t *testing.T) {
 		t.Fatal()
 	}
 	XmlDefaultEmptyElemSyntax()
+}
+
+func TestFixRoot(t *testing.T) {
+	val := map[string]interface{}{"toplevel": nil}
+	checkval := "<toplevel/>"
+
+	XmlDefaultEmptyElemSyntax()
+	FixRoot(true)
+
+	xmlout, err := AnyXml(val)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
+
+	xmlout, err = AnyXmlIndent(val, "", " ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(xmlout) != checkval {
+		fmt.Println(string(xmlout), "!=", checkval)
+		t.Fatal()
+	}
 }
