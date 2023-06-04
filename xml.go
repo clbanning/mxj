@@ -308,20 +308,31 @@ func KeepNamespace(b bool) {
 	keepNamespace = b
 }
 
-var forceList map[string]interface{}
+var forceListForKeys map[string]interface{}
+var forceListForPaths []string
 
-// ForceList force element with name to be a slice (array) even if there is only one single element with this name.
-func ForceList(n ...string) {
+// ForceListForKeys force element with name to be a slice (array) even if there is only one single element.
+func ForceListForKeys(n ...string) {
 	if len(n) != 0 {
-		if forceList == nil {
-			forceList = make(map[string]interface{})
+		if forceListForKeys == nil {
+			forceListForKeys = make(map[string]interface{})
 		}
 		for _, l := range n {
 			p := strings.Split(l, ",")
 			for _, s := range p {
-				forceList[s] = nil
+				forceListForKeys[s] = nil
 			}
 		}
+	}
+}
+
+// ForceListForPaths force element with path to be a slice (array) even if there is only one single element.
+func ForceListForPaths(n ...string) {
+	if forceListForPaths == nil {
+		forceListForPaths = make([]string, 0)
+	}
+	for _, s := range n {
+		forceListForPaths = append(forceListForPaths, s)
 	}
 }
 
@@ -478,7 +489,35 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 			// processing before getting the next token which is the element value,
 			// which is done above.
 			if skey == "" {
-				return xmlToMapParser(key, tt.Attr, p, r)
+				r, err := xmlToMapParser(key, tt.Attr, p, r)
+				if err != nil {
+					return nil, err
+				}
+				// force array for all forceList paths
+				rr := Map(r)
+				for _, path := range forceListForPaths {
+					sp := strings.Split(path, ".")
+					elem := sp[len(sp)-1]
+					path = strings.Join(sp[0:len(sp)-1], ".")
+					vals, err := rr.ValuesForPath(path)
+					if err != nil {
+						// on error, continue as it can be invalid path, no value, ...
+						continue
+					}
+					for _, v := range vals {
+						if vv, ok := v.(map[string]interface{}); ok {
+							if ve, ok := vv[elem]; ok {
+								switch ve.(type) {
+								case []interface{}:
+									// nothing to od, already an array
+								default:
+									vv[elem] = []interface{}{ve}
+								}
+							}
+						}
+					}
+				}
+				return r, nil
 			}
 
 			// If not initializing the map, parse the element.
@@ -533,7 +572,7 @@ func xmlToMapParser(skey string, a []xml.Attr, p *xml.Decoder, r bool) (map[stri
 				}
 				a = append(a, val)
 				na[key] = a
-			} else if _, ok := forceList[key]; ok {
+			} else if _, ok := forceListForKeys[key]; ok {
 				na[key] = []interface{}{val}
 			} else {
 				na[key] = val // save it as a singleton
