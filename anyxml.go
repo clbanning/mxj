@@ -114,6 +114,9 @@ func AnyXml(v interface{}, tags ...string) ([]byte, error) {
 	case map[string]interface{}:
 		m := Map(v.(map[string]interface{}))
 		b, err = m.Xml(rt)
+	case Map:
+		m := v.(Map)
+		b, err = m.Xml(rt)
 	default:
 		err = marshalMapToXmlIndent(false, s, rt, v, p)
 		b = s.Bytes()
@@ -191,6 +194,9 @@ func AnyXmlIndent(v interface{}, prefix, indent string, tags ...string) ([]byte,
 		b = s.Bytes()
 	case map[string]interface{}:
 		m := Map(v.(map[string]interface{}))
+		b, err = m.XmlIndent(prefix, indent, rt)
+	case Map:
+		m := v.(Map)
 		b, err = m.XmlIndent(prefix, indent, rt)
 	default:
 		err = marshalMapToXmlIndent(true, s, rt, v, p)
