@@ -325,6 +325,14 @@ func ForceList(n ...string) {
 	}
 }
 
+var fixRoot bool
+
+// FixRoot set if xml result should preserve first element as root when it is alone.
+// This currently only work when used with map[string]interface{} and not Map.
+func FixRoot(b bool) {
+	fixRoot = b
+}
+
 // 18jan17: Allows user to specify if the map keys should be in snake case instead
 // of the default hyphenated notation.
 var snakeCaseKeys bool
@@ -745,7 +753,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 	b := new(bytes.Buffer)
 	p := new(pretty) // just a stub
 
-	if len(m) == 1 && len(rootTag) == 0 {
+	if len(m) == 1 && (len(rootTag) == 0 || fixRoot) {
 		for key, value := range m {
 			// if it an array, see if all values are map[string]interface{}
 			// we force a new root tag if we'll end up with no key:value in the list
@@ -756,7 +764,11 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 					switch v.(type) {
 					case map[string]interface{}: // noop
 					default: // anything else
-						err = marshalMapToXmlIndent(false, b, DefaultRootTag, m, p)
+						if len(rootTag) == 0 && fixRoot {
+							err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
+						} else {
+							err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
+						}
 						goto done
 					}
 				}
@@ -1007,12 +1019,12 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 	p.indent = indent
 	p.padding = prefix
 
-	if len(m) == 1 {
+	if len(m) == 1 && (len(rootTag) == 0 || fixRoot) {
 		// this can extract the key for the single map element
 		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				if len(rootTag) == 0 {
+				if len(rootTag) == 0 && fixRoot {
 					err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
 				} else {
 					err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
