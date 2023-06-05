@@ -803,7 +803,7 @@ func (mv Map) Xml(rootTag ...string) ([]byte, error) {
 					switch v.(type) {
 					case map[string]interface{}: // noop
 					default: // anything else
-						if len(rootTag) == 0 && fixRoot {
+						if len(rootTag) == 0 {
 							err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
 						} else {
 							err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
@@ -1063,7 +1063,7 @@ func (mv Map) XmlIndent(prefix, indent string, rootTag ...string) ([]byte, error
 		// use it if it isn't a key for a list
 		for key, value := range m {
 			if _, ok := value.([]interface{}); ok {
-				if len(rootTag) == 0 && fixRoot {
+				if len(rootTag) == 0 {
 					err = marshalMapToXmlIndent(true, b, DefaultRootTag, m, p)
 				} else {
 					err = marshalMapToXmlIndent(true, b, rootTag[0], m, p)
