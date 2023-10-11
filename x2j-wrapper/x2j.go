@@ -81,7 +81,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/clbanning/mxj"
+	"github.com/clbanning/mxj/v2"
 )
 
 // If X2jCharsetReader != nil, it will be used to decode the doc or stream if required

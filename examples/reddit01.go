@@ -5,7 +5,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/clbanning/mxj"
+	"github.com/clbanning/mxj/v2"
 )
 
 var data = []byte(`<app>

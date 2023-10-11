@@ -11,7 +11,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/clbanning/mxj"
+	"github.com/clbanning/mxj/v2"
 )
 
 var xmlmsg1 = []byte(`<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">

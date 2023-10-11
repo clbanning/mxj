@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"github.com/clbanning/mxj/x2j"
+	"github.com/clbanning/mxj/v2/x2j"
 )
 
 func main() {

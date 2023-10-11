@@ -5,7 +5,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/clbanning/mxj"
+	"github.com/clbanning/mxj/v2"
 )
 
 var xmlData = []byte(`<?xml version="1.0" encoding="UTF-8"?>

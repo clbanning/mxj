@@ -21,7 +21,7 @@ func main() {
 package main
 
 import "fmt"
-import "github.com/clbanning/mxj"
+import "github.com/clbanning/mxj/v2"
 
 func main() {
 	m, err := mxj.NewMapJson(s)

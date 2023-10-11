@@ -10,7 +10,7 @@ package x2j
 import (
 	"strings"
 
-	"github.com/clbanning/mxj"
+	"github.com/clbanning/mxj/v2"
 )
 
 // ------------------- sweep up everything for some point in the node tree ---------------------
