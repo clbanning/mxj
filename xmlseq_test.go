@@ -81,17 +81,17 @@ func TestXmlSeqDecodeError(t *testing.T) {
 }
 
 func BenchmarkMapToXml(b *testing.B) {
+	xmlBytes, err := os.ReadFile("./largexml.xml")
+	if err != nil {
+		b.Fatal("err:", err)
+	}
+
+	msv, err := NewMapXmlSeq(xmlBytes)
+	if err != nil {
+		b.Fatal("err:", err)
+	}
+
 	for i := 0; i < b.N; i++ {
-		xmlBytes, err := os.ReadFile("./largexml.xml")
-		if err != nil {
-			b.Fatal("err:", err)
-		}
-
-		msv, err := NewMapXmlSeq(xmlBytes)
-		if err != nil {
-			b.Fatal("err:", err)
-		}
-
 		_, err = msv.XmlIndent("", "  ")
 		if err != nil {
 			b.Fatal("err:", err)
