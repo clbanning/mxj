@@ -3,6 +3,7 @@ package mxj
 import (
 	"fmt"
 	"io"
+	"os"
 	"testing"
 )
 
@@ -77,4 +78,23 @@ func TestXmlSeqDecodeError(t *testing.T) {
 		t.Fatal("didn't catch EndElement error")
 	}
 	fmt.Println("err ok:", err)
+}
+
+func BenchmarkMapToXml(b *testing.B) {
+	xmlBytes, err := os.ReadFile("./largexml.xml")
+	if err != nil {
+		b.Fatal("err:", err)
+	}
+
+	msv, err := NewMapXmlSeq(xmlBytes)
+	if err != nil {
+		b.Fatal("err:", err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err = msv.XmlIndent("", "  ")
+		if err != nil {
+			b.Fatal("err:", err)
+		}
+	}
 }
