@@ -14,6 +14,7 @@ Related Packages:
 	checkxml: github.com/clbanning/checkxml provides functions for validating XML data.
 
 Notes:
+	2025.08.10: mxj package no longer actively supported.
 	2022.11.28: v2.7 - add SetGlobalKeyMapPrefix to change default prefix, '#', for default keys
 	2022.11.20: v2.6 - add NewMapForattedXmlSeq for XML docs formatted with whitespace character
 	2021.02.02: v2.5 - add XmlCheckIsValid toggle to force checking that the encoded XML is valid
