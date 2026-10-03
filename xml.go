@@ -1019,6 +1019,10 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 	var elen int
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
 
+	if !validXmlName(key) {
+		return fmt.Errorf("invalid XML tag name: %q", key)
+	}
+
 	// per issue #48, 18apr18 - try and coerce maps to map[string]interface{}
 	// Don't need for mapToXmlSeqIndent, since maps there are decoded by NewMapXmlSeq().
 	if reflect.ValueOf(value).Kind() == reflect.Map {
@@ -1088,6 +1092,10 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 		var ss string
 		for k, v := range vv {
 			if lenAttrPrefix > 0 && lenAttrPrefix < len(k) && k[:lenAttrPrefix] == attrPrefix {
+				attrName := k[lenAttrPrefix:]
+				if !validXmlName(attrName) {
+					return fmt.Errorf("invalid XML attribute name: %q", attrName)
+				}
 				switch v.(type) {
 				case string:
 					if xmlEscapeChars {
@@ -1095,10 +1103,10 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 					} else {
 						ss = v.(string)
 					}
-					attrlist[n][0] = k[lenAttrPrefix:]
+					attrlist[n][0] = attrName
 					attrlist[n][1] = ss
 				case float64, bool, int, int32, int64, float32, json.Number:
-					attrlist[n][0] = k[lenAttrPrefix:]
+					attrlist[n][0] = attrName
 					attrlist[n][1] = fmt.Sprintf("%v", v)
 				case []byte:
 					if xmlEscapeChars {
@@ -1106,7 +1114,7 @@ func marshalMapToXmlIndent(doIndent bool, b *bytes.Buffer, key string, value int
 					} else {
 						ss = string(v.([]byte))
 					}
-					attrlist[n][0] = k[lenAttrPrefix:]
+					attrlist[n][0] = attrName
 					attrlist[n][1] = ss
 				default:
 					return fmt.Errorf("invalid attribute value for: %s:<%T>", k, v)

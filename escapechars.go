@@ -91,3 +91,26 @@ func XMLEscapeCharsDecoder(b ...bool) {
 		xmlEscapeChars = false
 	}
 }
+
+// validXmlName reports whether s is safe to emit, unquoted and
+// unescaped, as an XML element or attribute name.
+//
+// Unlike element/attribute *values*, which escapeChars() can make safe by
+// entity-encoding, a *name* is never entity-decoded by an XML parser, so
+// escaping can't neutralize a structural character here - the only safe
+// options are to reject it or strip it. Map keys become element and
+// attribute names verbatim (see marshalMapToXmlIndent / mapToXmlSeqIndent),
+// so an attacker-controlled key containing any of these characters can
+// close the current tag/attribute and inject arbitrary markup.
+func validXmlName(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		switch r {
+		case '<', '>', '&', '"', '\'', '=', '/', ' ', '\t', '\n', '\r':
+			return false
+		}
+	}
+	return true
+}

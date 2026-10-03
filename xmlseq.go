@@ -611,6 +611,10 @@ func mapToXmlSeqIndent(doIndent bool, sb *strings.Builder, key string, value int
 	var ss string
 	p := &pretty{pp.indent, pp.cnt, pp.padding, pp.mapDepth, pp.start}
 
+	if !validXmlName(key) {
+		return fmt.Errorf("invalid XML tag name: %q", key)
+	}
+
 	switch value.(type) {
 	case map[string]interface{}, []byte, string, float64, bool, int, int32, int64, float32:
 		if doIndent {
@@ -665,6 +669,9 @@ func mapToXmlSeqIndent(doIndent bool, sb *strings.Builder, key string, value int
 			sort.Sort(elemListSeq(kv))
 			// Now encode the attributes in original decoding sequence, using keyval array.
 			for _, a := range kv {
+				if !validXmlName(a.k) {
+					return fmt.Errorf("invalid XML attribute name: %q", a.k)
+				}
 				vv := a.v.(map[string]interface{})
 				switch vv[textK].(type) {
 				case string:
