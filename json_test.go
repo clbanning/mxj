@@ -2,8 +2,10 @@ package mxj
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 	"testing"
 )
 
@@ -134,4 +136,144 @@ func TestJsonWriter(t *testing.T) {
 
 	fmt.Println("JsonWriter, raw:", string(raw))
 	fmt.Println("JsonWriter, b  :", string(b))
+}
+
+func TestJsonLiteralEscapes(t *testing.T) {
+	maps := []Map{
+		{"value": `\u003c`},
+		{"value": `\u003e`},
+		{"value": `\u0026`},
+		{`\u003c\u003e\u0026`: "escaped key"},
+		{"nested": Map{"values": []interface{}{`\\u003c`, `before \u003e after`, `\u0026 <>&`}}},
+		{"value": `<>&`},
+		{"value": `\<\>\&`},
+		{"value": "quotes: \" and newline: \n and separators: \u2028\u2029"},
+		{},
+		nil,
+	}
+	options := []struct {
+		name string
+		args []bool
+	}{
+		{"default", nil},
+		{"false", []bool{false}},
+		{"true", []bool{true}},
+		{"multiple", []bool{true, true}},
+	}
+	encoders := []struct {
+		name string
+		call func(Map, []bool) ([]byte, error)
+	}{
+		{"Json", func(m Map, args []bool) ([]byte, error) { return m.Json(args...) }},
+		{"JsonIndent", func(m Map, args []bool) ([]byte, error) { return m.JsonIndent("", "  ", args...) }},
+		{"JsonWriter", func(m Map, args []bool) ([]byte, error) {
+			var buf bytes.Buffer
+			err := m.JsonWriter(&buf, args...)
+			return buf.Bytes(), err
+		}},
+		{"JsonWriterRaw", func(m Map, args []bool) ([]byte, error) {
+			var buf bytes.Buffer
+			b, err := m.JsonWriterRaw(&buf, args...)
+			if !bytes.Equal(b, buf.Bytes()) {
+				t.Errorf("JsonWriterRaw returned %q but wrote %q", b, buf.Bytes())
+			}
+			return b, err
+		}},
+		{"JsonIndentWriter", func(m Map, args []bool) ([]byte, error) {
+			var buf bytes.Buffer
+			err := m.JsonIndentWriter(&buf, "", "  ", args...)
+			return buf.Bytes(), err
+		}},
+		{"JsonIndentWriterRaw", func(m Map, args []bool) ([]byte, error) {
+			var buf bytes.Buffer
+			b, err := m.JsonIndentWriterRaw(&buf, "", "  ", args...)
+			if !bytes.Equal(b, buf.Bytes()) {
+				t.Errorf("JsonIndentWriterRaw returned %q but wrote %q", b, buf.Bytes())
+			}
+			return b, err
+		}},
+	}
+	for _, encoder := range encoders {
+		for _, option := range options {
+			t.Run(encoder.name+"/"+option.name, func(t *testing.T) {
+				for _, m := range maps {
+					b, err := encoder.call(m, option.args)
+					if err != nil {
+						t.Fatal(err)
+					}
+					var decoded Map
+					if err := json.Unmarshal(b, &decoded); err != nil {
+						t.Errorf("invalid JSON for %#v: %q: %v", m, b, err)
+						continue
+					}
+					want, err := json.Marshal(m)
+					if err != nil {
+						t.Fatal(err)
+					}
+					var expected Map
+					if err := json.Unmarshal(want, &expected); err != nil {
+						t.Fatal(err)
+					}
+					if !reflect.DeepEqual(decoded, expected) {
+						t.Errorf("decoded %#v, want %#v", decoded, expected)
+					}
+					if bytes.HasSuffix(b, []byte("\n")) {
+						t.Errorf("unexpected trailing newline: %q", b)
+					}
+				}
+			})
+		}
+	}
+}
+
+func TestJsonEncodingCompatibility(t *testing.T) {
+	m := Map{"html": `<>&`, "literal": `\u003c\u003e\u0026`, "nested": Map{"value": "line\ntext"}}
+	safe, err := m.Json(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantSafe, err := json.Marshal(m)
+	if err != nil || !bytes.Equal(safe, wantSafe) {
+		t.Fatalf("safe JSON = %q, want %q, error = %v", safe, wantSafe, err)
+	}
+	unsafe, err := m.Json()
+	if err != nil || !bytes.Contains(unsafe, []byte(`"html":"<>&"`)) {
+		t.Fatalf("default JSON = %q, error = %v", unsafe, err)
+	}
+	for _, format := range []struct{ prefix, indent string }{
+		{"", ""}, {"", "  "}, {"", "\t"}, {"> ", "  "}, {`\u003c`, `\u0026`},
+	} {
+		for _, safeEncoding := range []bool{false, true} {
+			compact, err := m.Json(safeEncoding)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var expected bytes.Buffer
+			if err := json.Indent(&expected, compact, format.prefix, format.indent); err != nil {
+				t.Fatal(err)
+			}
+			b, err := m.JsonIndent(format.prefix, format.indent, safeEncoding)
+			if err != nil || !bytes.Equal(b, expected.Bytes()) {
+				t.Errorf("prefix %q, indent %q, safe %v: got %q, want %q, error %v",
+					format.prefix, format.indent, safeEncoding, b, expected.Bytes(), err)
+			}
+			if safeEncoding {
+				want, err := json.MarshalIndent(m, format.prefix, format.indent)
+				if err != nil || !bytes.Equal(b, want) {
+					t.Errorf("safe indent = %q, want %q, error = %v", b, want, err)
+				}
+			}
+		}
+	}
+	for _, args := range [][]bool{nil, {false}, {true}} {
+		invalid := Map{"value": make(chan int)}
+		b, err := invalid.Json(args...)
+		if err == nil || b != nil {
+			t.Errorf("unsupported value: got %q, error %v", b, err)
+		}
+		b, err = invalid.JsonIndent("", "  ", args...)
+		if err == nil || b != nil {
+			t.Errorf("unsupported indented value: got %q, error %v", b, err)
+		}
+	}
 }

@@ -23,32 +23,27 @@ func (mv Map) Json(safeEncoding ...bool) ([]byte, error) {
 		s = safeEncoding[0]
 	}
 
-	b, err := json.Marshal(mv)
-
-	if !s {
-		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
-		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
-		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(s)
+	if err := enc.Encode(mv); err != nil {
+		return nil, err
 	}
-	return b, err
+	b := buf.Bytes()
+	return b[:len(b)-1], nil
 }
 
 // Just a wrapper on json.MarshalIndent.
 // If option safeEncoding is'true' then safe encoding of '<' , '>' and '&'
 // is preserved. (see encoding/json#Marshal, encoding/json#Encode)
 func (mv Map) JsonIndent(prefix, indent string, safeEncoding ...bool) ([]byte, error) {
-	var s bool
-	if len(safeEncoding) == 1 {
-		s = safeEncoding[0]
+	b, err := mv.Json(safeEncoding...)
+	if err != nil {
+		return b, err
 	}
-
-	b, err := json.MarshalIndent(mv, prefix, indent)
-	if !s {
-		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
-		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
-		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
-	}
-	return b, err
+	var buf bytes.Buffer
+	err = json.Indent(&buf, b, prefix, indent)
+	return buf.Bytes(), err
 }
 
 // The following implementation is provided for symmetry with NewMapJsonReader[Raw]
